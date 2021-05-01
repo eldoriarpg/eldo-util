@@ -18,7 +18,7 @@ Maven
 ``` xml
 <repository>
     <id>EldoNexus</id>
-    <url>https://eldonexus.de</url>
+    <url>https://eldonexus.de/repository/maven-releases/</url>
 </repository>
 
 <dependency>
@@ -27,4 +27,3 @@ Maven
     <version>version</version>
 </dependency>
 ```
-
