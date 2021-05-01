@@ -4,11 +4,24 @@ import de.eldoria.eldoutilities.debug.DebugSettings;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import org.bukkit.plugin.Plugin;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Scanner;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,7 +51,9 @@ public class LogMeta extends LogData {
     /**
      * Gets the latest log from the logs directory.
      *
-     * @param plugin plugin for pure lazyness and logging purposes
+     * @param plugin   plugin for pure lazyness and logging purposes
+     * @param settings settings for debug dispatching
+     *
      * @return Log as string.
      */
     public static LogData create(Plugin plugin, DebugSettings settings) {
@@ -63,8 +78,9 @@ public class LogMeta extends LogData {
                         // first we grab the start
                         if (start.size() < MAX_LOG_PART_SIZE) {
                             start.add(reader.nextLine());
-                            if (start.size() == MAX_LOG_PART_SIZE)
+                            if (start.size() == MAX_LOG_PART_SIZE) {
                                 pluginLog.addAll(extractPluginLog(start, plugin));
+                            }
                             continue;
                         }
                         // Now we build chunks and use a fixed stack where we push the oldest size exceeding entry out.

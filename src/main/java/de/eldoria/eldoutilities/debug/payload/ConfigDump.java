@@ -29,6 +29,7 @@ public class ConfigDump extends EntryData {
      * Creates a new config dump. This dump will include external configs as well if the plugin is a {@link EldoCommand}.
      *
      * @param plugin plugin to dump teh configs
+     * @param settings settings for debug dispatching
      * @return configs as an array.
      */
     public static EntryData[] create(Plugin plugin, DebugSettings settings) {
