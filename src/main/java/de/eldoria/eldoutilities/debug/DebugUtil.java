@@ -22,7 +22,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -40,8 +47,9 @@ public final class DebugUtil {
      * <p>
      * It will also send it to the butler instance and will send the links to the sender.
      *
-     * @param sender sender which requested the data
-     * @param plugin plugin to collect the data for
+     * @param sender   sender which requested the data
+     * @param plugin   plugin to collect the data for
+     * @param settings settings for debug dispatching
      */
     public static void dispatchDebug(CommandSender sender, Plugin plugin, DebugSettings settings) {
         ConfigFileWrapper config = EldoUtilities.getConfiguration();
@@ -90,6 +98,7 @@ public final class DebugUtil {
      * If the plugin is not a eldo plugin it will return an empty array.
      *
      * @param plugin plugin to get meta
+     *
      * @return array with meta data. may be empty, but not null.
      */
     public static @NotNull EntryData[] getAdditionalPluginMeta(Plugin plugin) {

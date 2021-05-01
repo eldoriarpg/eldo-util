@@ -92,10 +92,23 @@ public interface MessageChannel<T extends ChannelData> {
         }
     };
 
+    public static MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<ChannelData>() {
+        @Override
+        public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
+            Bukkit.broadcastMessage(message);
+        }
+
+        @Override
+        public String addPrefix(String message, String prefix) {
+            return prefix + message;
+        }
+    });
+
     /**
      * Get a default channel by name.
      *
      * @param name name of channel not case sensitive
+     *
      * @return channel or {@link #CHAT} if channel is not found or name is null
      */
     public static @NotNull MessageChannel<? extends ChannelData> getChannelByNameOrDefault(@Nullable String name) {
@@ -106,6 +119,7 @@ public interface MessageChannel<T extends ChannelData> {
      * Get a default channel by name.
      *
      * @param name name of channel not case sensitive
+     *
      * @return channel or null if name is null or no matching channel is found
      */
     public static @Nullable MessageChannel<? extends ChannelData> getChannelByName(@Nullable String name) {
@@ -126,6 +140,9 @@ public interface MessageChannel<T extends ChannelData> {
         }
         if ("BOSS_BAR".equalsIgnoreCase(name)) {
             return BOSS_BAR;
+        }
+        if ("BROADCAST".equalsIgnoreCase(name)) {
+            return BROADCAST;
         }
 
         return null;
