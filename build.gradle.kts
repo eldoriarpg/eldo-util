@@ -10,7 +10,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebade = group as String? + "." + mainPackage + "."
-version = "1.8.3"
+version = "1.8.4"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    api("org.bstats", "bstats-bukkit", "2.2.1")
+    implementation("org.bstats", "bstats-bukkit", "2.2.1")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:19.0.0")
 
