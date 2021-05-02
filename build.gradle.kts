@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "de.eldoria"
-version = "1.8.1"
+version = "1.8.2"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
