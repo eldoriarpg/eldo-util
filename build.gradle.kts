@@ -8,7 +8,9 @@ plugins {
 }
 
 group = "de.eldoria"
-version = "1.8.2"
+var mainPackage = "eldoutilities"
+val shadebade = group as String? + "." + mainPackage + "."
+version = "1.8.3"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -17,11 +19,10 @@ repositories {
     maven {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
     }
-
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "2.2.1")
+    api("org.bstats", "bstats-bukkit", "2.2.1")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains:annotations:19.0.0")
 
@@ -39,7 +40,9 @@ java {
 
 publishing {
     publications.create<MavenPublication>("maven") {
-        from(components["java"])
+        artifact(tasks["shadowJar"])
+        artifact(tasks["sourcesJar"])
+        artifact(tasks["javadocJar"])
         groupId = project.group as String?
         artifactId = project.name
         version = project.version as String?
@@ -75,7 +78,11 @@ tasks.test {
     }
 }
 
+
+
 tasks.named<ShadowJar>("shadowJar") {
-    relocate("org.bstats", "de.eldoria.eldoutilitites.bstats")
+    relocate("org.bstats", shadebade + "bstats")
     mergeServiceFiles()
+    archiveClassifier.set("")
+    //archiveFileName.set("${archiveBaseName}-${archiveVersion}.${archiveExtension}")
 }
