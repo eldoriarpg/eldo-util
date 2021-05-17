@@ -2,7 +2,7 @@ package de.eldoria.eldoutilities.serialization;
 
 import com.google.common.collect.ObjectArrays;
 import de.eldoria.eldoutilities.core.EldoUtilities;
-import de.eldoria.eldoutilities.serialization.util.MapEntry;
+import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;

@@ -7,8 +7,8 @@ import de.eldoria.eldoutilities.crossversion.functionbuilder.VersionFunctionBuil
 import de.eldoria.eldoutilities.inventory.InventoryActionHandler;
 import de.eldoria.eldoutilities.messages.MessageChannel;
 import de.eldoria.eldoutilities.scheduling.DelayedActions;
-import de.eldoria.eldoutilities.serialization.util.ArmorStandWrapper;
-import de.eldoria.eldoutilities.serialization.util.MapEntry;
+import de.eldoria.eldoutilities.serialization.wrapper.ArmorStandWrapper;
+import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import de.eldoria.eldoutilities.threading.AsyncSyncingCallbackExecutor;
 import org.bukkit.Bukkit;
@@ -102,7 +102,7 @@ public final class EldoUtilities {
             NamespacedKey key = bar.getKey();
             if (!key.getNamespace().equalsIgnoreCase(instanceOwner.getName())) continue;
             if (key.getKey().startsWith(MessageChannel.KEY_PREFIX)) {
-                logger().config("Removed boss bar with key" + key.toString());
+                logger().config("Removed boss bar with key" + key);
                 bar.removeAll();
                 Bukkit.removeBossBar(key);
             }

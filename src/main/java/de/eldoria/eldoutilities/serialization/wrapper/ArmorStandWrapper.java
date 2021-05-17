@@ -1,7 +1,8 @@
-package de.eldoria.eldoutilities.serialization.util;
+package de.eldoria.eldoutilities.serialization.wrapper;
 
 import de.eldoria.eldoutilities.entity.EntityBuilder;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import org.bukkit.Location;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.entity.ArmorStand;

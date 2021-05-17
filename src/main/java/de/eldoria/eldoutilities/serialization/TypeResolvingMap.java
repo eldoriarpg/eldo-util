@@ -1,6 +1,6 @@
 package de.eldoria.eldoutilities.serialization;
 
-import de.eldoria.eldoutilities.serialization.util.MapEntry;
+import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.utils.EnumUtil;
 import org.jetbrains.annotations.NotNull;
 

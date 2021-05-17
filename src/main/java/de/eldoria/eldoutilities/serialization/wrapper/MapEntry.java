@@ -1,6 +1,7 @@
-package de.eldoria.eldoutilities.serialization.util;
+package de.eldoria.eldoutilities.serialization.wrapper;
 
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
 

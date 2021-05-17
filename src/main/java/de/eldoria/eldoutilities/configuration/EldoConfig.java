@@ -1,7 +1,7 @@
 package de.eldoria.eldoutilities.configuration;
 
 import de.eldoria.eldoutilities.core.EldoUtilities;
-import de.eldoria.eldoutilities.serialization.util.MapEntry;
+import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.utils.ObjUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.configuration.ConfigurationSection;
