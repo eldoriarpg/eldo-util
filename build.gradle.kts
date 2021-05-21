@@ -10,7 +10,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebade = group as String? + "." + mainPackage + "."
-version = "1.8.5"
+version = "1.8.6"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
