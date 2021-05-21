@@ -9,16 +9,27 @@ import java.util.function.Consumer;
 
 // proudly stolen from https://github.com/lucko/synapse/tree/master
 public interface FutureResult<T> {
+    /**
+     * Attaches a completion callback to this {@link FutureResult}.
+     * <p>
+     * If the action is already complete, the runnable will be called immediately.
+     * <p>
+     * If it is not complete, the consumer will be called synchronously using
+     * the Bukkit scheduler when the action is completed.</p>
+     *
+     * @param callback the callback
+     */
+    void whenComplete(@NotNull Consumer<? super T> callback);
 
     /**
      * Attaches a completion callback to this {@link FutureResult}.
-     *
-     * <p>If the action is already complete, the runnable will be called immediately.</p>
-     *
-     * <p>If it is not complete, the consumer will be called synchronously using
+     * <p>
+     * If the action is already complete, the runnable will be called immediately.
+     * <p>
+     * If it is not complete, the consumer will be called synchronously using
      * the Bukkit scheduler when the action is completed.</p>
      *
-     * @param plugin   a plugin instance to use when running the callback
+     * @param plugin   used for callback.
      * @param callback the callback
      */
     void whenComplete(@NotNull Plugin plugin, @NotNull Consumer<? super T> callback);
