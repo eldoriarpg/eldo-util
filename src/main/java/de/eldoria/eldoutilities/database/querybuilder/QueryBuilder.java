@@ -2,7 +2,8 @@ package de.eldoria.eldoutilities.database.querybuilder;
 
 import de.eldoria.eldoutilities.consumer.ThrowingConsumer;
 import de.eldoria.eldoutilities.functions.ThrowingFunction;
-import de.eldoria.eldoutilities.threading.BukkitAsyncAction;
+import de.eldoria.eldoutilities.threading.futures.CompletableBukkitFuture;
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 import org.bukkit.plugin.Plugin;
 
 import javax.sql.DataSource;
@@ -13,6 +14,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
 public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage {
@@ -25,9 +28,9 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     /**
      * Create a neq query builder
      *
-     * @param plugin plugin of query builder
+     * @param plugin     plugin of query builder
      * @param dataSource data source to use
-     * @param clazz clazz of result
+     * @param clazz      clazz of result
      */
     public QueryBuilder(Plugin plugin, DataSource dataSource, Class<T> clazz) {
         this.plugin = plugin;
@@ -62,8 +65,13 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     }
 
     @Override
-    public BukkitAsyncAction<List<T>> retrieveResultsAsync() {
-        return BukkitAsyncAction.supplyAsync(plugin, this::retrieveResults);
+    public BukkitFutureResult<List<T>> retrieveResultsAsync() {
+        return CompletableBukkitFuture.supplyAsync(this::retrieveResults);
+    }
+
+    @Override
+    public BukkitFutureResult<List<T>> retrieveResultsAsync(Executor executor) {
+        return CompletableBukkitFuture.supplyAsync(this::retrieveResults, executor);
     }
 
     @Override
@@ -82,8 +90,13 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     }
 
     @Override
-    public BukkitAsyncAction<Optional<T>> retrieveResultAsync() {
-        return BukkitAsyncAction.supplyAsync(plugin, this::retrieveResult);
+    public BukkitFutureResult<Optional<T>> retrieveResultAsync() {
+        return CompletableBukkitFuture.supplyAsync(this::retrieveResult);
+    }
+
+    @Override
+    public BukkitFutureResult<Optional<T>> retrieveResultAsync(Executor executor) {
+        return CompletableBukkitFuture.supplyAsync(this::retrieveResult, executor);
     }
 
     @Override
@@ -111,8 +124,13 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     }
 
     @Override
-    public BukkitAsyncAction<Integer> executeUpdateAsync() {
-        return BukkitAsyncAction.supplyAsync(plugin, this::executeUpdate);
+    public BukkitFutureResult<Integer> executeUpdateAsync() {
+        return BukkitFutureResult.of(CompletableFuture.supplyAsync(this::executeUpdate));
+    }
+
+    @Override
+    public BukkitFutureResult<Integer> executeUpdateAsync(Executor executor) {
+        return BukkitFutureResult.of(CompletableFuture.supplyAsync(this::executeUpdate, executor));
     }
 
     @Override

@@ -1,9 +1,10 @@
 package de.eldoria.eldoutilities.database.querybuilder;
 
-import de.eldoria.eldoutilities.threading.BukkitAsyncAction;
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 
 public interface RetrievalStage<T> {
     /**
@@ -11,7 +12,15 @@ public interface RetrievalStage<T> {
      *
      * @return async execution action
      */
-    BukkitAsyncAction<List<T>> retrieveResultsAsync();
+    BukkitFutureResult<List<T>> retrieveResultsAsync();
+
+    /**
+     * Retrieve all results async as a list
+     *
+     * @param executor the executor used for async call
+     * @return async execution action
+     */
+    BukkitFutureResult<List<T>> retrieveResultsAsync(Executor executor);
 
     /**
      * Retrieve all results synced as a list
@@ -25,7 +34,15 @@ public interface RetrievalStage<T> {
      *
      * @return bukkit action which returns a result wrapped into an optional
      */
-    BukkitAsyncAction<Optional<T>> retrieveResultAsync();
+    BukkitFutureResult<Optional<T>> retrieveResultAsync();
+
+    /**
+     * Retrieve the first result from the results set async
+     *
+     * @param executor the executor used for async call
+     * @return bukkit action which returns a result wrapped into an optional
+     */
+    BukkitFutureResult<Optional<T>> retrieveResultAsync(Executor executor);
 
     /**
      * Retrieve the first result from the results set synced

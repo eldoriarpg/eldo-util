@@ -1,6 +1,8 @@
 package de.eldoria.eldoutilities.database.querybuilder;
 
-import de.eldoria.eldoutilities.threading.BukkitAsyncAction;
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
+
+import java.util.concurrent.Executor;
 
 public interface UpdateStage {
     /**
@@ -8,7 +10,14 @@ public interface UpdateStage {
      *
      * @return bukkit action which returns the number of changed rows
      */
-    BukkitAsyncAction<Integer> executeUpdateAsync();
+    BukkitFutureResult<Integer> executeUpdateAsync();
+    /**
+     * Execute the update async.
+     *
+     * @param executor executor used for async call
+     * @return bukkit action which returns the number of changed rows
+     */
+    BukkitFutureResult<Integer> executeUpdateAsync(Executor executor);
 
     /**
      * Execute the update synced.

@@ -18,7 +18,7 @@ class QueryBuilderTest {
                 .setStatements(stmt -> stmt.setString(1, "foo"))
                 .extractResults(rs -> rs.getString("something"))
                 .retrieveResultAsync()
-                .queue(result -> {
+                .whenComplete(result -> {
                     Optional<String> rs = result;
                 });
     }
@@ -38,7 +38,7 @@ class QueryBuilderTest {
                 .setStatements(stmt -> stmt.setString(1, "foo"))
                 .extractResults(rs -> rs.getString("something"))
                 .retrieveResultAsync()
-                .queue(results -> {
+                .whenComplete(results -> {
                     // do something
                 });
     }
@@ -69,16 +69,14 @@ class QueryBuilderTest {
                     stmt.setString(2, "some");
                 })
                 .update()
-                .executeUpdateAsync()
-                .queue();
+                .executeUpdateAsync();
 
         // Without statements
         builder(null)
                 .setQuery("DELETE FROM table")
                 .emptyStatements()
                 .update()
-                .executeUpdateAsync()
-                .queue();
+                .executeUpdateAsync();
     }
 
     private <T> QueryStage<T> builder(Class<T> clazz) {
