@@ -1,16 +1,15 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     id("com.github.johnrengelman.shadow") version "6.0.0"
     java
     `maven-publish`
     `java-library`
 }
+val publishData = PublishData(project)
 
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebade = group as String? + "." + mainPackage + "."
- version = "1.8.7-SNAPSHOT"
+version = "1.8.7"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
@@ -45,15 +44,11 @@ publishing {
         artifact(tasks["javadocJar"])
         groupId = project.group as String?
         artifactId = project.name
-        version = project.version as String?
+        version = publishData.getVersion()
     }
 
     repositories {
         maven {
-            val isSnapshot = version.toString().endsWith("SNAPSHOT");
-            val release = "https://eldonexus.de/repository/maven-releases/";
-            val snapshot = "https://eldonexus.de/repository/maven-snapshots/";
-
             authentication {
                 credentials(PasswordCredentials::class) {
                     username = System.getenv("NEXUS_USERNAME")
@@ -62,27 +57,60 @@ publishing {
             }
 
             name = "EldoNexus"
-            url = uri(if (isSnapshot) snapshot else release)
+            url = uri(publishData.getRepository())
         }
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
-
-tasks.test {
-    useJUnitPlatform()
-    testLogging {
-        events("passed", "skipped", "failed")
+tasks {
+    compileJava {
+        options.encoding = "UTF-8"
     }
-}
-
-
-
-tasks.named<ShadowJar>("shadowJar") {
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
+    }
+    shadowJar{
     relocate("org.bstats", shadebade + "bstats")
     mergeServiceFiles()
     archiveClassifier.set("")
-    //archiveFileName.set("${archiveBaseName}-${archiveVersion}.${archiveExtension}")
+    }
+}
+
+class PublishData(private val project: Project) {
+    var type: Type = getReleaseType()
+    var hashLength: Int = 7
+
+    private fun getReleaseType(): Type {
+        val branch = getCheckedOutBranch()
+        return when {
+            branch.contentEquals("master") -> Type.RELEASE
+            branch.startsWith("dev") -> Type.DEV
+            else -> Type.SNAPSHOT
+        }
+    }
+
+    private fun getCheckedOutGitCommitHash(): String = System.getenv("GITHUB_SHA")?.substring(0, hashLength) ?: "local"
+
+    private fun getCheckedOutBranch(): String = System.getenv("GITHUB_REF")?.replace("refs/heads/", "") ?: "local"
+
+    fun getVersion(): String = getVersion(false)
+
+    fun getVersion(appendCommit: Boolean): String =
+        type.append(getVersionString(), appendCommit, getCheckedOutGitCommitHash())
+
+    private fun getVersionString(): String = (project.version as String).replace("-SNAPSHOT", "").replace("-DEV", "")
+
+    fun getRepository(): String = type.repo
+
+    enum class Type(private val append: String, val repo: String, private val addCommit: Boolean) {
+        RELEASE("", "https://eldonexus.de/repository/maven-releases/", false),
+        DEV("-DEV", "https://eldonexus.de/repository/maven-dev/", true),
+        SNAPSHOT("-SNAPSHOT", "https://eldonexus.de/repository/maven-snapshots/", true);
+
+        fun append(name: String, appendCommit: Boolean, commitHash: String): String =
+            name.plus(append).plus(if (appendCommit && addCommit) "-".plus(commitHash) else "")
+    }
 }
