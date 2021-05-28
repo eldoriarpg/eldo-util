@@ -6,7 +6,7 @@
 Gradle
 ``` kotlin
 repositories {
-    maven { url = uri("https://eldonexus.de/repository/maven-releases") }
+    maven("https://eldonexus.de/repository/maven-public")
 }
 
 dependencies {
@@ -18,7 +18,7 @@ Maven
 ``` xml
 <repository>
     <id>EldoNexus</id>
-    <url>https://eldonexus.de/repository/maven-releases/</url>
+    <url>https://eldonexus.de/repository/maven-public/</url>
 </repository>
 
 <dependency>
