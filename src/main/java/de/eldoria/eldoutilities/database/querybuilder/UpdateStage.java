@@ -4,7 +4,7 @@ import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 
 import java.util.concurrent.Executor;
 
-public interface UpdateStage {
+public interface UpdateStage<T> {
     /**
      * Execute the update async.
      *

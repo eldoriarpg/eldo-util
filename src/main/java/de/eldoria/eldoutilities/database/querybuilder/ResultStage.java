@@ -22,14 +22,14 @@ public interface ResultStage<T> {
      *
      * @return update stage
      */
-    UpdateStage update();
+    UpdateStage<T> update();
 
     /**
      * Mark this query as deletion query. Alias for {@link #update()}
      *
      * @return update stage
      */
-    default UpdateStage delete() {
+    default UpdateStage<T> delete() {
         return update();
     }
 
@@ -38,7 +38,7 @@ public interface ResultStage<T> {
      *
      * @return update stage
      */
-    default UpdateStage insert() {
+    default UpdateStage<T> insert() {
         return update();
     }
 }

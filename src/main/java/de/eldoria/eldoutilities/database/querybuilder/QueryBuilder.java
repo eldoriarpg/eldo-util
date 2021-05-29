@@ -1,6 +1,7 @@
 package de.eldoria.eldoutilities.database.querybuilder;
 
 import de.eldoria.eldoutilities.consumer.ThrowingConsumer;
+import de.eldoria.eldoutilities.database.DBUtil;
 import de.eldoria.eldoutilities.functions.ThrowingFunction;
 import de.eldoria.eldoutilities.threading.futures.CompletableBukkitFuture;
 import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
@@ -18,7 +19,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
-public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage {
+public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage<T> {
     private final Plugin plugin;
     private final DataSource dataSource;
     private String query;
@@ -26,7 +27,7 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     ThrowingFunction<T, ResultSet, SQLException> resultMapper;
 
     /**
-     * Create a neq query builder
+     * Create a new query builder
      *
      * @param plugin     plugin of query builder
      * @param dataSource data source to use
@@ -60,7 +61,7 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     }
 
     @Override
-    public UpdateStage update() {
+    public UpdateStage<T> update() {
         return this;
     }
 
@@ -114,14 +115,9 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     }
 
     public void logDbError(SQLException e) {
-        plugin.getLogger().log(Level.SEVERE, "An SQL query occured:\n" + prettyException(e), e);
+        plugin.getLogger().log(Level.SEVERE, "An SQL query occured:\n" + DBUtil.prettyException(e), e);
     }
 
-    public static String prettyException(SQLException ex) {
-        return "SQLException: " + ex.getMessage() + "\n"
-                + "SQLState: " + ex.getSQLState() + "\n"
-                + "VendorError: " + ex.getErrorCode();
-    }
 
     @Override
     public BukkitFutureResult<Integer> executeUpdateAsync() {
