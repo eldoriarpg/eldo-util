@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.threading;
 
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -10,6 +11,11 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+/**
+ * @param <T> type of action
+ * @deprecated Use {@link BukkitFutureResult} instead.
+ */
+@Deprecated
 public final class BukkitAsyncAction<T> {
     private static final BukkitScheduler SCHEDULER = Bukkit.getScheduler();
     private static ExecutorService executor = Executors.newCachedThreadPool();

@@ -5,6 +5,7 @@ import de.eldoria.eldoutilities.database.querybuilder.QueryStage;
 import org.bukkit.plugin.Plugin;
 
 import javax.sql.DataSource;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 
@@ -29,12 +30,10 @@ public class QueryObject {
     }
 
     public void logDbError(String message, SQLException e) {
-        plugin.getLogger().log(Level.SEVERE, message + ":\n" + prettyException(e), e);
+        plugin.getLogger().log(Level.SEVERE, message + ":\n" + DBUtil.prettyException(e), e);
     }
 
-    public static String prettyException(SQLException ex) {
-        return "SQLException: " + ex.getMessage() + "\n"
-                + "SQLState: " + ex.getSQLState() + "\n"
-                + "VendorError: " + ex.getErrorCode();
+    protected Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
     }
 }
