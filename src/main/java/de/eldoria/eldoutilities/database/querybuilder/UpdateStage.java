@@ -16,6 +16,7 @@ public interface UpdateStage {
      * @return A {@link BukkitFutureResult} which returns the number of changed rows.
      */
     BukkitFutureResult<Integer> execute();
+
     /**
      * Execute the update async.
      *
@@ -26,6 +27,7 @@ public interface UpdateStage {
 
     /**
      * Execute the update synced.
+     *
      * @return Number of changed rows
      */
     int executeSync();
