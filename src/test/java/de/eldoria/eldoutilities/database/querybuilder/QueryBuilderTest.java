@@ -93,8 +93,6 @@ class QueryBuilderTest {
                 .whenComplete(id -> {
                     System.out.println("Inserted new entry with id " + id);
                 });
-
-
     }
 
     private <T> QueryStage<T> builder(Class<T> clazz) {

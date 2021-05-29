@@ -109,6 +109,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
      * @return true if the update was succesful.
      */
     protected boolean update() {
+
         return false;
     }
 
