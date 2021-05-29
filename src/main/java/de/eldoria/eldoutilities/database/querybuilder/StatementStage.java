@@ -7,20 +7,22 @@ import java.sql.SQLException;
 
 public interface StatementStage<T> {
     /**
-     * Set the statements for the query.
+     * Set the parameter of the {@link PreparedStatement} of the query.
      *
-     * @param stmt statement
-     * @return ResultStage
+     * @param stmt statement to change
+     * @return The {@link QueryBuilder} in a {@link ResultStage} with the parameters applied to the query.
      */
-    ResultStage<T> setStatements(ThrowingConsumer<PreparedStatement, SQLException> stmt);
+    ResultStage<T> params(ThrowingConsumer<PreparedStatement, SQLException> stmt);
 
     /**
-     * Set the statements for the query.
+     * Skip this stage and set no parameters in the query.
+     * <p>
+     * You can also call {@link QueryStage#queryWithoutParams(String)} on the previous {@link QueryStage} instead to avoid this step completely.
      *
-     * @return ResultStage
+     * @return The {@link QueryBuilder} in a {@link ResultStage} with no parameters set.
      */
-    default ResultStage<T> emptyStatements() {
-        return setStatements(s -> {
+    default ResultStage<T> emptyParams() {
+        return params(s -> {
         });
     }
 

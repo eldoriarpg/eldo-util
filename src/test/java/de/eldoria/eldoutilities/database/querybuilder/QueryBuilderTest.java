@@ -6,18 +6,18 @@ import java.util.Optional;
 class QueryBuilderTest {
     public void syncedResult() {
         Optional<String> syncedResult = builder(String.class)
-                .setQuery("SELECT something FROM table WHERE key = ?")
-                .setStatements(stmt -> stmt.setString(1, "foo"))
-                .extractResults(rs -> rs.getString("something"))
-                .retrieveResult();
+                .query("SELECT something FROM table WHERE key = ?")
+                .params(stmt -> stmt.setString(1, "foo"))
+                .readRow(rs -> rs.getString("something"))
+                .firstSync();
     }
 
     public void asyncResult() {
         builder(String.class)
-                .setQuery("SELECT something FROM table WHERE key = ?")
-                .setStatements(stmt -> stmt.setString(1, "foo"))
-                .extractResults(rs -> rs.getString("something"))
-                .retrieveResultAsync()
+                .query("SELECT something FROM table WHERE key = ?")
+                .params(stmt -> stmt.setString(1, "foo"))
+                .readRow(rs -> rs.getString("something"))
+                .first()
                 .whenComplete(result -> {
                     Optional<String> rs = result;
                 });
@@ -26,18 +26,18 @@ class QueryBuilderTest {
     public void syncedResults() {
         // Retrieve list of results synced
         List<String> syncedResults = builder(String.class)
-                .setQuery("SELECT something FROM table WHERE key = ?")
-                .setStatements(stmt -> stmt.setString(1, "foo"))
-                .extractResults(rs -> rs.getString("something"))
-                .retrieveResults();
+                .query("SELECT something FROM table WHERE key = ?")
+                .params(stmt -> stmt.setString(1, "foo"))
+                .readRow(rs -> rs.getString("something"))
+                .allSync();
     }
 
     public void asyncResults() {
         builder(String.class)
-                .setQuery("SELECT something FROM table WHERE key = ?")
-                .setStatements(stmt -> stmt.setString(1, "foo"))
-                .extractResults(rs -> rs.getString("something"))
-                .retrieveResultAsync()
+                .query("SELECT something FROM table WHERE key = ?")
+                .params(stmt -> stmt.setString(1, "foo"))
+                .readRow(rs -> rs.getString("something"))
+                .first()
                 .whenComplete(results -> {
                     // do something
                 });
@@ -45,38 +45,56 @@ class QueryBuilderTest {
 
     public void updateSynced() {
         builder(null)
-                .setQuery("UPDATE table SET col1 = ? WHERE key = ?")
-                .setStatements(stmt -> {
+                .query("UPDATE table SET col1 = ? WHERE key = ?")
+                .params(stmt -> {
                     stmt.setString(1, "newVal");
                     stmt.setString(2, "some");
                 })
                 .update()
-                .executeUpdate();
+                .executeSync();
 
         // Without statements
         builder(null)
-                .setQuery("DELETE FROM table")
-                .emptyStatements()
+                .query("DELETE FROM table")
+                .emptyParams()
                 .update()
-                .executeUpdate();
+                .executeSync();
     }
 
     public void updateAsync() {
         builder(null)
-                .setQuery("UPDATE table SET col1 = ? WHERE key = ?")
-                .setStatements(stmt -> {
+                .query("UPDATE table SET col1 = ? WHERE key = ?")
+                .params(stmt -> {
                     stmt.setString(1, "newVal");
                     stmt.setString(2, "some");
                 })
                 .update()
-                .executeUpdateAsync();
+                .execute();
 
         // Without statements
         builder(null)
-                .setQuery("DELETE FROM table")
-                .emptyStatements()
+                .query("DELETE FROM table")
+                .emptyParams()
                 .update()
-                .executeUpdateAsync();
+                .execute();
+    }
+
+    public void updateAsyncAppend() {
+        builder(Long.class)
+                .query("INSERT INTO table(first, second) VALUES(?, ?)")
+                .params(stmt -> {
+                    stmt.setString(1, "newVal");
+                    stmt.setString(2, "some");
+                })
+                .append()
+                .queryWithoutParams("SELECT LAST_INSERT_ID()")
+                .readRow(r -> r.getLong(1))
+                .first()
+                .whenComplete(id -> {
+                    System.out.println("Inserted new entry with id " + id);
+                });
+
+
     }
 
     private <T> QueryStage<T> builder(Class<T> clazz) {
