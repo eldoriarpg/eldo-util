@@ -98,6 +98,6 @@ class QueryBuilderTest {
     }
 
     private <T> QueryStage<T> builder(Class<T> clazz) {
-        return QueryBuilder.builder(null, null, clazz);
+        return QueryBuilder.builder(null, null, clazz).configure(QueryBuilderConfig.DEFAULT);
     }
 }
