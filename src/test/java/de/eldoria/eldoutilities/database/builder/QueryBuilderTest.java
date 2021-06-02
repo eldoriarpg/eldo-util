@@ -1,4 +1,6 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder;
+
+import de.eldoria.eldoutilities.database.builder.stage.QueryStage;
 
 import java.util.List;
 import java.util.Optional;

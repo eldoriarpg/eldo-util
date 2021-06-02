@@ -1,4 +1,6 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder.stage;
+
+import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 
 public interface QueryStage<T> {
     /**

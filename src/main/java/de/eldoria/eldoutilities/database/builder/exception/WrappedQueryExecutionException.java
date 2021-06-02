@@ -1,11 +1,11 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder.exception;
 
 import java.sql.SQLException;
 
-public class QueryExecutionException extends SQLException {
+public class WrappedQueryExecutionException extends RuntimeException {
     private SQLException cause;
 
-    public QueryExecutionException(String message) {
+    public WrappedQueryExecutionException(String message) {
         super(message);
     }
 
@@ -20,12 +20,10 @@ public class QueryExecutionException extends SQLException {
         return super.initCause(cause);
     }
 
-    @Override
     public String getSQLState() {
         return cause.getSQLState();
     }
 
-    @Override
     public int getErrorCode() {
         return cause.getErrorCode();
     }
@@ -34,4 +32,5 @@ public class QueryExecutionException extends SQLException {
     public String getMessage() {
         return cause.getMessage();
     }
+
 }

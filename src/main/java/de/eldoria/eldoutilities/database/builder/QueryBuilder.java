@@ -1,7 +1,15 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder;
 
 import de.eldoria.eldoutilities.consumer.ThrowingConsumer;
 import de.eldoria.eldoutilities.database.DBUtil;
+import de.eldoria.eldoutilities.database.builder.exception.QueryExecutionException;
+import de.eldoria.eldoutilities.database.builder.exception.WrappedQueryExecutionException;
+import de.eldoria.eldoutilities.database.builder.stage.ConfigurationStage;
+import de.eldoria.eldoutilities.database.builder.stage.QueryStage;
+import de.eldoria.eldoutilities.database.builder.stage.ResultStage;
+import de.eldoria.eldoutilities.database.builder.stage.RetrievalStage;
+import de.eldoria.eldoutilities.database.builder.stage.StatementStage;
+import de.eldoria.eldoutilities.database.builder.stage.UpdateStage;
 import de.eldoria.eldoutilities.functions.ThrowingFunction;
 import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 import de.eldoria.eldoutilities.threading.futures.CompletableBukkitFuture;
@@ -22,21 +30,46 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
-public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage {
+/**
+ * This query builder can be used to execute one or more queries onto a database via a connection provided by a datasource.
+ * <p>
+ * The query builder is a stage organized object. Every call will be invoked on a stage of the same query builder.
+ * <p>
+ * You may execute as many updates as you want. You may only get the returned results of one query, which must be the last.
+ * <p>
+ * All methods which are not labeled with a {@code Sync} suffix will be executed in an async context. Async method will
+ * provide a callback via a {@link BukkitFutureResult}. This callback will be executed by the bukkit main thread.
+ * <p>
+ * All queries will be executed in an atomic transaction. This means that data will be only written if all queries are executed successfully.
+ * This behaviour can be changed by calling {@link QueryBuilderConfig.Builder#notAtomic()} ()} on config creation.
+ * <p>
+ * Any exception thrown while executing queries will be wrapped into an {@link QueryExecutionException}. This exception
+ * was created on query submission to the query builder. Not that this is not the execution, which may be called on
+ * another thread. This exception will help you to trace back async calls.
+ * <p>
+ * Any {@link SQLException} thrown inside the query builder will not be thrown but logged by default.
+ *
+ * @param <T> type of query return type
+ */
+public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, StatementStage<T>, ResultStage<T>, RetrievalStage<T>, UpdateStage {
     private final Plugin plugin;
     private final DataSource dataSource;
     private final Queue<QueryTask> tasks = new ArrayDeque<>();
-    private final SQLException executionException;
 
     private String currQuery;
     private ThrowingConsumer<PreparedStatement, SQLException> currStatementConsumer;
     private ThrowingFunction<T, ResultSet, SQLException> currResultMapper;
-    private boolean atomic;
+
+    private QueryBuilderConfig config;
+
+    private final QueryExecutionException executionException;
+    private final WrappedQueryExecutionException wrappedExecutionException;
 
     private QueryBuilder(Plugin plugin, DataSource dataSource, Class<T> clazz) {
         this.plugin = plugin;
         this.dataSource = dataSource;
         executionException = new QueryExecutionException("An error occured while executing a query.");
+        wrappedExecutionException = new WrappedQueryExecutionException("An error occured while executing a query.");
     }
 
     /**
@@ -48,7 +81,7 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
      * @param <T>    type of return type
      * @return a new query builder in a {@link QueryStage}
      */
-    public static <T> QueryStage<T> builder(Plugin plugin, DataSource source, Class<T> clazz) {
+    public static <T> ConfigurationStage<T> builder(Plugin plugin, DataSource source, Class<T> clazz) {
         return new QueryBuilder<>(plugin, source, clazz);
     }
 
@@ -59,8 +92,22 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
      * @param source datasource for connection
      * @return a new query builder in a {@link QueryStage}
      */
-    public static QueryStage<?> builder(Plugin plugin, DataSource source) {
+    public static ConfigurationStage<?> builder(Plugin plugin, DataSource source) {
         return new QueryBuilder<>(plugin, source, null);
+    }
+
+    // CONFIGURATION STAGE
+
+    @Override
+    public QueryStage<T> configure(QueryBuilderConfig config) {
+        this.config = config;
+        return this;
+    }
+
+    @Override
+    public QueryStage<T> defaultConfig() {
+        config = QueryBuilderConfig.DEFAULT;
+        return this;
     }
 
     // QUERY STAGE
@@ -114,13 +161,7 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
 
     // RETRIEVAL STAGE
 
-    // LISTS
-
-    @Override
-    public RetrievalStage<T> notAtomic(boolean isAtomic) {
-        this.atomic = isAtomic;
-        return this;
-    }
+    // LISTS  RETRIEVAL
 
     @Override
     public BukkitFutureResult<List<T>> all() {
@@ -135,20 +176,19 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     @Override
     public List<T> allSync() {
         try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(!atomic);
+            autoCommit(conn);
             List<T> results = executeAndGetLast(conn).retrieveResults(conn);
-            if (atomic) {
-                conn.commit();
-            }
+            commit(conn);
             return results;
+        } catch (QueryExecutionException e) {
+            logDbError(e);
         } catch (SQLException e) {
-            executionException.initCause(e);
-            logDbError(executionException);
+            handleException(e);
         }
         return Collections.emptyList();
     }
 
-    // SINGLE
+    // SINGLE RETRIEVAL
 
     @Override
     public BukkitFutureResult<Optional<T>> first() {
@@ -163,14 +203,12 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     @Override
     public Optional<T> firstSync() {
         try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(!atomic);
-            Optional<T> t = executeAndGetLast(conn).retrieveResult(conn);
-            if (atomic) {
-                conn.commit();
-            }
-            return t;
+            autoCommit(conn);
+            Optional<T> result = executeAndGetLast(conn).retrieveResult(conn);
+            commit(conn);
+            return result;
         } catch (SQLException e) {
-            logDbError(e);
+            handleException(e);
         }
         return Optional.empty();
     }
@@ -190,23 +228,23 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
     @Override
     public int executeSync() {
         try (Connection conn = dataSource.getConnection()) {
-            conn.setAutoCommit(!atomic);
+            autoCommit(conn);
             int update = executeAndGetLast(conn).update(conn);
-            if (atomic) {
-                conn.commit();
-            }
+            commit(conn);
             return update;
         } catch (SQLException e) {
-            logDbError(e);
+            handleException(e);
         }
         return 0;
     }
+
 
     /*
     Execute all queries, since we are only interested in the result of the last of our queries.
     Thats why we will execute all queries inside this method regardless of the method which calls this method
     We will use a single connection for this, since the user may be interested in the last inserted id or something.
     */
+
     private QueryTask executeAndGetLast(Connection conn) throws SQLException {
         while (tasks.size() > 1) {
             tasks.poll().execute(conn);
@@ -214,21 +252,44 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
         return tasks.poll();
     }
 
-    public void logDbError(SQLException e) {
+    private void logDbError(SQLException e) {
         plugin.getLogger().log(Level.SEVERE, "An SQL query occured:\n" + DBUtil.prettyException(e), e);
+    }
+
+    private void handleException(SQLException e) {
+        if (config.isThrowing()) {
+            wrappedExecutionException.initCause(e);
+            throw wrappedExecutionException;
+        }
+        executionException.initCause(e);
+        logDbError(e);
+    }
+
+    private void autoCommit(Connection conn) throws SQLException {
+        conn.setAutoCommit(!config.isAtomic());
+    }
+
+    private void commit(Connection conn) throws SQLException {
+        if (config.isAtomic()) conn.commit();
     }
 
     private class QueryTask {
         private final String query;
         private final ThrowingConsumer<PreparedStatement, SQLException> statementConsumer;
         private final ThrowingFunction<T, ResultSet, SQLException> resultMapper;
-
+        private final QueryExecutionException executionException;
 
         public QueryTask(String currQuery, ThrowingConsumer<PreparedStatement, SQLException> statementConsumer,
                          ThrowingFunction<T, ResultSet, SQLException> resultMapper) {
             query = currQuery;
             this.statementConsumer = statementConsumer;
             this.resultMapper = resultMapper;
+            executionException = new QueryExecutionException("An error occured while executing a query.");
+        }
+
+        private void initAndThrow(SQLException e) throws SQLException {
+            executionException.initCause(e);
+            throw executionException;
         }
 
         public List<T> retrieveResults(Connection conn) throws SQLException {
@@ -239,6 +300,8 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
                 while (resultSet.next()) {
                     results.add(resultMapper.apply(resultSet));
                 }
+            } catch (SQLException e) {
+                initAndThrow(e);
             }
             return results;
         }
@@ -250,6 +313,8 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
                 if (resultSet.next()) {
                     return Optional.ofNullable(resultMapper.apply(resultSet));
                 }
+            } catch (SQLException e) {
+                initAndThrow(e);
             }
             return Optional.empty();
         }
@@ -258,6 +323,8 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
                 stmt.execute();
+            } catch (SQLException e) {
+                initAndThrow(e);
             }
         }
 
@@ -265,7 +332,10 @@ public class QueryBuilder<T> implements QueryStage<T>, StatementStage<T>, Result
             try (PreparedStatement stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
                 return stmt.executeUpdate();
+            } catch (SQLException e) {
+                initAndThrow(e);
             }
+            return 0;
         }
     }
 }

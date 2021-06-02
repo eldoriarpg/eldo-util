@@ -1,6 +1,7 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder.stage;
 
 import de.eldoria.eldoutilities.consumer.ThrowingConsumer;
+import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

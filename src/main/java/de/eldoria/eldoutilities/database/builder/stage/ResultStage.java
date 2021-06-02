@@ -1,5 +1,6 @@
-package de.eldoria.eldoutilities.database.querybuilder;
+package de.eldoria.eldoutilities.database.builder.stage;
 
+import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 import de.eldoria.eldoutilities.functions.ThrowingFunction;
 
 import java.sql.ResultSet;
