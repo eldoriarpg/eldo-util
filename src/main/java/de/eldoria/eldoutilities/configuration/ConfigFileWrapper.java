@@ -121,12 +121,12 @@ public final class ConfigFileWrapper {
             try {
                 Files.createDirectories(file.toPath().getParent());
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create directory at " + file.toPath().toString(), e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create directory at " + file.toPath(), e);
             }
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create config at " + file.toPath().toString(), e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create config at " + file.toPath(), e);
             }
         }
     }

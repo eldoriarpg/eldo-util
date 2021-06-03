@@ -1,6 +1,10 @@
 package de.eldoria.eldoutilities.debug;
 
-import de.eldoria.eldoutilities.debug.data.*;
+import de.eldoria.eldoutilities.debug.data.DebugPayloadData;
+import de.eldoria.eldoutilities.debug.data.EntryData;
+import de.eldoria.eldoutilities.debug.data.LogData;
+import de.eldoria.eldoutilities.debug.data.PluginMetaData;
+import de.eldoria.eldoutilities.debug.data.ServerMetaData;
 import de.eldoria.eldoutilities.debug.payload.ConfigDump;
 import de.eldoria.eldoutilities.debug.payload.LogMeta;
 import de.eldoria.eldoutilities.debug.payload.PluginMeta;

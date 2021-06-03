@@ -18,12 +18,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface MessageChannel<T extends ChannelData> {
-    public static final String KEY_PREFIX = "messageChannel";
+    String KEY_PREFIX = "messageChannel";
 
     /**
      * Default implementation for a chat message
      */
-    public static MessageChannel<? extends ChannelData> CHAT = new MessageChannel<ChannelData>() {
+    MessageChannel<? extends ChannelData> CHAT = new MessageChannel<ChannelData>() {
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             target.sendMessage(message);
@@ -38,7 +38,7 @@ public interface MessageChannel<T extends ChannelData> {
     /**
      * Default implementation for a title message
      */
-    public static MessageChannel<TitleData> TITLE = (message, sender, target, data) -> {
+    MessageChannel<TitleData> TITLE = (message, sender, target, data) -> {
         TitleData titleData = data;
         if (titleData == null) titleData = TitleData.DEFAULT;
         if (target instanceof Player) {
@@ -51,7 +51,7 @@ public interface MessageChannel<T extends ChannelData> {
     /**
      * Default implementation for a subtitle message
      */
-    public static MessageChannel<TitleData> SUBTITLE = (message, sender, target, data) -> {
+    MessageChannel<TitleData> SUBTITLE = (message, sender, target, data) -> {
         TitleData titleData = data;
         if (titleData == null) titleData = TitleData.DEFAULT;
         if (target instanceof Player) {
@@ -64,7 +64,7 @@ public interface MessageChannel<T extends ChannelData> {
     /**
      * Default implementation for a action bar message
      */
-    public static MessageChannel<? extends ChannelData> ACTION_BAR = (message, sender, target, data) -> {
+    MessageChannel<? extends ChannelData> ACTION_BAR = (message, sender, target, data) -> {
         if (target instanceof Player) {
             ((Player) target).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
         } else {
@@ -72,7 +72,7 @@ public interface MessageChannel<T extends ChannelData> {
         }
     };
 
-    public static MessageChannel<BossBarData> BOSS_BAR = (message, sender, target, data) -> {
+    MessageChannel<BossBarData> BOSS_BAR = (message, sender, target, data) -> {
         BossBarData bossBarData = data;
         if (bossBarData == null) {
             bossBarData = BossBarData.DEFAULT;
@@ -92,7 +92,7 @@ public interface MessageChannel<T extends ChannelData> {
         }
     };
 
-    public static MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<ChannelData>() {
+    MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<ChannelData>() {
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             Bukkit.broadcastMessage(message);
@@ -108,10 +108,9 @@ public interface MessageChannel<T extends ChannelData> {
      * Get a default channel by name.
      *
      * @param name name of channel not case sensitive
-     *
      * @return channel or {@link #CHAT} if channel is not found or name is null
      */
-    public static @NotNull MessageChannel<? extends ChannelData> getChannelByNameOrDefault(@Nullable String name) {
+    static @NotNull MessageChannel<? extends ChannelData> getChannelByNameOrDefault(@Nullable String name) {
         return ObjUtil.nonNull(getChannelByName(name), CHAT);
     }
 
@@ -119,10 +118,9 @@ public interface MessageChannel<T extends ChannelData> {
      * Get a default channel by name.
      *
      * @param name name of channel not case sensitive
-     *
      * @return channel or null if name is null or no matching channel is found
      */
-    public static @Nullable MessageChannel<? extends ChannelData> getChannelByName(@Nullable String name) {
+    static @Nullable MessageChannel<? extends ChannelData> getChannelByName(@Nullable String name) {
         if ("CHAT".equalsIgnoreCase(name)) {
             return CHAT;
         }

@@ -12,7 +12,7 @@ import java.util.Queue;
  * @since 1.2.3
  */
 public final class DelayedActions extends QueuingSelfSchedulingTask<DelayedActions.DelayedTask> {
-    private int currentTick = 0;
+    private int currentTick;
 
     private DelayedActions(Plugin plugin) {
         super(plugin);

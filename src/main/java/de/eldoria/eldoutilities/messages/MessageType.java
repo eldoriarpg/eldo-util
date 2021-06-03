@@ -4,16 +4,16 @@ public interface MessageType {
     /**
      * Default implementation for a normal message type
      */
-    public static MessageType NORMAL = () -> "§2";
+    MessageType NORMAL = () -> "§2";
     /**
      * Default implementation for a error message type.
      */
-    public static MessageType ERROR = () -> "§c";
+    MessageType ERROR = () -> "§c";
 
     /**
      * Default implementation for a message without default color.
      */
-    public static MessageType BLANK = () -> "";
+    MessageType BLANK = () -> "";
 
     /**
      * Get the default color of the channel.

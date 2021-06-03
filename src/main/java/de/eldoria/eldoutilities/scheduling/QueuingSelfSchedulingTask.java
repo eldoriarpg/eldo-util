@@ -10,7 +10,7 @@ import java.util.function.Predicate;
 public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     private static final int MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
     private final Queue<T> tasks;
-    private int idleTicks = 0;
+    private int idleTicks;
     private int maxIdleTicks = 200;
 
     public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks) {

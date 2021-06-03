@@ -9,7 +9,6 @@ package de.eldoria.eldoutilities.consumer;
  * whose functional method is {@link #accept(Object)}.
  *
  * @param <T> the type of the input to the operation
- *
  * @since 1.8
  */
 @FunctionalInterface

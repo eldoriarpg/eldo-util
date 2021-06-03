@@ -3,14 +3,31 @@ package de.eldoria.eldoutilities.localization;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,7 +61,7 @@ public class Localizer implements ILocalizer {
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
     private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
     private ResourceBundle localeFile;
-    private boolean checked = false;
+    private boolean checked;
 
     /**
      * Create a new localizer instance.
@@ -115,7 +132,7 @@ public class Localizer implements ILocalizer {
         try (InputStream stream = Files.newInputStream(Paths.get(plugin.getDataFolder().toString(), localesPath, localeFile))) {
             this.localeFile = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load locale file " + Paths.get(localesPath, localeFile).toString(), e);
+            plugin.getLogger().log(Level.WARNING, "Could not load locale file " + Paths.get(localesPath, localeFile), e);
             this.localeFile = fallbackLocaleFile;
         }
     }
@@ -216,7 +233,7 @@ public class Localizer implements ILocalizer {
                     localeFiles.add(path.toFile());
                 } else {
                     // Notify the user that he did something weird in his messages directory.
-                    plugin.getLogger().info(path.toString() + " is not a valid message file. Skipped.");
+                    plugin.getLogger().info(path + " is not a valid message file. Skipped.");
                 }
             }
         } catch (IOException e) {
@@ -251,7 +268,7 @@ public class Localizer implements ILocalizer {
             if (currLocale != null) {
                 try {
                     refBundle = new PropertyResourceBundle(new InputStreamReader(
-                            plugin.getResource(localesPrefix + "_" + currLocale.toString() + ".properties"), StandardCharsets.UTF_8));
+                            plugin.getResource(localesPrefix + "_" + currLocale + ".properties"), StandardCharsets.UTF_8));
                 } catch (IOException | NullPointerException e) {
                     plugin.getLogger().info("§eNo reference locale found for " + currLocale + ". Using default locale.");
                 }

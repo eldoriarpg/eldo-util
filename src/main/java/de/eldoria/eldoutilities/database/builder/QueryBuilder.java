@@ -55,15 +55,12 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
     private final Plugin plugin;
     private final DataSource dataSource;
     private final Queue<QueryTask> tasks = new ArrayDeque<>();
-
+    private final QueryExecutionException executionException;
+    private final WrappedQueryExecutionException wrappedExecutionException;
     private String currQuery;
     private ThrowingConsumer<PreparedStatement, SQLException> currStatementConsumer;
     private ThrowingFunction<T, ResultSet, SQLException> currResultMapper;
-
     private QueryBuilderConfig config;
-
-    private final QueryExecutionException executionException;
-    private final WrappedQueryExecutionException wrappedExecutionException;
 
     private QueryBuilder(Plugin plugin, DataSource dataSource, Class<T> clazz) {
         this.plugin = plugin;

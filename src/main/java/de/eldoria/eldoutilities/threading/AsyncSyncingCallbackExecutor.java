@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 /**
  * Scheduler Service which allows to execute a async call and handle the retrieved data in the main thread.
  * Preserves the main thread from overloading
+ *
  * @deprecated Use {@link BukkitFutureResult} instead.
  */
 @Deprecated

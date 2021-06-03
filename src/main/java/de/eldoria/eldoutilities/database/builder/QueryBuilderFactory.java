@@ -8,9 +8,9 @@ import javax.sql.DataSource;
 
 /**
  * This class provides simple methods to create preconfigured {@link QueryBuilder}.
- *
+ * <p>
  * The factory will always initialize the {@link QueryBuilder} with the plugin, datasource and configuration provided on creation.
- *
+ * <p>
  * This results in a QueryBuilder in the {@link QueryStage} and skips the {@link ConfigurationStage}.
  */
 public class QueryBuilderFactory {
@@ -27,8 +27,8 @@ public class QueryBuilderFactory {
     /**
      * Create a new query builder with a defined return type. Use it for selects.
      *
-     * @param clazz  class of required return type. Doesnt matter if you want a list or single result.
-     * @param <T>    type of return type
+     * @param clazz class of required return type. Doesnt matter if you want a list or single result.
+     * @param <T>   type of return type
      * @return a new query builder in a {@link QueryStage}
      */
     public <T> QueryStage<T> builder(Class<T> clazz) {

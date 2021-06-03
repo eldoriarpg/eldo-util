@@ -11,10 +11,10 @@ public class SimpleSampleImplementation {
     @SerializableAs("SerializableClass")
     public class SerializableClass implements ConfigurationSerializable {
         // We add a default value to all values
-        private int someInt = 1;
-        private String someString = "Hewo";
-        private NestedClass nestedClass = new NestedClass();
-        private transient int ignoreMe = 0;
+        private final int someInt = 1;
+        private final String someString = "Hewo";
+        private final NestedClass nestedClass = new NestedClass();
+        private final transient int ignoreMe;
 
         public SerializableClass() {
         }
@@ -38,8 +38,8 @@ public class SimpleSampleImplementation {
 
     @SerializableAs("NestedClass")
     public class NestedClass implements ConfigurationSerializable {
-        private String someString = "Amazing";
-        private String someOtherString = "Much default";
+        private final String someString = "Amazing";
+        private final String someOtherString = "Much default";
 
         public NestedClass(Map<String, Object> objectMap) {
             SerializationUtil.mapOnObject(objectMap, this);

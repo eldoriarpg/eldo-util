@@ -9,7 +9,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 // proudly stolen from https://github.com/lucko/synapse/tree/master
 public class BukkitFutureResult<T> implements FutureResult<T> {

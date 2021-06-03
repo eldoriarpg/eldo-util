@@ -22,11 +22,11 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     private final Plugin plugin;
     private final T data;
     private String latestVersion;
-    private boolean notifyActive = false;
-    private boolean updateAvailable = false;
-    private boolean downloaded = false;
+    private boolean notifyActive;
+    private boolean updateAvailable;
+    private boolean downloaded;
 
-    private Updater(T data) {
+    protected Updater(T data) {
         this.plugin = data.plugin();
         this.data = data;
     }

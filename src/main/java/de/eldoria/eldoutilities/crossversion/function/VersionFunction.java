@@ -2,7 +2,6 @@ package de.eldoria.eldoutilities.crossversion.function;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
 import de.eldoria.eldoutilities.crossversion.UnsupportedVersionException;
-import de.eldoria.eldoutilities.functions.QuadFunction;
 
 import java.util.Map;
 import java.util.function.Function;

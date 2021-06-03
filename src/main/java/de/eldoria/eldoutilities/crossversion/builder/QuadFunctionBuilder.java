@@ -1,7 +1,6 @@
 package de.eldoria.eldoutilities.crossversion.builder;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
-import de.eldoria.eldoutilities.crossversion.function.BiVersionFunction;
 import de.eldoria.eldoutilities.crossversion.function.QuadVersionFunction;
 import de.eldoria.eldoutilities.functions.QuadFunction;
 

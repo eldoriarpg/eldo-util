@@ -30,6 +30,7 @@ public final class BossBarData implements ChannelData {
 
     /**
      * Get a new BossBar Builder
+     *
      * @return return new Builder instance
      */
     public static Builder builder() {

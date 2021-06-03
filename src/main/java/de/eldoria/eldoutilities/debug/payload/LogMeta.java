@@ -53,7 +53,6 @@ public class LogMeta extends LogData {
      *
      * @param plugin   plugin for pure lazyness and logging purposes
      * @param settings settings for debug dispatching
-     *
      * @return Log as string.
      */
     public static LogData create(Plugin plugin, DebugSettings settings) {

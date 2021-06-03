@@ -8,6 +8,7 @@ import java.sql.SQLException;
 
 /**
  * Statement stage of a {@link QueryBuilder}
+ *
  * @param <T> type
  */
 public interface StatementStage<T> {

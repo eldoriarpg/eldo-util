@@ -35,10 +35,10 @@ import java.util.logging.Logger;
  * @since 1.1.0
  */
 public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
-    private PluginManager pluginManager = null;
-    private BukkitScheduler scheduler = null;
-    private DebugLogger debugLogger = null;
     private static EldoPlugin instance;
+    private PluginManager pluginManager;
+    private BukkitScheduler scheduler;
+    private DebugLogger debugLogger;
     private FailsaveCommand failcmd;
 
     public EldoPlugin() {

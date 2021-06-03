@@ -43,7 +43,7 @@ public final class EntityBuilder {
     /**
      * Returns a new EntityBuilder with an entity at the requested position.
      *
-     * @param entity entity type to spawn
+     * @param entity   entity type to spawn
      * @param location location to spawn
      * @return new EntityBuilder instance with spawned entity
      */

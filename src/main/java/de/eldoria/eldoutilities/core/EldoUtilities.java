@@ -34,10 +34,10 @@ import java.util.logging.Logger;
  * If your plugins extends {@link EldoPlugin} this will be done automatically.
  */
 public final class EldoUtilities {
-    private static DelayedActions delayedActions = null;
-    private static InventoryActionHandler inventoryActionHandler = null;
-    private static AsyncSyncingCallbackExecutor asyncSyncingCallbackExecutor = null;
-    private static ConversationRequester conversationRequester = null;
+    private static DelayedActions delayedActions;
+    private static InventoryActionHandler inventoryActionHandler;
+    private static AsyncSyncingCallbackExecutor asyncSyncingCallbackExecutor;
+    private static ConversationRequester conversationRequester;
     private static ConfigFileWrapper configuration;
     private static Plugin instanceOwner;
 

@@ -23,6 +23,12 @@ public final class BukkitAsyncAction<T> {
     private final Supplier<T> supplier;
     private final Consumer<Throwable> supplierError;
 
+    private BukkitAsyncAction(Plugin plugin, Supplier<T> supplier, Consumer<Throwable> supplierError) {
+        this.supplier = supplier;
+        this.plugin = plugin;
+        this.supplierError = supplierError;
+    }
+
     /**
      * This will change the executor.
      * <p>
@@ -35,12 +41,6 @@ public final class BukkitAsyncAction<T> {
     public static void changeExecutor(ExecutorService executor) {
         BukkitAsyncAction.executor.shutdownNow();
         BukkitAsyncAction.executor = executor;
-    }
-
-    private BukkitAsyncAction(Plugin plugin, Supplier<T> supplier, Consumer<Throwable> supplierError) {
-        this.supplier = supplier;
-        this.plugin = plugin;
-        this.supplierError = supplierError;
     }
 
     private static Consumer<Throwable> getDefaultLogger(Plugin plugin) {
