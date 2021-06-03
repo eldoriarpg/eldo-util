@@ -11,6 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Wrapper for {@link Conversation}
+ */
 public class EldoConversation extends Conversation {
     private final ILocalizer localizer;
     private final MessageSender sender;
@@ -91,6 +94,9 @@ public class EldoConversation extends Conversation {
         }
     }
 
+    /**
+     * Builder for a {@link EldoConversation}
+     */
     public static class Builder {
         private final Plugin plugin;
         private final Conversable forWhom;

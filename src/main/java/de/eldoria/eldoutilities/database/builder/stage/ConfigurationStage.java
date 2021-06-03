@@ -4,6 +4,10 @@ import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 import de.eldoria.eldoutilities.database.builder.QueryBuilderConfig;
 import de.eldoria.eldoutilities.database.builder.QueryBuilderFactory;
 
+/**
+ * Configuration stage of a {@link QueryBuilder}
+ * @param <T> type
+ */
 public interface ConfigurationStage<T> {
     /**
      * Configure the query builder.

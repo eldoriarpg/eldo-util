@@ -200,9 +200,15 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         }.runTaskLater(this, 1);
     }
 
+    /**
+     * Called when the server has started completely.
+     */
     public void onPostStart() {
     }
 
+    /**
+     * Called when this plugin is enabled
+     */
     public void onPluginEnable() {
     }
 
@@ -216,6 +222,9 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         }
     }
 
+    /**
+     * Called when this plugin is disabled.
+     */
     public void onPluginDisable() {
     }
 

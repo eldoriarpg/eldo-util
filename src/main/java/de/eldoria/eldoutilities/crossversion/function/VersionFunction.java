@@ -2,10 +2,17 @@ package de.eldoria.eldoutilities.crossversion.function;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
 import de.eldoria.eldoutilities.crossversion.UnsupportedVersionException;
+import de.eldoria.eldoutilities.functions.QuadFunction;
 
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * A {@link Function} with version sensitive context.
+ *
+ * @param <A> input Type
+ * @param <R> result Type
+ */
 public class VersionFunction<A, R> {
     private final Map<ServerVersion, Function<A, R>> functions;
 

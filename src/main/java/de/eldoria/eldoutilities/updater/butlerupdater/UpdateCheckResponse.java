@@ -10,6 +10,13 @@ public class UpdateCheckResponse {
     private final String latestVersion;
     private final String hash;
 
+    /**
+     * Create an ew Update check response.
+     *
+     * @param newVersionAvailable whether a new version is available or not
+     * @param latestVersion       latest available version
+     * @param hash                hash of latest version
+     */
     public UpdateCheckResponse(boolean newVersionAvailable, String latestVersion, String hash) {
         this.newVersionAvailable = newVersionAvailable;
         this.latestVersion = latestVersion;
@@ -20,11 +27,11 @@ public class UpdateCheckResponse {
         return newVersionAvailable;
     }
 
-    public String getLatestVersion() {
+    public String latestVersion() {
         return latestVersion;
     }
 
-    public String getHash() {
+    public String hash() {
         return hash;
     }
 }

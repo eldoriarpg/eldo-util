@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.entity;
+package de.eldoria.eldoutilities.builder;
 
 import de.eldoria.eldoutilities.utils.AttributeUtil;
 import de.eldoria.eldoutilities.utils.EMath;
@@ -22,6 +22,7 @@ import java.util.function.Consumer;
  *
  * @since 1.1.0
  */
+@SuppressWarnings("unused")
 public final class EntityBuilder {
     private final LivingEntity entity;
 
@@ -29,10 +30,23 @@ public final class EntityBuilder {
         this.entity = entity;
     }
 
+    /**
+     * Returns a new EntityBuilder with an entity at the requested position.
+     *
+     * @param entity entity to wrap
+     * @return new EntityBuilder instance with entity
+     */
     public static EntityBuilder of(LivingEntity entity) {
         return new EntityBuilder(entity);
     }
 
+    /**
+     * Returns a new EntityBuilder with an entity at the requested position.
+     *
+     * @param entity entity type to spawn
+     * @param location location to spawn
+     * @return new EntityBuilder instance with spawned entity
+     */
     public static EntityBuilder of(EntityType entity, Location location) {
         return new EntityBuilder((LivingEntity) location.getWorld().spawnEntity(location, entity));
     }
@@ -241,6 +255,12 @@ public final class EntityBuilder {
         return this;
     }
 
+    /**
+     * Applies changes to the persistent data container of the entity
+     *
+     * @param change conumer for data container
+     * @return builder instance
+     */
     public EntityBuilder withNBT(Consumer<PersistentDataContainer> change) {
         change.accept(entity.getPersistentDataContainer());
         return this;

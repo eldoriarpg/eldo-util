@@ -1,16 +1,23 @@
-package de.eldoria.eldoutilities.crossversion.functionbuilder;
+package de.eldoria.eldoutilities.crossversion.builder;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
-import de.eldoria.eldoutilities.crossversion.function.VersionFunction;
+import de.eldoria.eldoutilities.crossversion.function.BiVersionFunction;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
-public class FunctionBuilder<A, R> {
-    private final Map<ServerVersion, Function<A, R>> functions = new EnumMap<>(ServerVersion.class);
+/**
+ * A builder for a  {@link BiVersionFunction} with version sensitive context.
+ *
+ * @param <A> first Input Type
+ * @param <B> second Input Type
+ * @param <R> result Type
+ */
+public class BiFunctionBuilder<A, B, R> {
+    private final Map<ServerVersion, BiFunction<A, B, R>> functions = new EnumMap<>(ServerVersion.class);
 
-    protected FunctionBuilder() {
+    protected BiFunctionBuilder() {
     }
 
     /**
@@ -20,7 +27,7 @@ public class FunctionBuilder<A, R> {
      * @param version  versions which should use this function
      * @return builder instance with function applied for versions
      */
-    public FunctionBuilder<A, R> addVersionFunction(Function<A, R> function, ServerVersion... version) {
+    public BiFunctionBuilder<A, B, R> addVersionFunctionBetween(BiFunction<A, B, R> function, ServerVersion... version) {
         for (ServerVersion serverVersion : version) {
             functions.put(serverVersion, function);
         }
@@ -35,8 +42,8 @@ public class FunctionBuilder<A, R> {
      * @param function function to execute
      * @return builder instance with function applied for versions
      */
-    public FunctionBuilder<A, R> addVersionFunctionBetween(ServerVersion oldest, ServerVersion newest, Function<A, R> function) {
-        addVersionFunction(function, ServerVersion.versionsBetween(oldest, newest));
+    public BiFunctionBuilder<A, B, R> addVersionFunctionBetween(ServerVersion oldest, ServerVersion newest, BiFunction<A, B, R> function) {
+        addVersionFunctionBetween(function, ServerVersion.versionsBetween(oldest, newest));
         return this;
     }
 
@@ -45,7 +52,7 @@ public class FunctionBuilder<A, R> {
      *
      * @return version functions with applied functions for versions.
      */
-    public VersionFunction<A, R> build() {
-        return new VersionFunction<>(functions);
+    public BiVersionFunction<A, B, R> build() {
+        return new BiVersionFunction<>(functions);
     }
 }

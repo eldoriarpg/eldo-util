@@ -6,6 +6,10 @@ import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+/**
+ * Statement stage of a {@link QueryBuilder}
+ * @param <T> type
+ */
 public interface StatementStage<T> {
     /**
      * Set the parameter of the {@link PreparedStatement} of the query.

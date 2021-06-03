@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.crossversion.functionbuilder;
+package de.eldoria.eldoutilities.crossversion.builder;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
 import de.eldoria.eldoutilities.crossversion.function.TriVersionFunction;

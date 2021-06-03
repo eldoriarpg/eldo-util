@@ -2,6 +2,9 @@ package de.eldoria.eldoutilities.database;
 
 import java.sql.SQLException;
 
+/**
+ * Utilitites for database handling
+ */
 public final class DBUtil {
     private DBUtil() {
         throw new UnsupportedOperationException("This is a utility class.");

@@ -9,6 +9,9 @@ import org.bukkit.plugin.Plugin;
  * @since 1.1.0
  */
 public class ButlerUpdateData extends UpdateData {
+    /**
+     * Default adress to submit debug data and update checks
+     */
     public static final String HOST = "https://plugins.eldoria.de";
 
     private final int butlerId;
@@ -30,11 +33,11 @@ public class ButlerUpdateData extends UpdateData {
         this.host = host;
     }
 
-    public int getButlerId() {
+    public int butlerId() {
         return butlerId;
     }
 
-    public String getHost() {
+    public String host() {
         return host;
     }
 }

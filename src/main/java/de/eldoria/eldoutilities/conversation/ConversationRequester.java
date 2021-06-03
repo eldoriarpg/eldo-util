@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Class to handle Conversations.
+ */
 public class ConversationRequester implements ConversationAbandonedListener, ConversationCanceller {
 
     private final Plugin plugin;

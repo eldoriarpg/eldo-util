@@ -11,6 +11,9 @@ public final class BossBarData implements ChannelData {
     private static final BarStyle DEFAULT_STYLE = BarStyle.SOLID;
     private static final BarColor DEFAULT_COLOR = BarColor.WHITE;
     private static final int DEFAULT_DURATION = 20 * 10;
+    /**
+     * Default BossBar Data
+     */
     public static final BossBarData DEFAULT = new BossBarData(DEFAULT_COLOR, DEFAULT_STYLE, DEFAULT_DURATION);
 
     private final BarColor color;
@@ -25,10 +28,21 @@ public final class BossBarData implements ChannelData {
         this.flags = flags;
     }
 
+    /**
+     * Get a new BossBar Builder
+     * @return return new Builder instance
+     */
     public static Builder builder() {
         return new Builder();
     }
 
+    /**
+     * Create a bossbar with a message and a key
+     *
+     * @param key     kay of message
+     * @param message text of bossbar
+     * @return BossBar instance
+     */
     public BossBar create(NamespacedKey key, String message) {
         return Bukkit.createBossBar(key, message, color, style, flags);
     }

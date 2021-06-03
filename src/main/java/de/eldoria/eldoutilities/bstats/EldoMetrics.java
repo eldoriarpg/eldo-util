@@ -26,6 +26,11 @@ public class EldoMetrics extends Metrics {
         enabled = config.getBoolean("enabled", true);
     }
 
+    /**
+     * Check if metrics are enabled
+     *
+     * @return true if enabled
+     */
     public boolean isEnabled() {
         return enabled;
     }

@@ -1,12 +1,22 @@
-package de.eldoria.eldoutilities.crossversion.functionbuilder;
+package de.eldoria.eldoutilities.crossversion.builder;
 
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
+import de.eldoria.eldoutilities.crossversion.function.BiVersionFunction;
 import de.eldoria.eldoutilities.crossversion.function.QuadVersionFunction;
 import de.eldoria.eldoutilities.functions.QuadFunction;
 
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * A builder for a  {@link QuadVersionFunction} with version sensitive context.
+ *
+ * @param <A> first Input Type
+ * @param <B> second Input Type
+ * @param <C> third Input Type
+ * @param <D> fourth Input Type
+ * @param <R> result Type
+ */
 public class QuadFunctionBuilder<A, B, C, D, R> {
     private final Map<ServerVersion, QuadFunction<A, B, C, D, R>> functions = new EnumMap<>(ServerVersion.class);
 

@@ -1,7 +1,12 @@
 package de.eldoria.eldoutilities.database.builder.exception;
 
+import de.eldoria.eldoutilities.database.builder.QueryBuilder;
+
 import java.sql.SQLException;
 
+/**
+ * Exception to wrap {@link Exception} as {@link RuntimeException} thrown during queries executed by {@link QueryBuilder}
+ */
 public class WrappedQueryExecutionException extends RuntimeException {
     private SQLException cause;
 

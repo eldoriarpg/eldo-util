@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.items;
+package de.eldoria.eldoutilities.builder;
 
 import de.eldoria.eldoutilities.utils.ObjUtil;
 import org.bukkit.Material;
@@ -24,6 +24,7 @@ import java.util.function.Consumer;
  *
  * @since 1.1.0
  */
+@SuppressWarnings("unused")
 public final class ItemStackBuilder {
     private final ItemStack itemStack;
 
@@ -76,11 +77,7 @@ public final class ItemStackBuilder {
      * @return builder instance
      */
     public static ItemStackBuilder of(ItemStack stack, boolean clone) {
-        if (clone) {
-            return new ItemStackBuilder(stack.clone());
-        } else {
-            return new ItemStackBuilder(stack);
-        }
+        return new ItemStackBuilder(clone ? stack.clone() : stack);
     }
 
     /**

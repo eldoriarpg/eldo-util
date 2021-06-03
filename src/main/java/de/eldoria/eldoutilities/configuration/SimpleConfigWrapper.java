@@ -6,6 +6,9 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.function.Function;
 
+/**
+ * A simple wrapper for {@link FileConfiguration}
+ */
 public class SimpleConfigWrapper {
     private final Plugin plugin;
     private FileConfiguration config;

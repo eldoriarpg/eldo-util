@@ -12,6 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Function;
 
+/**
+ * Utilities to work with the {@link PersistentDataContainer}
+ */
 public final class DataContainerUtil {
     private DataContainerUtil() {
         throw new UnsupportedOperationException("This is a utility class.");
@@ -63,7 +66,6 @@ public final class DataContainerUtil {
      * @param map    map the current value to the new value. Current value is null if key is not set.
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return the mapped value. can be null if mapping function returns null or holder is null
      */
     public static @Nullable <T, Z> Z compute(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Function<@Nullable Z, Z> map) {
@@ -89,7 +91,6 @@ public final class DataContainerUtil {
      * @param map    map the current value to the new value. Current value is null if key is not set.
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return the mapped value. can be null if mapping function returns null or holder is null
      */
     public static @Nullable <T, Z> Z compute(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> map) {
@@ -110,7 +111,6 @@ public final class DataContainerUtil {
      * @param value  value which should be set if the key is not present.
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return the value associated with this key. can be null if holder is null.
      */
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
@@ -134,7 +134,6 @@ public final class DataContainerUtil {
      * @param value  value which should be set if the key is not present.
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return the value associated with this key. can be null if holder is null.
      */
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
@@ -156,7 +155,6 @@ public final class DataContainerUtil {
      * @param mappingFunction function to map the current value to the new value.
      * @param <T>             type of value
      * @param <Z>             type of value
-     *
      * @return the value associated with this key. can be null if holder is null.
      */
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
@@ -180,7 +178,6 @@ public final class DataContainerUtil {
      * @param mappingFunction function to map the current value to the new value.
      * @param <T>             type of value
      * @param <Z>             type of value
-     *
      * @return the value associated with this key. can be null if holder is null.
      */
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
@@ -202,7 +199,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return result wrapped in an optional if present.
      */
     public static <T, Z> Optional<Z> get(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -223,7 +219,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return result wrapped in an optional if present.
      */
     public static <T, Z> Optional<Z> get(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -240,7 +235,6 @@ public final class DataContainerUtil {
      * @param defaultValue default value if key is absent
      * @param <T>          type of value
      * @param <Z>          type of value
-     *
      * @return result wrapped in an optional if present.
      */
     public static <T, Z> Z getOrDefault(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue) {
@@ -256,7 +250,6 @@ public final class DataContainerUtil {
      * @param defaultValue default value if key is absent
      * @param <T>          type of value
      * @param <Z>          type of value
-     *
      * @return result wrapped in an optional if present.
      */
     public static <T, Z> Z getOrDefault(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue) {
@@ -304,7 +297,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return true if the key is set
      */
     public static <T, Z> boolean hasKey(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -320,7 +312,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return true if the key is set
      */
     public static <T, Z> boolean hasKey(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -337,7 +328,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return true if the key was present and removed.
      */
     public static <T, Z> boolean remove(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -358,7 +348,6 @@ public final class DataContainerUtil {
      * @param type   type of key
      * @param <T>    type of value
      * @param <Z>    type of value
-     *
      * @return true if the key was present and removed.
      */
     public static <T, Z> boolean remove(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
@@ -375,7 +364,6 @@ public final class DataContainerUtil {
      * Converts a byte to boolean.
      *
      * @param aByte byte to convert
-     *
      * @return byte as boolean. false if null
      */
     public static boolean byteToBoolean(Byte aByte) {
@@ -386,7 +374,6 @@ public final class DataContainerUtil {
      * Converts a boolean to a byte.
      *
      * @param aBoolean boolean to convert
-     *
      * @return boolean as byte.
      */
     public static byte booleanToByte(boolean aBoolean) {

@@ -1,5 +1,8 @@
 package de.eldoria.eldoutilities.debug.data;
 
+/**
+ * Response of UpdateButler.
+ */
 public class DebugResponse {
     private String hash;
     private String deletionHash;

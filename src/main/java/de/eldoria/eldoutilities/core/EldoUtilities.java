@@ -3,13 +3,14 @@ package de.eldoria.eldoutilities.core;
 import de.eldoria.eldoutilities.configuration.ConfigFileWrapper;
 import de.eldoria.eldoutilities.conversation.ConversationRequester;
 import de.eldoria.eldoutilities.crossversion.ServerVersion;
-import de.eldoria.eldoutilities.crossversion.functionbuilder.VersionFunctionBuilder;
+import de.eldoria.eldoutilities.crossversion.builder.VersionFunctionBuilder;
 import de.eldoria.eldoutilities.inventory.InventoryActionHandler;
 import de.eldoria.eldoutilities.messages.MessageChannel;
+import de.eldoria.eldoutilities.plugin.EldoPlugin;
 import de.eldoria.eldoutilities.scheduling.DelayedActions;
+import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import de.eldoria.eldoutilities.serialization.wrapper.ArmorStandWrapper;
 import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
-import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import de.eldoria.eldoutilities.threading.AsyncSyncingCallbackExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -26,6 +27,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+/**
+ * Core class of EldoUtilitites.
+ * <p>
+ * If you want to use anything from here you need to call {@link EldoUtilities#preWarm(Plugin)} onLoad and {@link EldoUtilities#ignite(Plugin)} onEnable.
+ * If your plugins extends {@link EldoPlugin} this will be done automatically.
+ */
 public final class EldoUtilities {
     private static DelayedActions delayedActions = null;
     private static InventoryActionHandler inventoryActionHandler = null;

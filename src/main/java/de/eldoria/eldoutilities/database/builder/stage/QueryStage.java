@@ -2,6 +2,10 @@ package de.eldoria.eldoutilities.database.builder.stage;
 
 import de.eldoria.eldoutilities.database.builder.QueryBuilder;
 
+/**
+ * Query stage of a {@link QueryBuilder}
+ * @param <T> type
+ */
 public interface QueryStage<T> {
     /**
      * Set the query to execute.

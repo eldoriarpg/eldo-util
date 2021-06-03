@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.crossversion.functionbuilder;
+package de.eldoria.eldoutilities.crossversion.builder;
 
 /**
  * Interface to create different function builders.

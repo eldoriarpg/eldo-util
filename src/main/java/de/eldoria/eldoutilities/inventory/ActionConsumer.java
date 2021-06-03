@@ -1,6 +1,6 @@
 package de.eldoria.eldoutilities.inventory;
 
-import de.eldoria.eldoutilities.items.ItemStackBuilder;
+import de.eldoria.eldoutilities.builder.ItemStackBuilder;
 import de.eldoria.eldoutilities.utils.DataContainerUtil;
 import de.eldoria.eldoutilities.utils.EMath;
 import org.bukkit.NamespacedKey;

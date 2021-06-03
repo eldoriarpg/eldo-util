@@ -2,6 +2,9 @@ package de.eldoria.eldoutilities.database.builder;
 
 import de.eldoria.eldoutilities.database.builder.exception.QueryExecutionException;
 
+/**
+ * Configuration for a {@link QueryBuilder}
+ */
 public class QueryBuilderConfig {
     /**
      * Contains the default configuration.
@@ -16,6 +19,11 @@ public class QueryBuilderConfig {
         this.atomic = atomic;
     }
 
+    /**
+     * Get a builder for a {@link QueryBuilderConfig}
+     *
+     * @return new builder instance
+     */
     public static Builder builder() {
         return new Builder();
     }
@@ -28,6 +36,9 @@ public class QueryBuilderConfig {
         return atomic;
     }
 
+    /**
+     * Builder for a {@link QueryBuilderConfig}
+     */
     public static class Builder {
         boolean throwing;
         boolean atomic = true;
