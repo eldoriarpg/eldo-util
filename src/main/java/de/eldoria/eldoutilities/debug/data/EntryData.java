@@ -2,6 +2,9 @@ package de.eldoria.eldoutilities.debug.data;
 
 import de.eldoria.eldoutilities.debug.DebugSettings;
 
+/**
+ * Represents a entry in a debug log
+ */
 public class EntryData {
     protected String name;
     protected String content;

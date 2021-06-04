@@ -2,7 +2,10 @@ package de.eldoria.eldoutilities.utils;
 
 import de.eldoria.eldoutilities.container.Pair;
 
-import static java.lang.Math.*;
+import static java.lang.Math.abs;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.pow;
 
 /**
  * Utility class with basic math functions which are not covered by java.math

@@ -1,6 +1,7 @@
 package de.eldoria.eldoutilities.threading;
 
 import de.eldoria.eldoutilities.scheduling.QueuingSelfSchedulingTask;
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -11,7 +12,10 @@ import java.util.function.Supplier;
 /**
  * Scheduler Service which allows to execute a async call and handle the retrieved data in the main thread.
  * Preserves the main thread from overloading
+ *
+ * @deprecated Use {@link BukkitFutureResult} instead.
  */
+@Deprecated
 public final class AsyncSyncingCallbackExecutor extends QueuingSelfSchedulingTask<AsyncSyncingCallbackExecutor.Callback<?>> {
 
     private final BukkitScheduler scheduler;

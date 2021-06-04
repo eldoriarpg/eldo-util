@@ -1,5 +1,8 @@
 package de.eldoria.eldoutilities.debug.data;
 
+/**
+ * Represents log data.
+ */
 public class LogData {
     private final String log;
     private final String pluginLog;

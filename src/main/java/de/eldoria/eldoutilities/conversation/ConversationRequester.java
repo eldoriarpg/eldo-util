@@ -2,7 +2,12 @@ package de.eldoria.eldoutilities.conversation;
 
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.messages.MessageType;
-import org.bukkit.conversations.*;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationAbandonedEvent;
+import org.bukkit.conversations.ConversationAbandonedListener;
+import org.bukkit.conversations.ConversationCanceller;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +18,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Class to handle Conversations.
+ */
 public class ConversationRequester implements ConversationAbandonedListener, ConversationCanceller {
 
     private final Plugin plugin;

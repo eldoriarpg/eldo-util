@@ -6,7 +6,11 @@ import de.eldoria.eldoutilities.updater.Updater;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -32,11 +36,11 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
 
     @Override
     protected Optional<String> getLatestVersion(ButlerUpdateData data) {
-        Plugin plugin = data.getPlugin();
+        Plugin plugin = data.plugin();
 
         HttpURLConnection con;
         try {
-            URL url = new URL(data.getHost() + "/check?version=" + plugin.getDescription().getVersion() + "&id=" + data.getButlerId() + "&devbuild=" + false);
+            URL url = new URL(data.host() + "/check?version=" + plugin.getDescription().getVersion() + "&id=" + data.butlerId() + "&devbuild=" + false);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
         } catch (IOException e) {
@@ -75,13 +79,13 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
             return Optional.empty();
         }
 
-        return Optional.ofNullable(response.getLatestVersion());
+        return Optional.ofNullable(response.latestVersion());
     }
 
     @Override
     protected boolean update() {
         if (response == null) return false;
-        Plugin plugin = getData().getPlugin();
+        Plugin plugin = getData().plugin();
         plugin.getLogger().info("§2>------------------------<");
         plugin.getLogger().info("§2> Performing auto update <");
         plugin.getLogger().info("§2>------------------------<");
@@ -89,7 +93,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
         plugin.getLogger().info("§2Performing auto update.");
         URL url;
         try {
-            url = new URL(getData().getHost() + "/download?id=" + getData().getButlerId() + "&version=" + response.getLatestVersion());
+            url = new URL(getData().host() + "/download?id=" + getData().butlerId() + "&version=" + response.latestVersion());
         } catch (MalformedURLException e) {
             plugin.getLogger().log(Level.CONFIG, "Could not create download url.", e);
             plugin.getLogger().warning("§cAborting Update.");
@@ -146,7 +150,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
             return false;
         }
 
-        if (!hash.equals(response.getHash())) {
+        if (!hash.equals(response.hash())) {
             plugin.getLogger().warning("§cChecksums of update file is not as expected.");
             plugin.getLogger().warning("§cAborting Update.");
             updateFile.delete();

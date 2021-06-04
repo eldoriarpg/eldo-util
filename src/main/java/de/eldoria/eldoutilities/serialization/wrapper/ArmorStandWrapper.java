@@ -1,6 +1,6 @@
 package de.eldoria.eldoutilities.serialization.wrapper;
 
-import de.eldoria.eldoutilities.entity.EntityBuilder;
+import de.eldoria.eldoutilities.builder.EntityBuilder;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import org.bukkit.Location;

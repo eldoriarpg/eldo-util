@@ -394,7 +394,7 @@ public final class MessageSender {
         if (data != null) {
             data.formatText(type, channel, prefix);
         }
-        channel.sendMessage(coloredMessage, this, target == null ? Bukkit.getConsoleSender(): target, data);
+        channel.sendMessage(coloredMessage, this, target == null ? Bukkit.getConsoleSender() : target, data);
     }
 
     public boolean isDefault() {

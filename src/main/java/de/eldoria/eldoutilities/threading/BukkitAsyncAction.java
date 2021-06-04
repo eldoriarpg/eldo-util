@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.threading;
 
+import de.eldoria.eldoutilities.threading.futures.BukkitFutureResult;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -10,12 +11,23 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.logging.Level;
 
+/**
+ * @param <T> type of action
+ * @deprecated Use {@link BukkitFutureResult} instead.
+ */
+@Deprecated
 public final class BukkitAsyncAction<T> {
     private static final BukkitScheduler SCHEDULER = Bukkit.getScheduler();
     private static ExecutorService executor = Executors.newCachedThreadPool();
     private final Plugin plugin;
     private final Supplier<T> supplier;
     private final Consumer<Throwable> supplierError;
+
+    private BukkitAsyncAction(Plugin plugin, Supplier<T> supplier, Consumer<Throwable> supplierError) {
+        this.supplier = supplier;
+        this.plugin = plugin;
+        this.supplierError = supplierError;
+    }
 
     /**
      * This will change the executor.
@@ -29,12 +41,6 @@ public final class BukkitAsyncAction<T> {
     public static void changeExecutor(ExecutorService executor) {
         BukkitAsyncAction.executor.shutdownNow();
         BukkitAsyncAction.executor = executor;
-    }
-
-    private BukkitAsyncAction(Plugin plugin, Supplier<T> supplier, Consumer<Throwable> supplierError) {
-        this.supplier = supplier;
-        this.plugin = plugin;
-        this.supplierError = supplierError;
     }
 
     private static Consumer<Throwable> getDefaultLogger(Plugin plugin) {

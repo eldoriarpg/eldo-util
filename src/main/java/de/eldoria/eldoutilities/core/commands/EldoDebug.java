@@ -18,6 +18,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Default command for plugin debugging.
+ */
 public class EldoDebug extends EldoCommand {
 
     private List<String> plugins;

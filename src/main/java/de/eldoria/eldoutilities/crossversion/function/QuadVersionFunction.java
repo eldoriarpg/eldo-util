@@ -6,6 +6,15 @@ import de.eldoria.eldoutilities.functions.QuadFunction;
 
 import java.util.Map;
 
+/**
+ * A {@link QuadFunction} with version sensitive context.
+ *
+ * @param <A> first Input Type
+ * @param <B> second Input Type
+ * @param <C> third Input Type
+ * @param <D> fourth Input Type
+ * @param <R> result Type
+ */
 public class QuadVersionFunction<A, B, C, D, R> {
     private final Map<ServerVersion, QuadFunction<A, B, C, D, R>> functions;
 

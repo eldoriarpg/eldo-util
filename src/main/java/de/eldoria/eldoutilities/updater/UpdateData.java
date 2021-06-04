@@ -30,7 +30,7 @@ public abstract class UpdateData {
         this.autoUpdate = autoUpdate;
     }
 
-    public String getNotifyPermission() {
+    public String notifyPermission() {
         return notifyPermission;
     }
 
@@ -38,7 +38,7 @@ public abstract class UpdateData {
         return notifyUpdate;
     }
 
-    public Plugin getPlugin() {
+    public Plugin plugin() {
         return plugin;
     }
 

@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 public abstract class SelfSchedulingWorker<V, T extends Collection<V>> extends ReschedulingTask {
     private final T tasks;
-    private int idleTicks = 0;
+    private int idleTicks;
     private int maxIdleTicks = 200;
 
     public SelfSchedulingWorker(Plugin plugin, int maxIdleTicks) {

@@ -31,7 +31,7 @@ public final class SpigotUpdateChecker extends Updater<SpigotUpdateData> {
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
         } catch (IOException e) {
-            data.getPlugin().getLogger().log(Level.WARNING, "Request to spigotmc.org failed.", e);
+            data.plugin().getLogger().log(Level.WARNING, "Request to spigotmc.org failed.", e);
             return Optional.empty();
         }
 
@@ -44,7 +44,7 @@ public final class SpigotUpdateChecker extends Updater<SpigotUpdateData> {
                 inputLine = in.readLine();
             }
         } catch (IOException e) {
-            data.getPlugin().getLogger().log(Level.WARNING, "Could not read response from spigotmc.org", e);
+            data.plugin().getLogger().log(Level.WARNING, "Could not read response from spigotmc.org", e);
             return Optional.empty();
         }
 

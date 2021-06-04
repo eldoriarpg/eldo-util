@@ -3,7 +3,11 @@ package de.eldoria.eldoutilities.conversation;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.messages.MessageType;
-import org.bukkit.conversations.*;
+import org.bukkit.conversations.Conversable;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationAbandonedEvent;
+import org.bukkit.conversations.ConversationCanceller;
+import org.bukkit.conversations.Prompt;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +15,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Wrapper for {@link Conversation}
+ */
 public class EldoConversation extends Conversation {
     private final ILocalizer localizer;
     private final MessageSender sender;
@@ -91,12 +98,15 @@ public class EldoConversation extends Conversation {
         }
     }
 
+    /**
+     * Builder for a {@link EldoConversation}
+     */
     public static class Builder {
         private final Plugin plugin;
         private final Conversable forWhom;
         private final Prompt firstPrompt;
         private Map<Object, Object> initialValues = new HashMap<>();
-        private String pluginPrefix = null;
+        private String pluginPrefix;
         private String userPrefix = "";
         private MessageType type = MessageType.BLANK;
 

@@ -6,6 +6,13 @@ import de.eldoria.eldoutilities.crossversion.UnsupportedVersionException;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+/**
+ * A {@link BiFunction} with version sensitive context.
+ *
+ * @param <A> first Input Type
+ * @param <B> second Input Type
+ * @param <R> result Type
+ */
 public class BiVersionFunction<A, B, R> {
     private final Map<ServerVersion, BiFunction<A, B, R>> functions;
 

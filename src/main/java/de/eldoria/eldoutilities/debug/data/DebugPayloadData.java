@@ -1,5 +1,8 @@
 package de.eldoria.eldoutilities.debug.data;
 
+/**
+ * Payload for UpdateButler
+ */
 public class DebugPayloadData {
     private final int v = 1;
     protected PluginMetaData pluginMeta;
@@ -15,4 +18,6 @@ public class DebugPayloadData {
         this.latestLog = latestLog;
         this.configDumps = configDumps;
     }
+
+
 }

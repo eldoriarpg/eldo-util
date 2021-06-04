@@ -12,6 +12,12 @@ public final class ERandom {
     private ERandom() {
     }
 
+    /**
+     * Get a random vector with a gaussian random number.
+     *
+     * @param count count of random vectors
+     * @return list with random vectors
+     */
     public static Collection<Vector> getRandomVector(int count) {
         List<Vector> vecs = new ArrayList<>();
         ThreadLocalRandom current = ThreadLocalRandom.current();
@@ -26,6 +32,12 @@ public final class ERandom {
         return getRandomVector(ThreadLocalRandom.current());
     }
 
+    /**
+     * Get a random vector with a gaussian random number.
+     *
+     * @param random random instance
+     * @return new random vector
+     */
     public static Vector getRandomVector(Random random) {
         while (true) {
             double x = random.nextGaussian();

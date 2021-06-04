@@ -6,6 +6,14 @@ import de.eldoria.eldoutilities.functions.TriFunction;
 
 import java.util.Map;
 
+/**
+ * A {@link TriFunction} with version sensitive context.
+ *
+ * @param <A> first Input Type
+ * @param <B> second Input Type
+ * @param <C> third Input Type
+ * @param <R> result Type
+ */
 public class TriVersionFunction<A, B, C, R> {
     private final Map<ServerVersion, TriFunction<A, B, C, R>> functions;
 

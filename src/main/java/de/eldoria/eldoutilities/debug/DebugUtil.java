@@ -98,7 +98,6 @@ public final class DebugUtil {
      * If the plugin is not a eldo plugin it will return an empty array.
      *
      * @param plugin plugin to get meta
-     *
      * @return array with meta data. may be empty, but not null.
      */
     public static @NotNull EntryData[] getAdditionalPluginMeta(Plugin plugin) {

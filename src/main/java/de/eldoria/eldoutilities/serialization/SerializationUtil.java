@@ -1,12 +1,16 @@
 package de.eldoria.eldoutilities.serialization;
 
-import com.google.common.collect.ObjectArrays;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
+import de.eldoria.eldoutilities.utils.ReflectionUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -80,7 +84,7 @@ public final class SerializationUtil {
      */
     public static Map<String, Object> objectToMap(Object obj) {
         Builder builder = newBuilder();
-        Field[] declaredFields = getAllFields(obj);
+        Field[] declaredFields = ReflectionUtil.getAllFields(obj);
         for (Field declaredField : declaredFields) {
             declaredField.setAccessible(true);
             if (!Modifier.isTransient(declaredField.getModifiers())) {
@@ -107,7 +111,7 @@ public final class SerializationUtil {
      * @since 1.1.0
      */
     public static <T> void mapOnObject(Map<String, Object> objectMap, T obj) {
-        Field[] declaredFields = getAllFields(obj);
+        Field[] declaredFields = ReflectionUtil.getAllFields(obj);
         for (Field declaredField : declaredFields) {
             declaredField.setAccessible(true);
             if (!Modifier.isTransient(declaredField.getModifiers())) {
@@ -121,15 +125,6 @@ public final class SerializationUtil {
         }
     }
 
-    private static Field[] getAllFields(Object obj) {
-        Field[] fields = new Field[0];
-        Class<?> clazz = obj.getClass();
-        while (clazz != null) {
-            fields = ObjectArrays.concat(fields, clazz.getDeclaredFields(), Field.class);
-            clazz = clazz.getSuperclass();
-        }
-        return fields;
-    }
 
     public static final class Builder {
         private final Map<String, Object> serialized;

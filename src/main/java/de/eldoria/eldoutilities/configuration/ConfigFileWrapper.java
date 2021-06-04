@@ -39,29 +39,67 @@ public final class ConfigFileWrapper {
         save();
     }
 
+    /**
+     * Create a config for a file
+     *
+     * @param plugin   owner of the config
+     * @param filePath path to file
+     * @return new instance
+     */
     public static ConfigFileWrapper forFile(Plugin plugin, String filePath) {
         return new ConfigFileWrapper(plugin, filePath, null);
     }
 
+    /**
+     * Create a config for a file
+     *
+     * @param plugin     owner of the config
+     * @param filePath   path to file
+     * @param defaultMap a map with default values to set.
+     * @return new instance
+     */
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, Map<String, Object> defaultMap) {
         YamlConfiguration defaults = new YamlConfiguration();
         defaultMap.forEach(defaults::set);
         return new ConfigFileWrapper(plugin, filePath, defaults);
     }
 
+    /**
+     * Create a config for a file
+     *
+     * @param plugin        owner of the config
+     * @param filePath      path to file
+     * @param defaultConfig a configuration with default values to set.
+     * @return new instance
+     */
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
         return new ConfigFileWrapper(plugin, filePath, defaultConfig);
     }
 
+    /**
+     * Get the file configuration.
+     * <p>
+     * Should not be cached.
+     *
+     * @return file configuration
+     */
     public FileConfiguration get() {
         return fileConfiguration;
     }
 
+    /**
+     * Write data to the config with a consumer
+     *
+     * @param consumer consumer to apply
+     */
     public void write(Consumer<FileConfiguration> consumer) {
         consumer.accept(fileConfiguration);
         save();
     }
 
+    /**
+     * Save the config file to disk
+     */
     public void save() {
         createIfAbsent();
         try {
@@ -71,6 +109,9 @@ public final class ConfigFileWrapper {
         }
     }
 
+    /**
+     * Reload the config file from disk
+     */
     public void reload() {
         fileConfiguration = YamlConfiguration.loadConfiguration(file);
     }
@@ -80,12 +121,12 @@ public final class ConfigFileWrapper {
             try {
                 Files.createDirectories(file.toPath().getParent());
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create directory at " + file.toPath().toString(), e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create directory at " + file.toPath(), e);
             }
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create config at " + file.toPath().toString(), e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create config at " + file.toPath(), e);
             }
         }
     }

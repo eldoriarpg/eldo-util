@@ -16,7 +16,12 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -32,7 +37,7 @@ public abstract class EldoCommand implements TabExecutor {
     private ILocalizer localizer;
     private MessageSender messageSender;
     private String[] registeredCommands = new String[0];
-    private TabExecutor defaultCommand = null;
+    private TabExecutor defaultCommand;
 
     public EldoCommand(Plugin plugin) {
         this.plugin = plugin;

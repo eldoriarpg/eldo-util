@@ -22,20 +22,32 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     private final Plugin plugin;
     private final T data;
     private String latestVersion;
-    private boolean notifyActive = false;
-    private boolean updateAvailable = false;
-    private boolean downloaded = false;
+    private boolean notifyActive;
+    private boolean updateAvailable;
+    private boolean downloaded;
 
-    public Updater(T data) {
-        this.plugin = data.getPlugin();
+    protected Updater(T data) {
+        this.plugin = data.plugin();
         this.data = data;
     }
 
-    public static Updater<?> Spigot(SpigotUpdateData data) {
+    /**
+     * Create a new spigot update checker
+     *
+     * @param data spigot plugin data
+     * @return Updater instance
+     */
+    public static Updater<?> spigot(SpigotUpdateData data) {
         return new SpigotUpdateChecker(data);
     }
 
-    public static Updater<?> Butler(ButlerUpdateData data) {
+    /**
+     * Create a new update butler checker
+     *
+     * @param data butler plugin data
+     * @return Updater instance
+     */
+    public static Updater<?> butler(ButlerUpdateData data) {
         return new ButlerUpdateChecker(data);
     }
 
@@ -69,9 +81,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
                 if (!downloaded) {
                     downloaded = update();
                 }
-                registerListener(new DownloadedNotifier(plugin, data.getNotifyPermission(), latestVersion, downloaded));
+                registerListener(new DownloadedNotifier(plugin, data.notifyPermission(), latestVersion, downloaded));
             } else {
-                registerListener(new UpdateNotifier(plugin, data.getNotifyPermission(), latestVersion));
+                registerListener(new UpdateNotifier(plugin, data.notifyPermission(), latestVersion));
             }
         } else {
             plugin.getLogger().info("§2Plugin is up to date.");
