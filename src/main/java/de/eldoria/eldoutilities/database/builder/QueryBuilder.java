@@ -129,6 +129,12 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
         return this;
     }
 
+    @Override
+    public ResultStage<T> paramsBuilder(ThrowingConsumer<ParamBuilder, SQLException> params) {
+        this.currStatementConsumer = stmt -> params.accept(new ParamBuilder(stmt));
+        return this;
+    }
+
     // RESULT STAGE
 
     @Override

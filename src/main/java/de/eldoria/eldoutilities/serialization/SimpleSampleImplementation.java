@@ -14,7 +14,7 @@ public class SimpleSampleImplementation {
         private final int someInt = 1;
         private final String someString = "Hewo";
         private final NestedClass nestedClass = new NestedClass();
-        private final transient int ignoreMe;
+        private final transient int ignoreMe = 0;
 
         public SerializableClass() {
         }

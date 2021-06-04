@@ -35,13 +35,14 @@ class QueryBuilderTest {
     }
 
     public void asyncResults() {
-        builder(String.class)
+        QueryBuilder.builder(null, null,String.class)
+                .defaultConfig()
                 .query("SELECT something FROM table WHERE key = ?")
                 .params(stmt -> stmt.setString(1, "foo"))
                 .readRow(rs -> rs.getString("something"))
-                .first()
+                .all()
                 .whenComplete(results -> {
-                    // do something
+                    List<String> resultList = results;
                 });
     }
 
@@ -82,7 +83,8 @@ class QueryBuilderTest {
     }
 
     public void updateAsyncAppend() {
-        builder(Long.class)
+        QueryBuilder.builder(null, null, Long.class)
+                .defaultConfig()
                 .query("INSERT INTO table(first, second) VALUES(?, ?)")
                 .params(stmt -> {
                     stmt.setString(1, "newVal");
