@@ -90,7 +90,7 @@ public enum ServerVersion {
         if (matcher.find()) {
             int major = Integer.parseInt(matcher.group(1));
             int minor = Integer.parseInt(matcher.group(2));
-            int patch = Integer.parseInt(matcher.group(3).isEmpty() ? "0" : matcher.group(3));
+            int patch = Integer.parseInt(matcher.group(3) == null ? "0" : matcher.group(3));
             return Optional.of(new Triple<>(major, minor, patch));
         }
         return Optional.empty();
