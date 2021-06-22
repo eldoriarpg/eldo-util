@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.configuration;
 
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -20,12 +21,18 @@ import java.util.logging.Level;
  */
 public final class ConfigFileWrapper {
     private final File file;
+    @Nullable
     private final Plugin plugin;
     private FileConfiguration fileConfiguration;
 
-    private ConfigFileWrapper(Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
+    private ConfigFileWrapper(@Nullable Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
         this.plugin = plugin;
-        Path path = Paths.get(plugin.getDataFolder().toString(), filePath);
+        Path path;
+        if (plugin == null) {
+            path = Paths.get(Bukkit.getUpdateFolderFile().toPath().getParent().toString(), filePath);
+        } else {
+            path = Paths.get(plugin.getDataFolder().toString(), filePath);
+        }
         file = path.toFile();
 
         createIfAbsent();
@@ -48,6 +55,17 @@ public final class ConfigFileWrapper {
      */
     public static ConfigFileWrapper forFile(Plugin plugin, String filePath) {
         return new ConfigFileWrapper(plugin, filePath, null);
+    }
+
+    /**
+     * Create a config for a file. This file is not owned by any plugin.
+     * The path will be relative to the plugin directory itself.
+     *
+     * @param filePath path to file
+     * @return new instance
+     */
+    public static ConfigFileWrapper forFile(String filePath) {
+        return new ConfigFileWrapper(null, filePath, null);
     }
 
     /**
@@ -105,7 +123,7 @@ public final class ConfigFileWrapper {
         try {
             fileConfiguration.save(file);
         } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Could not Save config to " + this.plugin, e);
+            log(Level.SEVERE, "Could not Save config to " + this.plugin, e);
         }
     }
 
@@ -117,17 +135,25 @@ public final class ConfigFileWrapper {
     }
 
     private void createIfAbsent() {
-        if (!file.exists()) {
+        if (!Files.exists(file.toPath())) {
             try {
                 Files.createDirectories(file.toPath().getParent());
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create directory at " + file.toPath(), e);
+                log(Level.SEVERE, "Could not create directory at " + file.toPath(), e);
             }
             try {
-                file.createNewFile();
+                Files.createFile(file.toPath());
             } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not create config at " + file.toPath(), e);
+                log(Level.SEVERE, "Could not create config at " + file.toPath(), e);
             }
+        }
+    }
+
+    private void log(Level level, String message, Throwable e) {
+        if (plugin == null) {
+            Bukkit.getLogger().log(level, "[EldoUtilitites] " + message, e);
+        } else {
+            plugin.getLogger().log(level, message, e);
         }
     }
 

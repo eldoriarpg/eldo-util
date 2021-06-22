@@ -44,7 +44,7 @@ public enum ServerVersion {
     private static final Pattern VERSION_PATTERN;
 
     static {
-        VERSION_PATTERN = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})(?:\\.([0-9]{0,3}))?");
+        VERSION_PATTERN = Pattern.compile("^([0-9]{1,3})\\.([0-9]{1,3})(?:\\.([0-9]{1,3}))?");
         CURRENT_VERSION = Bukkit.getServer() != null ? getVersion() : MC_UNKOWN;
     }
 
