@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -25,15 +24,9 @@ public final class ConfigFileWrapper {
     private final Plugin plugin;
     private FileConfiguration fileConfiguration;
 
-    private ConfigFileWrapper(@Nullable Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
+    private ConfigFileWrapper(@Nullable Plugin plugin, Path filePath, @Nullable Configuration defaultConfig) {
         this.plugin = plugin;
-        Path path;
-        if (plugin == null) {
-            path = Paths.get(Bukkit.getUpdateFolderFile().toPath().getParent().toString(), filePath);
-        } else {
-            path = Paths.get(plugin.getDataFolder().toString(), filePath);
-        }
-        file = path.toFile();
+        file = filePath.toFile();
 
         createIfAbsent();
 
@@ -54,6 +47,17 @@ public final class ConfigFileWrapper {
      * @return new instance
      */
     public static ConfigFileWrapper forFile(Plugin plugin, String filePath) {
+        return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), null);
+    }
+
+    /**
+     * Create a config for a file
+     *
+     * @param plugin   owner of the config
+     * @param filePath path to file
+     * @return new instance
+     */
+    public static ConfigFileWrapper forFile(Plugin plugin, Path filePath) {
         return new ConfigFileWrapper(plugin, filePath, null);
     }
 
@@ -64,7 +68,7 @@ public final class ConfigFileWrapper {
      * @param filePath path to file
      * @return new instance
      */
-    public static ConfigFileWrapper forFile(String filePath) {
+    public static ConfigFileWrapper forFile(Path filePath) {
         return new ConfigFileWrapper(null, filePath, null);
     }
 
@@ -79,6 +83,20 @@ public final class ConfigFileWrapper {
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, Map<String, Object> defaultMap) {
         YamlConfiguration defaults = new YamlConfiguration();
         defaultMap.forEach(defaults::set);
+        return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), defaults);
+    }
+
+    /**
+     * Create a config for a file
+     *
+     * @param plugin     owner of the config
+     * @param filePath   path to file
+     * @param defaultMap a map with default values to set.
+     * @return new instance
+     */
+    public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, Path filePath, Map<String, Object> defaultMap) {
+        YamlConfiguration defaults = new YamlConfiguration();
+        defaultMap.forEach(defaults::set);
         return new ConfigFileWrapper(plugin, filePath, defaults);
     }
 
@@ -91,6 +109,18 @@ public final class ConfigFileWrapper {
      * @return new instance
      */
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
+        return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), defaultConfig);
+    }
+
+    /**
+     * Create a config for a file
+     *
+     * @param plugin        owner of the config
+     * @param filePath      path to file
+     * @param defaultConfig a configuration with default values to set.
+     * @return new instance
+     */
+    public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, Path filePath, @Nullable Configuration defaultConfig) {
         return new ConfigFileWrapper(plugin, filePath, defaultConfig);
     }
 
@@ -155,6 +185,13 @@ public final class ConfigFileWrapper {
         } else {
             plugin.getLogger().log(level, message, e);
         }
+    }
+
+    private static Path resolvePath(Plugin plugin, String filePath) {
+        if (plugin == null) {
+            return Bukkit.getUpdateFolderFile().toPath().getParent().resolve(filePath);
+        }
+        return plugin.getDataFolder().toPath().resolve(filePath);
     }
 
 }
