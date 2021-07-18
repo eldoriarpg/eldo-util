@@ -22,7 +22,7 @@ public class MapEntry implements ConfigurationSerializable {
     public MapEntry(Map<String, Object> objectMap) {
         TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
 
-        objectMap.entrySet().forEach(e -> EldoUtilities.logger().config("Key: " + key + " | Value : " + e.getValue()));
+        objectMap.forEach((k, v) -> EldoUtilities.logger().finer("Key: " + k + " | Value : " + v));
 
         key = map.getValue("key");
         object = map.getValue("object");
