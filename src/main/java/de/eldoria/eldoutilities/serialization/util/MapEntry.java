@@ -17,7 +17,7 @@ public class MapEntry implements ConfigurationSerializable {
         throw new UnsupportedOperationException("This class is deprecated.");
     }
 
-    public de.eldoria.eldoutilities.serialization.wrapper.MapEntry deserialize(Map<String, Object> objectMap) {
+    public static de.eldoria.eldoutilities.serialization.wrapper.MapEntry deserialize(Map<String, Object> objectMap) {
         return new de.eldoria.eldoutilities.serialization.wrapper.MapEntry(objectMap);
     }
 
