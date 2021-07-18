@@ -25,4 +25,12 @@ public class MapEntry implements ConfigurationSerializable {
     public @NotNull Map<String, Object> serialize() {
         return SerializationUtil.objectToMap(this);
     }
+
+    @Override
+    public String toString() {
+        return "MapEntry{" +
+                "key='" + key + '\'' +
+                ", object=" + object +
+                '}';
+    }
 }

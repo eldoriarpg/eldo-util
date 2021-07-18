@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.serialization.wrapper;
 
+import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
 import de.eldoria.eldoutilities.serialization.TypeResolvingMap;
 import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
@@ -20,6 +21,9 @@ public class MapEntry implements ConfigurationSerializable {
 
     public MapEntry(Map<String, Object> objectMap) {
         TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+
+        objectMap.entrySet().forEach(e -> EldoUtilities.logger().config("Key: " + key + " | Value : " + e.getValue()));
+
         key = map.getValue("key");
         object = map.getValue("object");
     }
@@ -38,5 +42,13 @@ public class MapEntry implements ConfigurationSerializable {
 
     public Object getObject() {
         return object;
+    }
+
+    @Override
+    public String toString() {
+        return "MapEntry{" +
+                "key='" + key + '\'' +
+                ", object=" + object +
+                '}';
     }
 }
