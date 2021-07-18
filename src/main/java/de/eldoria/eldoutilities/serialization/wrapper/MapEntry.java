@@ -27,8 +27,8 @@ public class MapEntry implements ConfigurationSerializable {
     @Override
     public @NotNull Map<String, Object> serialize() {
         return SerializationUtil.newBuilder()
-                .add("key", "key")
-                .add("object","object")
+                .add("key", key)
+                .add("object", object)
                 .build();
     }
 
