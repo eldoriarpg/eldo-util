@@ -1,6 +1,7 @@
 package de.eldoria.eldoutilities.serialization.wrapper;
 
 import de.eldoria.eldoutilities.serialization.SerializationUtil;
+import de.eldoria.eldoutilities.serialization.TypeResolvingMap;
 import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +19,17 @@ public class MapEntry implements ConfigurationSerializable {
     }
 
     public MapEntry(Map<String, Object> objectMap) {
-        SerializationUtil.mapOnObject(objectMap, this);
+        TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+        key = map.getValue("key");
+        object = map.getValue("object");
     }
 
     @Override
     public @NotNull Map<String, Object> serialize() {
-        return SerializationUtil.objectToMap(this);
+        return SerializationUtil.newBuilder()
+                .add("key", "key")
+                .add("object","object")
+                .build();
     }
 
     public String getKey() {
