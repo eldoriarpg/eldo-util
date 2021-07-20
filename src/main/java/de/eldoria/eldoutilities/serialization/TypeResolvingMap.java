@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.serialization;
 
+import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.utils.EnumUtil;
 import org.jetbrains.annotations.NotNull;
@@ -144,7 +145,15 @@ public final class TypeResolvingMap extends AbstractMap<String, Object> {
             return results;
         }
 
-        mapObjects.stream().forEach(e -> results.put(keyOrValueToKey.apply(e.getKey(), (V) e.getObject()), (V) e.getObject()));
+
+        mapObjects.forEach(e -> {
+            EldoUtilities.logger().config("Building map entry from: " + e);
+            if (e == null) {
+                EldoUtilities.logger().config("Map is null");
+                return;
+            }
+            results.put(keyOrValueToKey.apply(e.getKey(), (V) e.getObject()), (V) e.getObject());
+        });
         return results;
     }
 

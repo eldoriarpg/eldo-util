@@ -7,16 +7,17 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 @Deprecated
+//git a@DelegateDeserialization(de.eldoria.eldoutilities.serialization.wrapper.MapEntry.class)
 public class MapEntry implements ConfigurationSerializable {
     private String key;
     private Object object;
 
+    @Deprecated
     public MapEntry(String key, Object object) {
-        this.key = key;
-        this.object = object;
+        throw new UnsupportedOperationException("This class is deprecated.");
     }
 
-    public de.eldoria.eldoutilities.serialization.wrapper.MapEntry deserialize(Map<String, Object> objectMap){
+    public static de.eldoria.eldoutilities.serialization.wrapper.MapEntry deserialize(Map<String, Object> objectMap) {
         return new de.eldoria.eldoutilities.serialization.wrapper.MapEntry(objectMap);
     }
 
@@ -25,11 +26,11 @@ public class MapEntry implements ConfigurationSerializable {
         return SerializationUtil.objectToMap(this);
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public Object getObject() {
-        return object;
+    @Override
+    public String toString() {
+        return "MapEntry{" +
+                "key='" + key + '\'' +
+                ", object=" + object +
+                '}';
     }
 }
