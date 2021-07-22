@@ -172,13 +172,12 @@ public final class EntityBuilder {
     }
 
     /**
-     * Sets whether or not to display the mob's custom name client side. The
-     * name will be displayed above the mob similarly to a player.
-     * <p>
-     * This value has no effect on players, they will always display their
-     * name.
+     * Sets whether the entity has a team colored (default: white) glow.
      *
-     * @param flag custom name or not
+     * <b>nb: this refers to the 'Glowing' entity property, not whether a
+     * glowing potion effect is applied</b>
+     *
+     * @param flag if the entity is glowing
      * @return builder instance
      */
     public EntityBuilder withGlowing(boolean flag) {
