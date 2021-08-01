@@ -12,4 +12,12 @@ public class CompletableBukkitFuture {
     public static <T> BukkitFutureResult<T> supplyAsync(Supplier<T> supplier, Executor executor) {
         return BukkitFutureResult.of(CompletableFuture.supplyAsync(supplier, executor));
     }
+
+    public static BukkitFutureResult<Void> supplyAsync(Runnable supplier) {
+        return BukkitFutureResult.of(CompletableFuture.runAsync(supplier));
+    }
+
+    public static BukkitFutureResult<Void> supplyAsync(Runnable supplier, Executor executor) {
+        return BukkitFutureResult.of(CompletableFuture.runAsync(supplier, executor));
+    }
 }

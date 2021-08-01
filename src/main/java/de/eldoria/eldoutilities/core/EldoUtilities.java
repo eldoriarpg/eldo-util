@@ -18,6 +18,7 @@ import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,6 +88,8 @@ public final class EldoUtilities {
                 PluginSerializationName annotation = clazz.getAnnotation(PluginSerializationName.class);
                 ConfigurationSerialization.registerClass(clazz,
                         annotation.value().replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
+            } else {
+                ConfigurationSerialization.registerClass(clazz);
             }
         }
     }
@@ -98,8 +101,8 @@ public final class EldoUtilities {
                             Bukkit.getScheduler().runTaskLater(eldoPlugin, EldoUtilities::performLateCleanUp, 5);
                             return null;
                         });
-        Path eldoUtilconfig = Paths.get("..", "EldoUtilities", "config.yml");
-        configuration = ConfigFileWrapper.forFile(eldoPlugin, eldoUtilconfig.toString());
+        Path path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        configuration = ConfigFileWrapper.forFile(eldoPlugin, path);
     }
 
     private static void performLateCleanUp() {
@@ -134,10 +137,16 @@ public final class EldoUtilities {
     }
 
     public static List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
-        return Arrays.asList(MapEntry.class, ArmorStandWrapper.class);
+        return Arrays.asList(MapEntry.class, ArmorStandWrapper.class,
+                de.eldoria.eldoutilities.serialization.util.MapEntry.class,
+                de.eldoria.eldoutilities.serialization.util.ArmorStandWrapper.class);
     }
 
     public static ConfigFileWrapper getConfiguration() {
+        if (configuration == null) {
+            Path config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+            configuration = ConfigFileWrapper.forFile(config);
+        }
         return configuration;
     }
 
