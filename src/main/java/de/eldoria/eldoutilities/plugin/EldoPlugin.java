@@ -26,6 +26,9 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -44,7 +47,6 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     private BukkitScheduler scheduler;
     private DebugLogger debugLogger;
     private FailsaveCommand failcmd;
-    private boolean started;
     private ReloadListener reloadListener;
 
     public EldoPlugin() {
@@ -185,22 +187,21 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     @Override
     public final void onEnable() {
-        if (started) {
+        boolean reload = isLocked();
+        if (reload) {
             try {
                 logger().config("Detected plugin reload.");
-                onPluginReload();
+                onReload();
             } catch (Throwable e) {
                 initFailsave("Plugin failed to reload.", e);
             }
-            return;
         }
         reloadListener = new ReloadListener();
         registerListener(reloadListener);
-        started = true;
         EldoUtilities.ignite(instance);
         try {
             logger().config("Detected initial plugin enable.");
-            onPluginEnable();
+            onPluginEnable(reload);
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
             for (String cmd : getDescription().getCommands().keySet()) {
@@ -216,12 +217,13 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             @Override
             public void run() {
                 try {
-                    onPostStart();
+                    onPostStart(reload);
                 } catch (Throwable e) {
                     initFailsave("Plugin post start failed.", e);
                 }
             }
         }.runTaskLater(this, 1);
+        removeLock();
     }
 
     private void initFailsave(String message, Throwable e) {
@@ -258,26 +260,53 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     /**
      * Called when the server has started completely.
+     * @param reload
      */
-    public void onPostStart() throws Throwable {
+    public void onPostStart(boolean reload) throws Throwable {
     }
 
     /**
      * Called when this plugin is enabled
+     * @param reload
      */
-    public void onPluginEnable() throws Throwable {
+    public void onPluginEnable(boolean reload) throws Throwable {
     }
 
     @Override
     public final void onDisable() {
         if (reloadListener.isReload()) {
             logger().severe("Plugin is disabled by server reload.");
+            createLock();
         }
         EldoUtilities.shutdown();
         try {
             onPluginDisable();
         } catch (Throwable e) {
             logger().log(Level.SEVERE, "Plugin failed to shutdown correctly.", e);
+        }
+    }
+
+    private Path getLockFile() {
+        return getDataFolder().toPath().resolve("lock");
+    }
+
+    private void createLock() {
+        try {
+            Files.createFile(getLockFile());
+        } catch (IOException e) {
+            logger().config("Could not create lock file");
+        }
+    }
+
+    private boolean isLocked() {
+        return Files.exists(getLockFile());
+    }
+
+    private void removeLock(){
+        try {
+            Files.deleteIfExists(getLockFile());
+        } catch (IOException e) {
+            logger().config("Could not resolve lock");
         }
     }
 
