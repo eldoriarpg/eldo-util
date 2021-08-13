@@ -194,7 +194,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             }
             return;
         }
-        registerListener(new ReloadListener());
+        reloadListener = new ReloadListener();
+        registerListener(reloadListener);
         started = true;
         EldoUtilities.ignite(instance);
         try {
