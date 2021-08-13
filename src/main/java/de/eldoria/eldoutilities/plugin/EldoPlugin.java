@@ -244,11 +244,11 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     private void onReload() {
         try {
-            logger().config("");
+            logger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
             logger().severe("Detected server reload.");
             logger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
             logger().severe("Please do not report any bugs caused by reloading the server.");
-            logger().config("");
+            logger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
             onPluginReload();
         } catch (Throwable e) {
             initFailsave("Plugin failed to reload.", e);
@@ -345,16 +345,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             }
         }
 
-        @EventHandler
-        public void onRconCommand(RemoteServerCommandEvent event) {
-        }
-
         public boolean isReload() {
             return reload;
-        }
-
-        public void reset() {
-            reload = false;
         }
     }
 }
