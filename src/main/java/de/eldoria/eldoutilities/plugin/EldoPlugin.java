@@ -171,7 +171,6 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     @Override
     public final void onLoad() {
-        registerListener(new ReloadListener());
         logger().config("Loading plugin.");
         try {
             onPluginLoad();
@@ -195,6 +194,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             }
             return;
         }
+        registerListener(new ReloadListener());
         started = true;
         EldoUtilities.ignite(instance);
         try {
