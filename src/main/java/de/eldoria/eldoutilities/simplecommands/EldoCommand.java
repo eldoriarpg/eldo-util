@@ -75,7 +75,7 @@ public abstract class EldoCommand implements TabExecutor {
 
         final String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
-        return getCommand(args[0]).map(c -> c.onCommand(sender, command, label, newArgs)).orElse(false);
+        return getCommand(args[0]).map(c -> c.onCommand(sender, command, args[0], newArgs)).orElse(false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public abstract class EldoCommand implements TabExecutor {
 
         if (args.length == 0) return Collections.emptyList();
 
-        return getCommand(args[0]).map(c -> c.onTabComplete(sender, command, alias, newArgs))
+        return getCommand(args[0]).map(c -> c.onTabComplete(sender, command, args[0], newArgs))
                 .orElse(Collections.singletonList(localizer().getMessage("error.invalidCommand")));
     }
 
