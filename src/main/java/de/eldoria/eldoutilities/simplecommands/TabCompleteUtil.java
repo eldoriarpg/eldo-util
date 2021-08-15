@@ -1,20 +1,32 @@
 package de.eldoria.eldoutilities.simplecommands;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.gson.internal.LinkedHashTreeMap;
 import de.eldoria.eldoutilities.C;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.ArrayUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,7 +36,70 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public final class TabCompleteUtil {
+    private static final Set<String> smartMats;
+    private static final Map<String, List<String>> smartShortMats;
+    private static final Map<String, List<String>> smartPartMats;
+    private static final Pattern SHORT_NAME = Pattern.compile("(?:(?:^|_)(.))");
+    private static final Cache<String, List<String>> SMART_MAT_RESULTS = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+
     private TabCompleteUtil() {
+    }
+
+    static {
+        smartMats = new LinkedHashSet<>();
+        smartShortMats = new LinkedHashTreeMap<>();
+        smartPartMats = new LinkedHashTreeMap<>();
+
+        for (Material material : Material.values()) {
+            String name = material.name();
+            if (name.startsWith("LEGACY")) continue;
+            smartShortMats.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            smartMats.add(name);
+            for (String part : getParts(material)) {
+                smartPartMats.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            }
+        }
+    }
+
+    private static String getShortName(Material mat) {
+        Matcher matcher = SHORT_NAME.matcher(mat.name());
+        StringBuilder builder = new StringBuilder();
+        while (matcher.find()) {
+            builder.append(matcher.group(1));
+        }
+        return builder.toString();
+    }
+
+    private static Set<String> getParts(Material mat) {
+        return Arrays.stream(mat.name().split("_")).collect(Collectors.toSet());
+    }
+
+    /**
+     * Complete a material with precomputed result maps
+     *
+     * @param value     value to complete
+     * @param lowerCase true to receive results in lower case
+     * @return a list with unique entries
+     */
+    public static List<String> completeMaterial(String value, boolean lowerCase) {
+        value = value.toLowerCase(Locale.ROOT);
+        Set<String> results = new LinkedHashSet<>();
+        // Smart matches on part have the highest priority
+        for (Map.Entry<String, List<String>> entry : smartShortMats.entrySet()) {
+            if (!entry.getKey().startsWith(value)) continue;
+            results.addAll(entry.getValue());
+        }
+
+        // Matches on the start of the value have second prio
+        results.addAll(complete(value, smartMats));
+
+        // Part maches are nice, but have low priority
+        for (Map.Entry<String, List<String>> entry : smartPartMats.entrySet()) {
+            if (!entry.getKey().startsWith(value)) continue;
+            results.addAll(entry.getValue());
+        }
+
+        return results.stream().map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name).collect(Collectors.toList());
     }
 
     /**
