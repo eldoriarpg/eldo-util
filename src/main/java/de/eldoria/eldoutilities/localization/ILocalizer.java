@@ -1,6 +1,7 @@
 package de.eldoria.eldoutilities.localization;
 
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.PropertyKey;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,6 +26,10 @@ public interface ILocalizer {
     static ILocalizer getPluginLocalizer(Class<? extends Plugin> plugin) {
         if (plugin == null) return DEFAULT;
         return LOCALIZER.getOrDefault(plugin, DEFAULT);
+    }
+
+    static String escape(String string) {
+        return String.format("$%s$", string);
     }
 
     /**

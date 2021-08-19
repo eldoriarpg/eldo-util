@@ -93,11 +93,15 @@ public final class TabCompleteUtil {
         // Matches on the start of the value have second prio
         results.addAll(complete(value, smartMats));
 
-        // Part maches are nice, but have low priority
+        // Part matches are nice, but have low priority
         for (Map.Entry<String, List<String>> entry : smartPartMats.entrySet()) {
             if (!entry.getKey().startsWith(value)) continue;
             results.addAll(entry.getValue());
         }
+
+        String finalValue = value;
+
+        results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
         return results.stream().map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name).collect(Collectors.toList());
     }
