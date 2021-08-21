@@ -161,7 +161,7 @@ public class Localizer implements ILocalizer {
 
         if (result == null) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
-            return "";
+            return key;
         }
 
         for (Replacement replacement : replacements) {
@@ -384,6 +384,11 @@ public class Localizer implements ILocalizer {
             //Replace current locale code with result
             result = result.replace("$" + match + "$", getMessage(match, replacements));
         }
+
+        if (EMBED_LOCALIZATION_CODE.matcher(result).find()) {
+            return localize(result, replacements);
+        }
+
         return result;
     }
 

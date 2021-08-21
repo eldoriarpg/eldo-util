@@ -237,7 +237,7 @@ public final class TabCompleteUtil {
      * @param value current value
      * @return null as this will enable minecraft to standard completion which is nearly always a player
      */
-    public static List<String> completeOnlinePlayers(String value) {1
+    public static List<String> completeOnlinePlayers(String value) {
         Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
         if (lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
             ONLINE_NAMES.clear();
