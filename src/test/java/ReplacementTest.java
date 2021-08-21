@@ -1,12 +1,6 @@
 import de.eldoria.eldoutilities.localization.Replacement;
-import de.eldoria.eldoutilities.utils.Parser;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 public class ReplacementTest {
     Replacement repCaps = Replacement.create("ENTITY", "name");
