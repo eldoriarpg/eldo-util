@@ -161,7 +161,7 @@ public class Localizer implements ILocalizer {
 
         if (result == null) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
-            return key;
+            result = key;
         }
 
         for (Replacement replacement : replacements) {
@@ -367,7 +367,7 @@ public class Localizer implements ILocalizer {
         }
 
         // If the matcher doesn't find any key we assume its a simple message.
-        if (LOCALIZATION_CODE.matcher(message).matches()) {
+        if (!EMBED_LOCALIZATION_CODE.matcher(message).matches()) {
             return getMessage(message, replacements);
         }
 
