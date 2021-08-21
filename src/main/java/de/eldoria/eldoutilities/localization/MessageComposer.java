@@ -25,8 +25,28 @@ public class MessageComposer {
         return this;
     }
 
+    /**
+     * Add a string to the message.
+     * <p>
+     * This also allows to use a string format like {@link String#format(String, Object...)}
+     *
+     * @param text    text to add
+     * @param objects objects for placeholder
+     * @return this instance
+     */
+    public MessageComposer text(String text, Object... objects) {
+        stringBuilder.append(String.format(text.toString(), objects));
+        return this;
+    }
+
+    /**
+     * Add a object to the message as string.
+     *
+     * @param object object to add
+     * @return this instance
+     */
     public MessageComposer text(Object object) {
-        stringBuilder.append(object);
+        stringBuilder.append(object.toString());
         return this;
     }
 
