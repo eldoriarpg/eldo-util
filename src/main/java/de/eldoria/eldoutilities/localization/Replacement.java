@@ -88,6 +88,8 @@ public final class Replacement {
      * @return replacement with formatting set
      */
     public Replacement addFormatting(char[] format, char... afterFormat) {
+        if (format.length == 0 && afterFormat.length == 0) return this;
+
         StringBuilder builder = new StringBuilder();
         for (char aChar : format) {
             builder.append("§").append(aChar);
