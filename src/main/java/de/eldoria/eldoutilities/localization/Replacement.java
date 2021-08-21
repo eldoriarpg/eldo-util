@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
  * A replacement represents a text placeholder and its replacement.
  */
 public final class Replacement {
+    private static String format = "%%%s%%";
+
     private final String key;
     private String value;
     private boolean caseSensitive;
@@ -25,7 +27,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static Replacement create(String key, String value, char... formats) {
-        Replacement replacement = new Replacement("%" + key + "%", value);
+        Replacement replacement = new Replacement(key, value);
         return replacement.addFormatting(formats);
     }
 
@@ -128,8 +130,30 @@ public final class Replacement {
      */
     public String invoke(String string) {
         if (!caseSensitive) {
-            return string.replaceAll("(?i)" + key, value);
+            return string.replaceAll("(?i)" + markedKey(), value);
         }
         return string.replace(key, value);
+    }
+
+    private String markedKey() {
+        return String.format(format, key);
+    }
+
+    @Override
+    public String toString() {
+        return "Replacement{" +
+               "key='" + key + '\'' +
+               ", value='" + value + '\'' +
+               ", caseSensitive=" + caseSensitive +
+               '}';
+    }
+
+    /**
+     * Sets the format used to recognize placeholders. This is the string which will be replaced by the replacement value
+     *
+     * @param format format for replacement markers
+     */
+    public static void setFormat(String format) {
+        Replacement.format = format;
     }
 }

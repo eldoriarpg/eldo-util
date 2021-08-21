@@ -165,6 +165,7 @@ public class Localizer implements ILocalizer {
         }
 
         for (Replacement replacement : replacements) {
+            plugin.getLogger().finer("Applying " +  replacement.toString());
             result = replacement.invoke(result);
         }
 
