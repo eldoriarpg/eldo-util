@@ -10,12 +10,17 @@ import de.eldoria.eldoutilities.utils.ArrayUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +41,9 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public final class TabCompleteUtil {
+    private static final Set<String> PLAYER_NAMES = new HashSet<>();
+    private static final Set<String> ONLINE_NAMES = new HashSet<>();
+    private static Instant lastPlayerRefresh = Instant.now();
     private static final Set<String> smartMats;
     private static final Map<String, List<String>> smartShortMats;
     private static final Map<String, List<String>> smartPartMats;
@@ -99,7 +107,7 @@ public final class TabCompleteUtil {
             results.addAll(entry.getValue());
         }
 
-        String finalValue = value;
+        String finalValue = value.toUpperCase(Locale.ROOT);
 
         results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
@@ -207,9 +215,37 @@ public final class TabCompleteUtil {
      * @param value current value
      * @return null as this will enable minecraft to standard completion which is nearly always a player
      */
-    @Nullable
     public static List<String> completePlayers(String value) {
-        return null;
+        if (PLAYER_NAMES.isEmpty()) {
+            PLAYER_NAMES.addAll(
+                    Arrays.stream(Bukkit.getOfflinePlayers())
+                            .filter(p -> Instant.ofEpochMilli(p.getLastPlayed()).isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
+                            .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
+                            .limit(1000)
+                            .map(OfflinePlayer::getName)
+                            .collect(Collectors.toSet()));
+        }
+
+        Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
+        complete.addAll(completeOnlinePlayers(value));
+        return new ArrayList<>(complete);
+    }
+
+    /**
+     * Complete a player
+     *
+     * @param value current value
+     * @return null as this will enable minecraft to standard completion which is nearly always a player
+     */
+    public static List<String> completeOnlinePlayers(String value) {1
+        Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
+        if (lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
+            ONLINE_NAMES.clear();
+            ONLINE_NAMES.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
+            lastPlayerRefresh = Instant.now();
+        }
+        complete.addAll(complete(value, ONLINE_NAMES));
+        return new ArrayList<>(complete);
     }
 
 
