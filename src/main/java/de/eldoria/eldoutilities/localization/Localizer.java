@@ -50,8 +50,8 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public class Localizer implements ILocalizer {
-    private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z.]+?)\\$");
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z.]+?)");
+    private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z0-9_.]+?)\\$");
+    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_.]+?)");
 
     private final ResourceBundle fallbackLocaleFile;
     private final Plugin plugin;
@@ -164,12 +164,7 @@ public class Localizer implements ILocalizer {
             result = key;
         }
 
-        for (Replacement replacement : replacements) {
-            plugin.getLogger().finer("Applying " +  replacement.toString());
-            result = replacement.invoke(result);
-        }
-
-        return result;
+        return invokeReplacements(result, replacements);
     }
 
     private void createOrUpdateLocaleFiles() {
@@ -325,7 +320,7 @@ public class Localizer implements ILocalizer {
             if (updated) {
                 try (OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                     outputStream.write("# File automatically updated at "
-                            + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
+                                       + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
                     for (Map.Entry<String, String> entry : treemap.entrySet()) {
                         outputStream.write(entry.getKey() + "=" + entry.getValue().replace("\n", "\\n") + "\n");
                     }
@@ -368,8 +363,11 @@ public class Localizer implements ILocalizer {
         }
 
         // If the matcher doesn't find any key we assume its a simple message.
-        if (!EMBED_LOCALIZATION_CODE.matcher(message).matches()) {
-            return getMessage(message, replacements);
+        if (!EMBED_LOCALIZATION_CODE.matcher(message).find()) {
+            if (LOCALIZATION_CODE.matcher(message).matches()) {
+                return getMessage(message, replacements);
+            }
+            return invokeReplacements(message, replacements);
         }
 
         // find locale codes in message
@@ -378,7 +376,6 @@ public class Localizer implements ILocalizer {
         while (matcher.find()) {
             keys.add(matcher.group(1));
         }
-
 
         String result = message;
         for (String match : keys) {
@@ -391,6 +388,13 @@ public class Localizer implements ILocalizer {
         }
 
         return result;
+    }
+
+    private String invokeReplacements(String message, Replacement... replacements) {
+        for (Replacement replacement : replacements) {
+            message = replacement.invoke(message);
+        }
+        return message;
     }
 
     /**
