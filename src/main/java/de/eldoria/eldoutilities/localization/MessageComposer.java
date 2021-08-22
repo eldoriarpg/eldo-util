@@ -3,6 +3,8 @@ package de.eldoria.eldoutilities.localization;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Class to compose localized messages.
@@ -52,6 +54,12 @@ public class MessageComposer {
 
     public MessageComposer space() {
         stringBuilder.append(" ");
+        return this;
+    }
+
+    public MessageComposer space(int spaces) {
+        // TODO: waiting for java 11 migration
+        stringBuilder.append(IntStream.of(spaces).mapToObj(i -> " ").collect(Collectors.joining()));
         return this;
     }
 
