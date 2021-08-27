@@ -240,7 +240,7 @@ public final class TabCompleteUtil {
      */
     public static List<String> completeOnlinePlayers(String value) {
         Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
-        if (lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
+        if (ONLINE_NAMES.isEmpty() || lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
             ONLINE_NAMES.clear();
             ONLINE_NAMES.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
             lastPlayerRefresh = Instant.now();
