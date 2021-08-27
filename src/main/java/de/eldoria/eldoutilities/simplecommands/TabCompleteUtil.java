@@ -134,8 +134,9 @@ public final class TabCompleteUtil {
      */
     public static List<String> complete(String value, Stream<String> inputs) {
         if (value.isEmpty()) return inputs.collect(Collectors.toList());
+        String lowerValue = value.toLowerCase(Locale.ROOT);
         return inputs
-                .filter(i -> i.toLowerCase().startsWith(value))
+                .filter(i -> i.toLowerCase().startsWith(lowerValue))
                 .collect(Collectors.toList());
     }
 
