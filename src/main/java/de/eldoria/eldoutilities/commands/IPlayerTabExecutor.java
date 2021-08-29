@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface IPlayerTabExecutor extends TabCompleter {
+public interface IPlayerTabExecutor {
     void onCommand(@NotNull Player sender, @NotNull String label, @NotNull Arguments arguments) throws CommandException;
 
     @Nullable

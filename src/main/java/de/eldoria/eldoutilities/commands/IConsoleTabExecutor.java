@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public interface IConsoleTabExecutor extends TabCompleter {
+public interface IConsoleTabExecutor {
     void onCommand(@NotNull ConsoleCommandSender sender, @NotNull String label, @NotNull Arguments arguments) throws CommandException;
 
     @Nullable
