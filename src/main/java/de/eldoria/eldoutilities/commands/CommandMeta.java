@@ -91,11 +91,14 @@ public class CommandMeta {
     }
 
     public boolean isCommand(String value) {
-        if(value.equalsIgnoreCase(name())) return true;
+        if (value.equalsIgnoreCase(name())) return true;
         for (String alias : aliases) {
-            if(alias.equalsIgnoreCase(value)) return true;
+            if (alias.equalsIgnoreCase(value)) return true;
         }
         return false;
     }
 
+    public static CommandMetaBuilder builder(String name) {
+        return new CommandMetaBuilder(name);
+    }
 }
