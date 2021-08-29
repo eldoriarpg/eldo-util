@@ -1,5 +1,6 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command.util;
 
+import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.EnumUtil;
@@ -7,6 +8,9 @@ import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 /**
  * Util class to throw exceptions based on conditions.
@@ -39,6 +43,21 @@ public final class CommandAssertions {
     public static void invalidArguments(CommandMeta meta, Arguments args) throws CommandException {
         isFalse(args.size() < meta.requiredArguments(), "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + meta.argumentString()).addFormatting('6'));
+    }
+
+    /**
+     * Checks that the arguments have the required length
+     *
+     * @param meta      meta
+     * @param args      arguments
+     * @param arguments arguments which are required and optional in correct order
+     * @throws CommandException when the arguments are not sufficient.
+     */
+    public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args) throws CommandException {
+        long required = Arrays.stream(args).filter(Argument::isRequired).count();
+        String argumentString = Arrays.stream(args).map(arg -> String.format(arg.isRequired() ? "<%s>" : "[%s]", arg.name())).collect(Collectors.joining(" "));
+        isFalse(arguments.size() < required, "error.invalidArguments",
+                Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString).addFormatting('6'));
     }
 
     /**

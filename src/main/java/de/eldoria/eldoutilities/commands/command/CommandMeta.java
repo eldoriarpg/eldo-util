@@ -1,5 +1,7 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command;
 
+import de.eldoria.eldoutilities.commands.command.util.Argument;
+import de.eldoria.eldoutilities.commands.command.util.CommandMetaBuilder;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -14,14 +16,14 @@ public class CommandMeta {
     private final String[] aliases;
     private final Set<String> permissions;
     private final Set<Class<? extends CommandSender>> allowedSender;
-    private final List<CommandArgument> arguments;
+    private final List<Argument> arguments;
     private final AdvancedCommand defaultCommand;
     private final Map<String, AdvancedCommand> subCommands;
     private final Set<String> registeredCommands;
     private final int requiredArguments;
     private AdvancedCommand parent;
 
-    public CommandMeta(String name, String[] aliases, Set<String> permissions, Set<Class<? extends CommandSender>> allowedSender, List<CommandArgument> arguments,
+    public CommandMeta(String name, String[] aliases, Set<String> permissions, Set<Class<? extends CommandSender>> allowedSender, List<Argument> arguments,
                        AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands) {
         this.name = name;
         this.aliases = aliases;
@@ -31,7 +33,7 @@ public class CommandMeta {
         this.defaultCommand = defaultCommand;
         this.subCommands = subCommands;
         registeredCommands = subCommands.keySet();
-        requiredArguments = (int) arguments().stream().filter(CommandArgument::isRequired).count();
+        requiredArguments = (int) arguments().stream().filter(Argument::isRequired).count();
     }
 
     public String createCommandCall() {
@@ -58,7 +60,7 @@ public class CommandMeta {
         return allowedSender;
     }
 
-    public List<CommandArgument> arguments() {
+    public List<Argument> arguments() {
         return arguments;
     }
 

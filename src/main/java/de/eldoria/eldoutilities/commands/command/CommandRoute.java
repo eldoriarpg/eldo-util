@@ -1,5 +1,6 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command;
 
+import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.Nullable;

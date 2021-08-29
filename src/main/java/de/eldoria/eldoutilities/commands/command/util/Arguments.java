@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command.util;
 
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.Replacement;

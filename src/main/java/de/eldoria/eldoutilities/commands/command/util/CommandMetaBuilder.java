@@ -1,5 +1,7 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command.util;
 
+import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
+import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
@@ -19,7 +21,7 @@ public class CommandMetaBuilder {
     private final Set<String> alias = new HashSet<>();
     private final Set<String> permissions = new HashSet<>();
     private final Set<Class<? extends CommandSender>> allowedSender = new HashSet<>();
-    private List<CommandArgument> arguments = new ArrayList<>();
+    private List<Argument> arguments = new ArrayList<>();
     private AdvancedCommand defaultCommand;
     private Map<String, AdvancedCommand> subCommands = new HashMap<>();
 
@@ -54,11 +56,11 @@ public class CommandMetaBuilder {
     }
 
     public CommandMetaBuilder addArgument(String name, boolean reqired) {
-        arguments.add(new CommandArgument(name, reqired));
+        arguments.add(new Argument(name, reqired));
         return this;
     }
 
-    public CommandMetaBuilder withArguments(CommandArgument... arguments) {
+    public CommandMetaBuilder withArguments(Argument... arguments) {
         this.arguments = Arrays.asList(arguments);
         return this;
     }

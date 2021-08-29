@@ -1,8 +1,8 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.executor;
 
+import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

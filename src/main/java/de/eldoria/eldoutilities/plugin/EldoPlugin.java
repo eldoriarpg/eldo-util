@@ -1,7 +1,7 @@
 package de.eldoria.eldoutilities.plugin;
 
-import de.eldoria.eldoutilities.commands.AdvancedCommand;
-import de.eldoria.eldoutilities.commands.AdvancedCommandAdapter;
+import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
+import de.eldoria.eldoutilities.commands.command.AdvancedCommandAdapter;
 import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
