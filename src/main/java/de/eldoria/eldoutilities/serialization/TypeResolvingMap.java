@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
@@ -106,7 +107,7 @@ public final class TypeResolvingMap extends AbstractMap<String, Object> {
     public <T extends Enum<T>> List<T> getValueOrDefault(String key, List<T> defaultValue, Class<T> clazz) {
         List<String> names = getValue(key);
         if (names == null) return defaultValue;
-        return names.stream().map(name -> EnumUtil.parse(name, clazz)).filter(Objects::nonNull).collect(Collectors.toList());
+        return names.stream().map(name -> EnumUtil.parse(name, clazz)).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
     }
 
     /**

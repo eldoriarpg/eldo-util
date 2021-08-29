@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -302,12 +303,12 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeDouble(String value, double min, double max, ILocalizer loc) {
-        OptionalDouble d = Parser.parseDouble(value);
+        Optional<Double> d = Parser.parseDouble(value);
         if (d.isPresent()) {
-            if (d.getAsDouble() > max || d.getAsDouble() < min) {
+            if (d.get() > max || d.get() < min) {
                 return Collections.singletonList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", min).addFormatting('6'),
-                        Replacement.create("MAX", max).addFormatting('6')));
+                        Replacement.create("MIN", String.format("%.2f", min)).addFormatting('6'),
+                        Replacement.create("MAX", String.format("%.2f", min)).addFormatting('6')));
 
             }
             return Collections.singletonList(min + "-" + max);
@@ -326,9 +327,9 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeInt(String value, int min, int max, ILocalizer loc) {
-        OptionalInt d = Parser.parseInt(value);
+        Optional<Integer> d = Parser.parseInt(value);
         if (d.isPresent()) {
-            if (d.getAsInt() > max || d.getAsInt() < min) {
+            if (d.get() > max || d.get() < min) {
                 return Collections.singletonList(loc.getMessage("error.invalidRange",
                         Replacement.create("MIN", min).addFormatting('6'),
                         Replacement.create("MAX", max).addFormatting('6')));

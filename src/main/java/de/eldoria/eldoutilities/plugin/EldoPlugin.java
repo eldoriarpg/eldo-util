@@ -1,5 +1,7 @@
 package de.eldoria.eldoutilities.plugin;
 
+import de.eldoria.eldoutilities.commands.AdvancedCommand;
+import de.eldoria.eldoutilities.commands.AdvancedCommandAdapter;
 import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
@@ -15,7 +17,6 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.server.RemoteServerCommandEvent;
 import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -103,6 +104,18 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             return;
         }
         getLogger().warning("Command " + command + " not found!");
+    }
+
+    /**
+     * Register a tabexecutor for a command.
+     * <p>
+     * This tabexecutor will handle execution and tab completion.
+     *
+     * @param command     name of command
+     * @param executor command executor
+     */
+    public void registerCommand(String command, AdvancedCommand executor) {
+        registerCommand(command, AdvancedCommandAdapter.wrap(this, executor));
     }
 
     /**

@@ -92,26 +92,33 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaults() {
-        Map<String, String> locales = new HashMap<String, String>() {
-            {
-                put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
-                put("error.invalidCommand", "Invalid Command");
-                put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
-                put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
-                put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
-                put("error.invalidNumber", "Invalid number");
-                put("error.invalidLength", "This input is too long. Max: %MAX% chars.");
-                put("error.notAsConsole", "This command can not be executed from console.");
-                put("error.notAsPlayer", "This command can not be executed as player");
-                put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
-                put("dialog.accept", "accept");
-                put("dialog.deny", "deny");
-                put("dialog.add", "add");
-                put("dialog.remove", "remove");
-                put("dialog.leftClickChange", "Left click to change");
-                put("dialog.rightClickRemove", "Right click to remove");
-            }
-        };
+        Map<String, String> locales = new HashMap<>();
+        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
+        locales.put("error.invalidCommand", "Invalid Command");
+        locales.put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
+        locales.put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
+        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
+        locales.put("error.invalidMaterial", "Invalid material.");
+        locales.put("error.invalidNumber", "Invalid number");
+        locales.put("error.invalidBoolean", "Invalid value, %TRUE% or %FALSE%");
+        locales.put("error.invalidLength", "This input is too long. Max: %MAX% chars.");
+        locales.put("error.notOnline", "Invalid player. This player is not online.");
+        locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
+        locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
+        locales.put("error.notAsConsole", "This command can not be executed from console.");
+        locales.put("error.onlyPlayer", "This command can only be used by players.");
+        locales.put("error.onlyConsole", "This command can only be used by console.");
+        locales.put("error.invalidSender", "This command can not be executed from here.");
+        locales.put("error.missingArgument", "Argument %INDEX% is accessed but not present.");
+        locales.put("error.notAsPlayer", "This command can not be executed as player");
+        locales.put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
+        locales.put("dialog.accept", "accept");
+        locales.put("dialog.deny", "deny");
+        locales.put("dialog.add", "add");
+        locales.put("dialog.remove", "remove");
+        locales.put("dialog.leftClickChange", "Left click to change");
+        locales.put("dialog.rightClickRemove", "Right click to remove");
+
         addLocaleCodes(locales);
     }
 
