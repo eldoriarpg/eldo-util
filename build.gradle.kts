@@ -9,7 +9,7 @@ val publishData = PublishData(project)
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.10.1c"
+version = "1.10.1d"
 description = "Utility Library for spigot plugins used by the eldoria team."
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 

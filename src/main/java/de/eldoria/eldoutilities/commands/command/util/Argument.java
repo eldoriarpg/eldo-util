@@ -11,15 +11,15 @@ public abstract class Argument {
 
     public abstract String formatted();
 
-    static Argument unlocalizedInput(String name, boolean required) {
+    public static Argument unlocalizedInput(String name, boolean required) {
         return new InputArgument(name, required);
     }
 
-    static Argument input(String name, boolean required) {
+    public static Argument input(String name, boolean required) {
         return new InputArgument(MessageComposer.escape(name), required);
     }
 
-    static Argument subCommand(String name) {
+    public static Argument subCommand(String name) {
         return new SubCommand(name);
     }
 
