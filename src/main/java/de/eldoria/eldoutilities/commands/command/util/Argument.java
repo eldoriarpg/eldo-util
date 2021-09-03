@@ -1,23 +1,31 @@
 package de.eldoria.eldoutilities.commands.command.util;
 
-public class Argument {
-    private final String name;
-    private final boolean required;
+import de.eldoria.eldoutilities.localization.MessageComposer;
 
-    public Argument(String name, boolean required) {
+public abstract class Argument {
+    private final String name;
+
+    protected Argument(String name) {
         this.name = name;
-        this.required = required;
     }
 
-    public static Argument of(String name, boolean required){
-        return new Argument(name, required);
+    public abstract String formatted();
+
+    static Argument unlocalizedInput(String name, boolean required) {
+        return new InputArgument(name, required);
+    }
+
+    static Argument input(String name, boolean required) {
+        return new InputArgument(MessageComposer.escape(name), required);
+    }
+
+    static Argument subCommand(String name) {
+        return new SubCommand(name);
     }
 
     public String name() {
         return name;
     }
 
-    public boolean isRequired() {
-        return required;
-    }
+    public abstract boolean isRequired();
 }

@@ -24,7 +24,7 @@ public class CommandMeta {
     private AdvancedCommand parent;
 
     public CommandMeta(String name, String[] aliases, Set<String> permissions, Set<Class<? extends CommandSender>> allowedSender, List<Argument> arguments,
-                       AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands) {
+                       AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands, AdvancedCommand parent) {
         this.name = name;
         this.aliases = aliases;
         this.permissions = permissions;
@@ -33,9 +33,17 @@ public class CommandMeta {
         this.defaultCommand = defaultCommand;
         this.subCommands = subCommands;
         registeredCommands = subCommands.keySet();
+        this.parent = parent;
         requiredArguments = (int) arguments().stream().filter(Argument::isRequired).count();
     }
 
+    /**
+     * Create a command call route based on this command.
+     * <p>
+     * This method traced back to the parent commands until the end is reached.
+     *
+     * @return a string containing all commands of the route in the correct order.
+     */
     public String createCommandCall() {
         List<String> calls = new ArrayList<>();
         calls.add(name);
@@ -48,20 +56,40 @@ public class CommandMeta {
         return String.join(" ", calls);
     }
 
+    /**
+     * Get the name of the command
+     *
+     * @return name of command
+     */
     public String name() {
         return name;
     }
 
+    /**
+     * A set of permissions, which may be required for this command.
+     *
+     * @return set of permissions
+     */
     public Set<String> permissions() {
-        return permissions;
+        return Collections.unmodifiableSet(permissions);
     }
 
+    /**
+     * Set of command senders which are allowed to use this command
+     *
+     * @return set of command senders
+     */
     public Set<Class<? extends CommandSender>> allowedSender() {
-        return allowedSender;
+        return Collections.unmodifiableSet(allowedSender);
     }
 
+    /**
+     * Ordered list of arguments. The list is ordered by creation order.
+     *
+     * @return list of arguments
+     */
     public List<Argument> arguments() {
-        return arguments;
+        return Collections.unmodifiableList(arguments);
     }
 
     public AdvancedCommand defaultCommand() {
@@ -69,11 +97,11 @@ public class CommandMeta {
     }
 
     public Map<String, AdvancedCommand> subCommands() {
-        return subCommands;
+        return Collections.unmodifiableMap(subCommands);
     }
 
     public Set<String> registeredCommands() {
-        return registeredCommands;
+        return Collections.unmodifiableSet(registeredCommands);
     }
 
     public int requiredArguments() {
@@ -81,7 +109,7 @@ public class CommandMeta {
     }
 
     public String argumentString() {
-        return arguments.stream().map(arg -> String.format(arg.isRequired() ? "<%s>" : "[%s]", arg.name())).collect(Collectors.joining(" "));
+        return arguments.stream().map(Argument::formatted).collect(Collectors.joining(" "));
     }
 
     protected void parent(AdvancedCommand parent) {
@@ -102,5 +130,18 @@ public class CommandMeta {
 
     public static CommandMetaBuilder builder(String name) {
         return new CommandMetaBuilder(name);
+    }
+
+    /**
+     * Creates a meta for a internal subcommand. This is for small commands only and has several caveats.
+     * <p>
+     * Only set arguments on this builder. Everything else wont have any effect.
+     *
+     * @param name   name of internal subcommand
+     * @param parent parent command which contains this subcommand
+     * @return a builder which allows to add arguments.
+     */
+    public CommandMetaBuilder forSubCommand(String name, AdvancedCommand parent) {
+        return new CommandMetaBuilder(name).ofParent(parent);
     }
 }

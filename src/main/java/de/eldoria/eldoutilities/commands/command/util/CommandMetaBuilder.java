@@ -21,16 +21,17 @@ public class CommandMetaBuilder {
     private final Set<String> alias = new HashSet<>();
     private final Set<String> permissions = new HashSet<>();
     private final Set<Class<? extends CommandSender>> allowedSender = new HashSet<>();
-    private List<Argument> arguments = new ArrayList<>();
+    private final List<Argument> arguments = new ArrayList<>();
+    private final Map<String, AdvancedCommand> subCommands = new HashMap<>();
     private AdvancedCommand defaultCommand;
-    private Map<String, AdvancedCommand> subCommands = new HashMap<>();
+    private AdvancedCommand parent;
 
     public CommandMetaBuilder(String name) {
         this.name = name;
     }
 
-    public CommandMetaBuilder withPermission(String permission) {
-        permissions.add(permission);
+    public CommandMetaBuilder withPermission(String... permission) {
+        permissions.addAll(Arrays.asList(permission));
         return this;
     }
 
@@ -56,12 +57,17 @@ public class CommandMetaBuilder {
     }
 
     public CommandMetaBuilder addArgument(String name, boolean reqired) {
-        arguments.add(new Argument(name, reqired));
+        arguments.add(Argument.input(name, reqired));
+        return this;
+    }
+
+    public CommandMetaBuilder addUnlocalizedArgument(String name, boolean reqired) {
+        arguments.add(Argument.unlocalizedInput(name, reqired));
         return this;
     }
 
     public CommandMetaBuilder withArguments(Argument... arguments) {
-        this.arguments = Arrays.asList(arguments);
+        this.arguments.addAll(Arrays.asList(arguments));
         return this;
     }
 
@@ -75,7 +81,22 @@ public class CommandMetaBuilder {
         return this;
     }
 
+    public CommandMetaBuilder ofParent(AdvancedCommand parent) {
+        this.parent = parent;
+        return this;
+    }
+
     public CommandMeta build() {
-        return new CommandMeta(name, alias.toArray(new String[0]), permissions, allowedSender, arguments, defaultCommand, subCommands);
+        return new CommandMeta(name, alias.toArray(new String[0]), permissions, allowedSender, arguments, defaultCommand, subCommands, parent);
+    }
+
+    public CommandMetaBuilder allowCommandSender(Set<Class<? extends CommandSender>> allowedSender) {
+        this.allowedSender.addAll(allowedSender);
+        return this;
+    }
+
+    public CommandMetaBuilder withPermission(Set<String> permissions) {
+        this.permissions.addAll(permissions);
+        return this;
     }
 }
