@@ -18,11 +18,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AdvancedCommand implements CommandRoute {
     private final Plugin plugin;
-    private final CommandMeta meta;
+    private CommandMeta meta;
     private ILocalizer localizer;
     private MessageSender messageSender;
 
@@ -160,7 +161,11 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     public CommandMeta meta() {
+        Objects.requireNonNull(meta);
         return meta;
     }
 
+    protected void meta(CommandMeta meta) {
+        this.meta = meta;
+    }
 }
