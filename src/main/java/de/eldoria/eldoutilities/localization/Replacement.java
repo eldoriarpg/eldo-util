@@ -31,6 +31,10 @@ public final class Replacement {
         return replacement.addFormatting(formats);
     }
 
+    public static Replacement create(String key, Double value, char... formats) {
+        return create(key, String.format("%.2f", value), formats);
+    }
+
     /**
      * Creates a new replacement.
      *

@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Util class to throw exceptions based on conditions.
  */
+@SuppressWarnings("unused")
 public final class CommandAssertions {
 
     private CommandAssertions() {
@@ -122,8 +123,8 @@ public final class CommandAssertions {
      */
     public static void range(double value, double min, double max) throws CommandException {
         isTrue(value <= max && value >= min, "error.invalidRange",
-                Replacement.create("MIN", String.format("%.2f", min)).addFormatting('6'),
-                Replacement.create("MAX", String.format("%.2f", min)).addFormatting('6'));
+                Replacement.create("MIN", min).addFormatting('6'),
+                Replacement.create("MAX", max).addFormatting('6'));
     }
 
     /**
@@ -136,6 +137,48 @@ public final class CommandAssertions {
     public static void range(int value, int min, int max) throws CommandException {
         isTrue(value <= max && value >= min, "error.invalidRange",
                 Replacement.create("MIN", min).addFormatting('6'),
+                Replacement.create("MAX", max).addFormatting('6'));
+    }
+
+    /**
+     * Checks if a value value is larger.
+     *
+     * @param value current value
+     * @param min   min value
+     */
+    public static void min(int value, int min) throws CommandException {
+        isTrue(value >= min, "error.tooLow",
+                Replacement.create("MIN", min).addFormatting('6'));
+    }
+    /**
+     * Checks if a value value is larger.
+     *
+     * @param value current value
+     * @param min   min value
+     */
+    public static void min(double value, double min) throws CommandException {
+        isTrue(value >= min, "error.tooLow",
+                Replacement.create("MIN", min).addFormatting('6'));
+    }
+
+    /**
+     * Checks if a value value is smaller.
+     *
+     * @param value current value
+     * @param max   max value (inclusive)
+     */
+    public static void max(int value, int max) throws CommandException {
+        isTrue(value <= max, "error.tooLarge",
+                Replacement.create("MAX", max).addFormatting('6'));
+    }
+    /**
+     * Checks if a value value is smaller.
+     *
+     * @param value current value
+     * @param max   max value (inclusive)
+     */
+    public static void max(double value, double max) throws CommandException {
+        isTrue(value <= max, "error.tooLarge",
                 Replacement.create("MAX", max).addFormatting('6'));
     }
 
