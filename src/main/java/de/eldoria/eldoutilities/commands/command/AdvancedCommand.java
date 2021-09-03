@@ -65,6 +65,7 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
         if (this instanceof ITabExecutor) {
             CommandAssertions.invalidArguments(meta(), args);
+            CommandAssertions.allowedSender(meta, sender);
             ((ITabExecutor) this).onCommand(sender, label, args);
             return;
         }
@@ -156,7 +157,7 @@ public abstract class AdvancedCommand implements CommandRoute {
      * @param sender sender to cast
      * @return player or null if sender is not player
      */
-    protected Player getPlayerFromSender(CommandSender sender) {
+    protected final Player getPlayerFromSender(CommandSender sender) {
         return (sender instanceof Player) ? (Player) sender : null;
     }
 
@@ -164,12 +165,12 @@ public abstract class AdvancedCommand implements CommandRoute {
         return plugin;
     }
 
-    public CommandMeta meta() {
+    public final CommandMeta meta() {
         Objects.requireNonNull(meta);
         return meta;
     }
 
-    protected void meta(CommandMeta meta) {
+    protected final void meta(CommandMeta meta) {
         if (this.meta != null) throw new IllegalStateException("Meta is already assigned");
         this.meta = meta;
         linkMeta();

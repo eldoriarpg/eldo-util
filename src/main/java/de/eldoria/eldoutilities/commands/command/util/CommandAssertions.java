@@ -150,6 +150,7 @@ public final class CommandAssertions {
         isTrue(value >= min, "error.tooLow",
                 Replacement.create("MIN", min).addFormatting('6'));
     }
+
     /**
      * Checks if a value value is larger.
      *
@@ -171,6 +172,7 @@ public final class CommandAssertions {
         isTrue(value <= max, "error.tooLarge",
                 Replacement.create("MAX", max).addFormatting('6'));
     }
+
     /**
      * Checks if a value value is smaller.
      *
@@ -258,6 +260,7 @@ public final class CommandAssertions {
     }
 
     public static void allowedSender(CommandMeta meta, CommandSender sender) throws CommandException {
+        if (meta.allowedSender().isEmpty()) return;
         if (meta.allowedSender().contains(sender.getClass())) return;
         throw CommandException.message("error.invalidSender");
     }

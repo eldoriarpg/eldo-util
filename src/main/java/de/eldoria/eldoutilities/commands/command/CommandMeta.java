@@ -144,4 +144,8 @@ public class CommandMeta {
     public CommandMetaBuilder forSubCommand(String name, AdvancedCommand parent) {
         return new CommandMetaBuilder(name).ofParent(parent);
     }
+
+    public String[] aliases() {
+        return aliases.clone();
+    }
 }
