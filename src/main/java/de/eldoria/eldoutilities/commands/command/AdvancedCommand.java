@@ -33,6 +33,10 @@ public abstract class AdvancedCommand implements CommandRoute {
         linkMeta();
     }
 
+    public AdvancedCommand(Plugin plugin) {
+        this.plugin = plugin;
+    }
+
     private void linkMeta() {
         for (AdvancedCommand cmd : meta.subCommands().values()) {
             cmd.meta().parent(this);
@@ -166,6 +170,8 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     protected void meta(CommandMeta meta) {
+        if (this.meta != null) throw new IllegalStateException("Meta is already assigned");
         this.meta = meta;
+        linkMeta();
     }
 }
