@@ -298,6 +298,36 @@ public class Arguments {
     }
 
     /**
+     * Returns a range of arguments as string.
+     *
+     * @return range as string
+     */
+    public String join() {
+        return String.join(" ", args);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param from start index (included). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(int from) {
+        return ArgumentUtils.getMessage(args, from);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param from start index (included). Use negative counts to count from the last index.
+     * @param to   end index (excluded). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(int from, int to) {
+        return ArgumentUtils.getMessage(args, from, to);
+    }
+
+    /**
      * Get the arguments as a list
      *
      * @return arguments as list
