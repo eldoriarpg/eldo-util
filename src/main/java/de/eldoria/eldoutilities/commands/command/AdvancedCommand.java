@@ -85,7 +85,7 @@ public abstract class AdvancedCommand implements CommandRoute {
 
         Optional<AdvancedCommand> command = getCommand(args.asString(0));
         if (command.isPresent()) {
-            command.get().commandRoute(sender, label, newArgs);
+            command.get().commandRoute(sender, args.asString(0), newArgs);
             return;
         }
         throw CommandException.message("error.invalidCommand");
