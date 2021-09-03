@@ -474,7 +474,7 @@ public class Arguments {
      * @return range as string
      */
     public String join() {
-        return String.join(" ", args);
+        return join(" ");
     }
 
     /**
@@ -484,7 +484,7 @@ public class Arguments {
      * @return range as string
      */
     public String join(int from) {
-        return ArgumentUtils.getMessage(args, from);
+        return join(" ", from);
     }
 
     /**
@@ -495,6 +495,39 @@ public class Arguments {
      * @return range as string
      */
     public String join(int from, int to) {
+        return join(" ", from, to);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @return range as string
+     */
+    public String join(String delimiter) {
+        return String.join(delimiter, args);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @param from      start index (included). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(String delimiter, int from) {
+        return ArgumentUtils.getMessage(args, from);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @param from      start index (included). Use negative counts to count from the last index.
+     * @param to        end index (excluded). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(String delimiter, int from, int to) {
         return ArgumentUtils.getMessage(args, from, to);
     }
 
