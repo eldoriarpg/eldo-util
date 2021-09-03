@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 @SuppressWarnings("unused")
 public class CommandMetaBuilder {
@@ -73,6 +74,25 @@ public class CommandMetaBuilder {
 
     public CommandMetaBuilder withSubCommand(AdvancedCommand advancedCommand) {
         subCommands.put(advancedCommand.meta().name(), advancedCommand);
+        return this;
+    }
+
+    /**
+     * Use this consumer when you need more complex command setup.
+     * <p>
+     * Add subcommands to the provided list.
+     * <p>
+     * Set the default command via the provided builder
+     *
+     * @param commandConsumer consumer
+     * @return this instance
+     */
+    public CommandMetaBuilder buildSubCommands(BiConsumer<List<AdvancedCommand>, CommandMetaBuilder> commandConsumer) {
+        List<AdvancedCommand> subCommands = new ArrayList<>();
+        commandConsumer.accept(subCommands, this);
+        for (AdvancedCommand subCommand : subCommands) {
+            this.subCommands.put(subCommand.meta().name(), subCommand);
+        }
         return this;
     }
 
