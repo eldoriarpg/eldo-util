@@ -6,11 +6,14 @@ import org.bukkit.command.CommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface ITabExecutor {
-    void onCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull Arguments arguments) throws CommandException;
+    void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) throws CommandException;
 
     @Nullable
-    List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments arguments);
+    default List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args){
+        return Collections.emptyList();
+    }
 }

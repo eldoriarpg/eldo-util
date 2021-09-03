@@ -6,11 +6,14 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface IPlayerTabExecutor {
-    void onCommand(@NotNull Player player, @NotNull String label, @NotNull Arguments arguments) throws CommandException;
+    void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException;
 
     @Nullable
-    List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments arguments);
+    default List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args){
+        return Collections.emptyList();
+    }
 }

@@ -114,6 +114,18 @@ public class Arguments {
     }
 
     /**
+     * Get the argument as string
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return argument as string
+     */
+    public @NotNull String asString(int index, String def) {
+        if (hasArg(index)) return asString(index);
+        return def;
+    }
+
+    /**
      * Get the argument as integer
      *
      * @param index index of argument

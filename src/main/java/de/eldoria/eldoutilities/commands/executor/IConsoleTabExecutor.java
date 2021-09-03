@@ -6,12 +6,14 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface IConsoleTabExecutor {
-    void onCommand(@NotNull ConsoleCommandSender console, @NotNull String label, @NotNull Arguments arguments) throws CommandException;
+    void onCommand(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args) throws CommandException;
 
     @Nullable
-    List<String> onTabComplete(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments arguments);
-
+    default List<String> onTabComplete(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args){
+        return Collections.emptyList();
+    }
 }
