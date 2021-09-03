@@ -136,7 +136,7 @@ public final class Replacement {
      */
     public String invoke(String string) {
         if (!caseSensitive) {
-            return string.replaceAll("(?i)" + markedKey(), value);
+            return string.replaceAll("(?i)" + markedKey(), value.replace("$", "\\$"));
         }
         return string.replace(key, value);
     }
