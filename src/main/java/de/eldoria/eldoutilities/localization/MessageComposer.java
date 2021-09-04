@@ -1,5 +1,7 @@
 package de.eldoria.eldoutilities.localization;
 
+import de.eldoria.eldoutilities.utils.TextUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,6 +13,7 @@ import java.util.stream.IntStream;
  * Class to compose localized messages.
  * Handles escaping and concatenation of messages.
  */
+@SuppressWarnings("unused")
 public class MessageComposer {
     private final StringBuilder stringBuilder = new StringBuilder();
     private final List<Replacement> replacements = new ArrayList<>();
@@ -56,7 +59,7 @@ public class MessageComposer {
     /**
      * Add a list of messages with a delimiter as string.
      *
-     * @param messages  messages to add
+     * @param messages messages to add
      * @return this instance
      */
     public MessageComposer text(Collection<String> messages) {
@@ -83,6 +86,18 @@ public class MessageComposer {
     public MessageComposer space(int spaces) {
         // TODO: waiting for java 11 migration
         stringBuilder.append(IntStream.of(spaces).mapToObj(i -> " ").collect(Collectors.joining()));
+        return this;
+    }
+
+    public MessageComposer fillLines() {
+        return fillLines(25);
+    }
+
+    public MessageComposer fillLines(int lines) {
+        int lineCount = TextUtil.countChars(stringBuilder.toString(), '\n');
+        // TODO: waiting for java 11 migration
+        String newLines = IntStream.of(Math.max(lines - lineCount, 0)).mapToObj(i -> " \n").collect(Collectors.joining());
+        stringBuilder.insert(0, newLines);
         return this;
     }
 
