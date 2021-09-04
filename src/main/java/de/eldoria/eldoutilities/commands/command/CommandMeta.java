@@ -20,11 +20,12 @@ public class CommandMeta {
     private final AdvancedCommand defaultCommand;
     private final Map<String, AdvancedCommand> subCommands;
     private final Set<String> registeredCommands;
+    private final boolean hidden;
     private final int requiredArguments;
     private AdvancedCommand parent;
 
     public CommandMeta(String name, String[] aliases, Set<String> permissions, Set<Class<? extends CommandSender>> allowedSender, List<Argument> arguments,
-                       AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands, AdvancedCommand parent) {
+                       AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands, AdvancedCommand parent, boolean hidden) {
         this.name = name;
         this.aliases = aliases;
         this.permissions = permissions;
@@ -32,8 +33,12 @@ public class CommandMeta {
         this.arguments = arguments;
         this.defaultCommand = defaultCommand;
         this.subCommands = subCommands;
-        registeredCommands = subCommands.keySet();
+        registeredCommands = subCommands.entrySet().stream()
+                .filter(e -> !e.getValue().meta().isHidden())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
         this.parent = parent;
+        this.hidden = hidden;
         requiredArguments = (int) arguments().stream().filter(Argument::isRequired).count();
     }
 
@@ -147,5 +152,9 @@ public class CommandMeta {
 
     public String[] aliases() {
         return aliases.clone();
+    }
+
+    public boolean isHidden() {
+        return hidden;
     }
 }

@@ -26,6 +26,7 @@ public class CommandMetaBuilder {
     private final Map<String, AdvancedCommand> subCommands = new HashMap<>();
     private AdvancedCommand defaultCommand;
     private AdvancedCommand parent;
+    private boolean hidden = false;
 
     public CommandMetaBuilder(String name) {
         this.name = name;
@@ -81,6 +82,15 @@ public class CommandMetaBuilder {
     }
 
     /**
+     * Sets the command as hidden. It will not be suggested in tab completion.
+     * @return this instance
+     */
+    public CommandMetaBuilder hidden(){
+        hidden = true;
+        return this;
+    }
+
+    /**
      * Use this consumer when you need more complex command setup.
      * <p>
      * Add subcommands to the provided list.
@@ -110,7 +120,7 @@ public class CommandMetaBuilder {
     }
 
     public CommandMeta build() {
-        return new CommandMeta(name, alias.toArray(new String[0]), permissions, allowedSender, arguments, defaultCommand, subCommands, parent);
+        return new CommandMeta(name, alias.toArray(new String[0]), permissions, allowedSender, arguments, defaultCommand, subCommands, parent, hidden);
     }
 
     public CommandMetaBuilder allowCommandSender(Set<Class<? extends CommandSender>> allowedSender) {
