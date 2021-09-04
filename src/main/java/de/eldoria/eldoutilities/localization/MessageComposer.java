@@ -2,6 +2,7 @@ package de.eldoria.eldoutilities.localization;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -49,6 +50,28 @@ public class MessageComposer {
      */
     public MessageComposer text(Object object) {
         stringBuilder.append(object.toString());
+        return this;
+    }
+
+    /**
+     * Add a list of messages with a delimiter as string.
+     *
+     * @param messages  messages to add
+     * @return this instance
+     */
+    public MessageComposer text(Collection<String> messages) {
+        return text(messages, "\n");
+    }
+
+    /**
+     * Add a list of messages with a delimiter as string.
+     *
+     * @param messages  messages to add
+     * @param delimiter delimiter to join
+     * @return this instance
+     */
+    public MessageComposer text(Collection<String> messages, String delimiter) {
+        stringBuilder.append(String.join(delimiter, messages));
         return this;
     }
 
