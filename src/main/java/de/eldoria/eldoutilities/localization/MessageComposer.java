@@ -41,7 +41,7 @@ public class MessageComposer {
      * @return this instance
      */
     public MessageComposer text(String text, Object... objects) {
-        stringBuilder.append(String.format(text.toString(), objects));
+        stringBuilder.append(String.format(text, objects));
         return this;
     }
 
@@ -85,7 +85,7 @@ public class MessageComposer {
 
     public MessageComposer space(int spaces) {
         // TODO: waiting for java 11 migration
-        stringBuilder.append(IntStream.of(spaces).mapToObj(i -> " ").collect(Collectors.joining()));
+        stringBuilder.append(IntStream.range(0, spaces).mapToObj(i -> " ").collect(Collectors.joining()));
         return this;
     }
 
@@ -96,7 +96,7 @@ public class MessageComposer {
     public MessageComposer fillLines(int lines) {
         int lineCount = TextUtil.countChars(stringBuilder.toString(), '\n');
         // TODO: waiting for java 11 migration
-        String newLines = IntStream.of(Math.max(lines - lineCount, 0)).mapToObj(i -> " \n").collect(Collectors.joining());
+        String newLines = IntStream.range(0, Math.max(lines - lineCount, 0)).mapToObj(i -> " ").collect(Collectors.joining("\n"));
         stringBuilder.insert(0, newLines);
         return this;
     }
