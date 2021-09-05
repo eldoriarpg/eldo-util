@@ -94,9 +94,14 @@ public class MessageComposer {
     }
 
     public MessageComposer fillLines(int lines) {
-        int lineCount = TextUtil.countChars(stringBuilder.toString(), '\n');
+        int lineCount = TextUtil.countChars(stringBuilder.toString(), '\n') + 1;
         // TODO: waiting for java 11 migration
-        String newLines = IntStream.range(0, Math.max(lines - lineCount, 0)).mapToObj(i -> " ").collect(Collectors.joining("\n"));
+        prependLines(Math.max(lines - lineCount, 0));
+        return this;
+    }
+
+    public MessageComposer prependLines(int lines) {
+        String newLines = IntStream.range(0, Math.max(lines, 0)).mapToObj(i -> "\n").collect(Collectors.joining());
         stringBuilder.insert(0, newLines);
         return this;
     }
