@@ -76,11 +76,11 @@ public abstract class AdvancedCommand implements CommandRoute {
                 meta.defaultCommand().commandRoute(sender, label, args);
                 return;
             }
-            throw CommandException.message("Unhandled end of route. Command needs to implement a executor or subcommands");
+            throw CommandException.message("error.invalidCommand");
         }
 
         if (meta.subCommands().isEmpty()) {
-            throw CommandException.message("Unhandled end of route. Command needs to implement a executor or subcommands");
+            throw CommandException.message("Unhandled end of command route. The command needs to implement a executor or subcommands");
         }
         final Arguments newArgs = args.subArguments();
 
