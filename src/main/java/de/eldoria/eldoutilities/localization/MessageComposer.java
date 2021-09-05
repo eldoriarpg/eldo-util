@@ -106,6 +106,11 @@ public class MessageComposer {
         return this;
     }
 
+    public MessageComposer prependLines() {
+        prependLines(25);
+        return this;
+    }
+
     public MessageComposer newLine() {
         stringBuilder.append(String.format("%n"));
         return this;

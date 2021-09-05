@@ -8,6 +8,7 @@ import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
 import de.eldoria.eldoutilities.commands.executor.ITabExecutor;
 import de.eldoria.eldoutilities.localization.DummyLocalizer;
 import de.eldoria.eldoutilities.localization.ILocalizer;
+import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import org.bukkit.command.CommandSender;
@@ -93,6 +94,21 @@ public abstract class AdvancedCommand implements CommandRoute {
 
     @Override
     public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) {
+        if (!meta().permissions().isEmpty()) {
+            boolean access = false;
+            for (String permission : meta().permissions()) {
+                if (sender.hasPermission(permission)) {
+                    access = true;
+                    break;
+                }
+            }
+            if (!access) {
+                String permissions = String.join(", ", meta().permissions());
+                return Collections.singletonList(localizer.localize("error.permission",
+                        Replacement.create("PERMISSION", permissions)));
+            }
+        }
+
         // Check for end of route
         if (this instanceof IPlayerTabExecutor && sender instanceof Player) {
             return ((IPlayerTabExecutor) this).onTabComplete((Player) sender, label, args);
