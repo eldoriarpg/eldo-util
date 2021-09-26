@@ -373,9 +373,8 @@ public class Localizer implements ILocalizer {
         // If the matcher doesn't find any key we assume its a simple message.
         if (!EMBED_LOCALIZATION_CODE.matcher(message).find()) {
             if (LOCALIZATION_CODE.matcher(message).matches()) {
-                return getMessage(message, replacements);
+                message = getMessage(message, replacements);
             }
-            return invokeReplacements(message, replacements);
         }
 
         // find locale codes in message
