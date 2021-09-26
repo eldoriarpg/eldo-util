@@ -222,7 +222,7 @@ public final class CommandAssertions {
     }
 
     public static void invalidLength(String input, int max) throws CommandException {
-        isTrue(input.length() > max, "error.invalidLength", Replacement.create("max", max));
+        isTrue(input.length() < max, "error.invalidLength", Replacement.create("max", max));
     }
 
     public static void missingArgument(String[] args, int index) throws CommandException {
