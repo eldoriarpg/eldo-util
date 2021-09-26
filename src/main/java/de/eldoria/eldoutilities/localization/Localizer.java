@@ -356,11 +356,10 @@ public class Localizer implements ILocalizer {
     }
 
     /**
-     * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
-     * right order.
+     * Translates a String with Placeholders. Can handle multiple messages with replacements.
      *
      * @param message      Message to translate
-     * @param replacements Replacements in the right order.
+     * @param replacements Replacements.
      * @return Replaced Messages
      */
     @Override
@@ -389,6 +388,8 @@ public class Localizer implements ILocalizer {
             //Replace current locale code with result
             result = result.replace("$" + match + "$", getMessage(match, replacements));
         }
+
+        result = invokeReplacements(result, replacements);
 
         if (EMBED_LOCALIZATION_CODE.matcher(result).find()) {
             return localize(result, replacements);
