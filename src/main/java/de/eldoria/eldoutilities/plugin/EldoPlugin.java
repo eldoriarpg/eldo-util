@@ -111,7 +111,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * <p>
      * This tabexecutor will handle execution and tab completion.
      *
-     * @param command     name of command
+     * @param command  name of command
      * @param executor command executor
      */
     public void registerCommand(String command, AdvancedCommand executor) {
@@ -245,10 +245,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         FailsaveCommand failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
         for (String cmd : getDescription().getCommands().keySet()) {
             try {
-                PluginCommand command = getCommand(cmd);
-                if (command != null) {
-                    registerCommand(cmd, failcmd);
-                }
+                registerCommand(cmd, failcmd);
             } catch (Throwable ex) {
                 logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
             }
@@ -273,6 +270,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     /**
      * Called when the server has started completely.
+     *
      * @param reload
      */
     public void onPostStart(boolean reload) throws Throwable {
@@ -280,6 +278,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     /**
      * Called when this plugin is enabled
+     *
      * @param reload
      */
     public void onPluginEnable(boolean reload) throws Throwable {
@@ -315,7 +314,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         return Files.exists(getLockFile());
     }
 
-    private void removeLock(){
+    private void removeLock() {
         try {
             Files.deleteIfExists(getLockFile());
         } catch (IOException e) {

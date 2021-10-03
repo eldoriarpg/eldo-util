@@ -203,8 +203,8 @@ public class Arguments {
      * @throws CommandException          when the argument is not a boolean
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public boolean asBoolen(int index) throws CommandException, IndexOutOfBoundsException {
-        return asBoolen(index, "true", "false");
+    public boolean asBoolean(int index) throws CommandException, IndexOutOfBoundsException {
+        return asBoolean(index, "true", "false");
     }
 
     /**
@@ -215,8 +215,8 @@ public class Arguments {
      * @return index as boolean
      * @throws CommandException when the argument is not a boolean
      */
-    public boolean asBoolen(int index, boolean def) throws CommandException {
-        if (hasArg(index)) return asBoolen(index);
+    public boolean asBoolean(int index, boolean def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index);
         return def;
     }
 
@@ -228,8 +228,8 @@ public class Arguments {
      * @return index as boolean
      * @throws CommandException when the argument is not a boolean
      */
-    public boolean asBoolen(int index, String aTrue, String aFalse, boolean def) throws CommandException {
-        if (hasArg(index)) return asBoolen(index, aTrue, aFalse);
+    public boolean asBoolean(int index, String aTrue, String aFalse, boolean def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index, aTrue, aFalse);
         return def;
     }
 
@@ -243,7 +243,7 @@ public class Arguments {
      * @throws CommandException          when the argument is not a boolean
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public boolean asBoolen(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
+    public boolean asBoolean(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
         return Parser.parseBoolean(asString(index), aTrue, aFalse)
                 .orElseThrow(() -> CommandException.message("error.invalidBoolean",
                         Replacement.create("true", aTrue), Replacement.create("false", aFalse)));
