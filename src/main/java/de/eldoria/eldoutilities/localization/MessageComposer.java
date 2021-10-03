@@ -1,7 +1,10 @@
 package de.eldoria.eldoutilities.localization;
 
+import de.eldoria.eldoutilities.utils.TextUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -10,6 +13,7 @@ import java.util.stream.IntStream;
  * Class to compose localized messages.
  * Handles escaping and concatenation of messages.
  */
+@SuppressWarnings("unused")
 public class MessageComposer {
     private final StringBuilder stringBuilder = new StringBuilder();
     private final List<Replacement> replacements = new ArrayList<>();
@@ -37,7 +41,7 @@ public class MessageComposer {
      * @return this instance
      */
     public MessageComposer text(String text, Object... objects) {
-        stringBuilder.append(String.format(text.toString(), objects));
+        stringBuilder.append(String.format(text, objects));
         return this;
     }
 
@@ -52,6 +56,28 @@ public class MessageComposer {
         return this;
     }
 
+    /**
+     * Add a list of messages with a delimiter as string.
+     *
+     * @param messages messages to add
+     * @return this instance
+     */
+    public MessageComposer text(Collection<String> messages) {
+        return text(messages, "\n");
+    }
+
+    /**
+     * Add a list of messages with a delimiter as string.
+     *
+     * @param messages  messages to add
+     * @param delimiter delimiter to join
+     * @return this instance
+     */
+    public MessageComposer text(Collection<String> messages, String delimiter) {
+        stringBuilder.append(String.join(delimiter, messages));
+        return this;
+    }
+
     public MessageComposer space() {
         stringBuilder.append(" ");
         return this;
@@ -59,7 +85,29 @@ public class MessageComposer {
 
     public MessageComposer space(int spaces) {
         // TODO: waiting for java 11 migration
-        stringBuilder.append(IntStream.of(spaces).mapToObj(i -> " ").collect(Collectors.joining()));
+        stringBuilder.append(IntStream.range(0, spaces).mapToObj(i -> " ").collect(Collectors.joining()));
+        return this;
+    }
+
+    public MessageComposer fillLines() {
+        return fillLines(25);
+    }
+
+    public MessageComposer fillLines(int lines) {
+        int lineCount = TextUtil.countChars(stringBuilder.toString(), '\n') + 1;
+        // TODO: waiting for java 11 migration
+        prependLines(Math.max(lines - lineCount, 0));
+        return this;
+    }
+
+    public MessageComposer prependLines(int lines) {
+        String newLines = IntStream.range(0, Math.max(lines, 0)).mapToObj(i -> "\n").collect(Collectors.joining());
+        stringBuilder.insert(0, newLines);
+        return this;
+    }
+
+    public MessageComposer prependLines() {
+        prependLines(25);
         return this;
     }
 

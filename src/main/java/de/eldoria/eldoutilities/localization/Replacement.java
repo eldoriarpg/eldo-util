@@ -31,6 +31,10 @@ public final class Replacement {
         return replacement.addFormatting(formats);
     }
 
+    public static Replacement create(String key, Double value, char... formats) {
+        return create(key, String.format("%.2f", value), formats);
+    }
+
     /**
      * Creates a new replacement.
      *
@@ -132,7 +136,7 @@ public final class Replacement {
      */
     public String invoke(String string) {
         if (!caseSensitive) {
-            return string.replaceAll("(?i)" + markedKey(), value);
+            return string.replaceAll("(?i)" + markedKey(), value.replace("$", "\\$"));
         }
         return string.replace(key, value);
     }

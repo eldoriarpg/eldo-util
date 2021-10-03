@@ -111,6 +111,8 @@ public class Localizer implements ILocalizer {
         locales.put("error.invalidSender", "This command can not be executed from here.");
         locales.put("error.missingArgument", "Argument %INDEX% is accessed but not present.");
         locales.put("error.notAsPlayer", "This command can not be executed as player");
+        locales.put("error.tooSmall", "The number is too small. Min: %MIN%");
+        locales.put("error.tooLarge", "The number is too Large. Max: %MAX%");
         locales.put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
         locales.put("dialog.accept", "accept");
         locales.put("dialog.deny", "deny");
@@ -371,9 +373,8 @@ public class Localizer implements ILocalizer {
         // If the matcher doesn't find any key we assume its a simple message.
         if (!EMBED_LOCALIZATION_CODE.matcher(message).find()) {
             if (LOCALIZATION_CODE.matcher(message).matches()) {
-                return getMessage(message, replacements);
+                message = getMessage(message, replacements);
             }
-            return invokeReplacements(message, replacements);
         }
 
         // find locale codes in message

@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
@@ -336,6 +334,93 @@ public final class TabCompleteUtil {
 
             }
             return Collections.singletonList(min + "-" + max);
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooSmall (%MIN%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param min   min value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMinDouble(String value, double min, ILocalizer loc) {
+        Optional<Double> val = Parser.parseDouble(value);
+        if (val.isPresent()) {
+            if (val.get() < min) {
+                return Collections.singletonList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting('6')));
+
+            }
+            return Collections.singletonList(String.format("%.2f<", min));
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooSmall (%MIN%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param min   min value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMinInt(String value, int min, ILocalizer loc) {
+        Optional<Integer> val = Parser.parseInt(value);
+        if (val.isPresent()) {
+            if (val.get() < min) {
+                return Collections.singletonList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting('6')));
+
+            }
+            return Collections.singletonList(min + "<");
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooLarge (%MAX%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param max   max value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMaxDouble(String value, double max, ILocalizer loc) {
+        Optional<Double> val = Parser.parseDouble(value);
+        if (val.isPresent()) {
+            if (val.get() > max) {
+                return Collections.singletonList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting('6')));
+
+            }
+            return Collections.singletonList(String.format("%.2f", max) + ">");
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooLarge (%MAX%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param max   max value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMaxInt(String value, int max, ILocalizer loc) {
+        Optional<Integer> val = Parser.parseInt(value);
+        if (val.isPresent()) {
+            if (val.get() > max) {
+                return Collections.singletonList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting('6')));
+
+            }
+            return Collections.singletonList(max + ">");
         }
         return Collections.singletonList(loc.getMessage("error.invalidNumber"));
     }

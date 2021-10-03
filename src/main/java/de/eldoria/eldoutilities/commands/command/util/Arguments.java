@@ -1,4 +1,4 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command.util;
 
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.Replacement;
@@ -109,8 +109,20 @@ public class Arguments {
      * @return argument as string
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public String asString(int index) throws IndexOutOfBoundsException {
+    public @NotNull String asString(int index) throws IndexOutOfBoundsException {
         return args[index];
+    }
+
+    /**
+     * Get the argument as string
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return argument as string
+     */
+    public @NotNull String asString(int index, String def) {
+        if (hasArg(index)) return asString(index);
+        return def;
     }
 
     /**
@@ -127,6 +139,19 @@ public class Arguments {
     }
 
     /**
+     * Get the argument as integer
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as integer
+     * @throws CommandException when the argument is not an integer
+     */
+    public int asInt(int index, int def) throws CommandException {
+        if (hasArg(index)) return asInt(index);
+        return def;
+    }
+
+    /**
      * @param index index of argument
      * @return index as long
      * @throws CommandException          when the argument is not a long
@@ -135,6 +160,17 @@ public class Arguments {
     public long asLong(int index) throws CommandException, IndexOutOfBoundsException {
         return Parser.parseLong(asString(index))
                 .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+    }
+
+    /**
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as long
+     * @throws CommandException when the argument is not a long
+     */
+    public long asLong(int index, long def) throws CommandException {
+        if (hasArg(index)) return asLong(index);
+        return def;
     }
 
     /**
@@ -149,6 +185,17 @@ public class Arguments {
     }
 
     /**
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as double
+     * @throws CommandException when the argument is not a double
+     */
+    public double asDouble(int index, double def) throws CommandException {
+        if (hasArg(index)) return asDouble(index);
+        return def;
+    }
+
+    /**
      * Get the argument as a boolean
      *
      * @param index index of argument
@@ -156,8 +203,34 @@ public class Arguments {
      * @throws CommandException          when the argument is not a boolean
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public boolean asBoolen(int index) throws CommandException, IndexOutOfBoundsException {
-        return asBoolen(index, "true", "false");
+    public boolean asBoolean(int index) throws CommandException, IndexOutOfBoundsException {
+        return asBoolean(index, "true", "false");
+    }
+
+    /**
+     * Get the argument as a boolean
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as boolean
+     * @throws CommandException when the argument is not a boolean
+     */
+    public boolean asBoolean(int index, boolean def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index);
+        return def;
+    }
+
+    /**
+     * Get the argument as a boolean
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as boolean
+     * @throws CommandException when the argument is not a boolean
+     */
+    public boolean asBoolean(int index, String aTrue, String aFalse, boolean def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index, aTrue, aFalse);
+        return def;
     }
 
     /**
@@ -170,7 +243,7 @@ public class Arguments {
      * @throws CommandException          when the argument is not a boolean
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public boolean asBoolen(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
+    public boolean asBoolean(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
         return Parser.parseBoolean(asString(index), aTrue, aFalse)
                 .orElseThrow(() -> CommandException.message("error.invalidBoolean",
                         Replacement.create("true", aTrue), Replacement.create("false", aFalse)));
@@ -196,6 +269,22 @@ public class Arguments {
      * <p>
      * This will send a custom message without listing all possible values.
      *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as material
+     * @throws CommandException when the argument is not a material
+     */
+    @NotNull
+    public Material asMaterial(int index, Material def) throws CommandException {
+        if (hasArg(index)) return asMaterial(index);
+        return def;
+    }
+
+    /**
+     * Get the argument as a material.
+     * <p>
+     * This will send a custom message without listing all possible values.
+     *
      * @param index        index of argument
      * @param stripStrings if true underscores will be removed before checking
      * @return index as material
@@ -206,6 +295,23 @@ public class Arguments {
     public Material asMaterial(int index, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
         return EnumUtil.parse(asString(index), Material.class, stripStrings)
                 .orElseThrow(() -> CommandException.message("error.invalidMaterial"));
+    }
+
+    /**
+     * Get the argument as a material.
+     * <p>
+     * This will send a custom message without listing all possible values.
+     *
+     * @param index        index of argument
+     * @param def          returned if the index is not valid
+     * @param stripStrings if true underscores will be removed before checking
+     * @return index as material
+     * @throws CommandException when the argument is not a material
+     */
+    @NotNull
+    public Material asMaterial(int index, boolean stripStrings, Material def) throws CommandException {
+        if (hasArg(index)) return asMaterial(index, stripStrings);
+        return def;
     }
 
     /**
@@ -221,6 +327,22 @@ public class Arguments {
     @NotNull
     public <T extends Enum<T>> T asEnum(int index, Class<T> clazz) throws CommandException, IndexOutOfBoundsException {
         return asEnum(index, clazz, false);
+    }
+
+    /**
+     * Get the argument as an enum
+     *
+     * @param index index of argument
+     * @param clazz enum clazz to parse
+     * @param def   returned if the index is not valid
+     * @param <T>   type of enum
+     * @return index as enum value
+     * @throws CommandException When the string could not be parsed to an enum
+     */
+    @NotNull
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, T def) throws CommandException {
+        if (hasArg(index)) return asEnum(index, clazz);
+        return def;
     }
 
     /**
@@ -242,6 +364,23 @@ public class Arguments {
     }
 
     /**
+     * Get the argument as an enum
+     *
+     * @param index        index of argument
+     * @param clazz        enum clazz to parse
+     * @param stripStrings if true underscores will be removed before checking
+     * @param def          returned if the index is not valid
+     * @param <T>          type of enum
+     * @return index as enum value
+     * @throws CommandException When the string could not be parsed to an enum
+     */
+    @NotNull
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, T def) throws CommandException {
+        if (hasArg(index)) return asEnum(index, clazz, stripStrings);
+        return def;
+    }
+
+    /**
      * Get the argument as a player
      *
      * @param index index of argument
@@ -254,6 +393,20 @@ public class Arguments {
         Player player = plugin.getServer().getPlayer(asString(index));
         if (player == null) throw CommandException.message("error.notOnline");
         return player;
+    }
+
+    /**
+     * Get the argument as a player
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as player
+     * @throws CommandException when no player with this name is online
+     */
+    @NotNull
+    public Player asPlayer(int index, Player def) throws CommandException {
+        if (hasArg(index)) return asPlayer(index);
+        return def;
     }
 
     /**
@@ -274,6 +427,22 @@ public class Arguments {
     }
 
     /**
+     * Get the argument as a offline player
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as offline player
+     * @throws CommandException when no player with this name was on this server previously
+     */
+    @NotNull
+    public OfflinePlayer asOfflinePlayer(int index, OfflinePlayer def) throws CommandException {
+        if (hasArg(index)) return asOfflinePlayer(index);
+        return def;
+    }
+
+    /**
+     * Get the argument as a world
+     *
      * @param index index of argument
      * @return index as world
      * @throws CommandException          When the string is not the name of a world
@@ -288,6 +457,20 @@ public class Arguments {
     }
 
     /**
+     * Get the argument as a world
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as world
+     * @throws CommandException When the string is not the name of a world
+     */
+    @NotNull
+    public World asWorld(int index, World def) throws CommandException {
+        if (hasArg(index)) return asWorld(index);
+        return def;
+    }
+
+    /**
      * Get the arguments starting from an index till the end as a list
      *
      * @param from the first index to be returned
@@ -295,6 +478,69 @@ public class Arguments {
      */
     public List<String> args(int from) {
         return ArgumentUtils.getRangeAsList(args, from);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @return range as string
+     */
+    public String join() {
+        return join(" ");
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param from start index (included). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(int from) {
+        return join(" ", from);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param from start index (included). Use negative counts to count from the last index.
+     * @param to   end index (excluded). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(int from, int to) {
+        return join(" ", from, to);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @return range as string
+     */
+    public String join(String delimiter) {
+        return String.join(delimiter, args);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @param from      start index (included). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(String delimiter, int from) {
+        return ArgumentUtils.getMessage(args, from);
+    }
+
+    /**
+     * Returns a range of arguments as string.
+     *
+     * @param delimiter delimiter to join
+     * @param from      start index (included). Use negative counts to count from the last index.
+     * @param to        end index (excluded). Use negative counts to count from the last index.
+     * @return range as string
+     */
+    public String join(String delimiter, int from, int to) {
+        return ArgumentUtils.getMessage(args, from, to);
     }
 
     /**

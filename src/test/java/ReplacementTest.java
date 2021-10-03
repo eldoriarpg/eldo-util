@@ -11,5 +11,8 @@ public class ReplacementTest {
     public void test1() {
         Assertions.assertEquals("name", repCaps.invoke("%ENTITY%"));
         Assertions.assertEquals("name", repLower.invoke("%ENTITY%"));
+        Assertions.assertEquals("2.20", Replacement.create("NUM", 2.2000).invoke("%NUM%").replace(",", "."));
+        Assertions.assertEquals("2.00", Replacement.create("NUM", 2.0).invoke("%NUM%").replace(",", "."));
+        Assertions.assertEquals("2", Replacement.create("NUM", 2).invoke("%NUM%"));
     }
 }

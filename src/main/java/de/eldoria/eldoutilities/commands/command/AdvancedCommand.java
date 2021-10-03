@@ -1,8 +1,14 @@
-package de.eldoria.eldoutilities.commands;
+package de.eldoria.eldoutilities.commands.command;
 
+import de.eldoria.eldoutilities.commands.command.util.Arguments;
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.eldoutilities.commands.executor.IConsoleTabExecutor;
+import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.eldoutilities.commands.executor.ITabExecutor;
 import de.eldoria.eldoutilities.localization.DummyLocalizer;
 import de.eldoria.eldoutilities.localization.ILocalizer;
+import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.simplecommands.TabCompleteUtil;
 import org.bukkit.command.CommandSender;
@@ -13,11 +19,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class AdvancedCommand implements CommandRoute {
     private final Plugin plugin;
-    private final CommandMeta meta;
+    private CommandMeta meta;
     private ILocalizer localizer;
     private MessageSender messageSender;
 
@@ -25,6 +32,10 @@ public abstract class AdvancedCommand implements CommandRoute {
         this.plugin = plugin;
         this.meta = meta;
         linkMeta();
+    }
+
+    public AdvancedCommand(Plugin plugin) {
+        this.plugin = plugin;
     }
 
     private void linkMeta() {
@@ -55,6 +66,7 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
         if (this instanceof ITabExecutor) {
             CommandAssertions.invalidArguments(meta(), args);
+            CommandAssertions.allowedSender(meta, sender);
             ((ITabExecutor) this).onCommand(sender, label, args);
             return;
         }
@@ -64,17 +76,17 @@ public abstract class AdvancedCommand implements CommandRoute {
                 meta.defaultCommand().commandRoute(sender, label, args);
                 return;
             }
-            throw CommandException.message("Unhandled end of route. Command needs to implement a executor or subcommands");
+            throw CommandException.message("error.invalidCommand");
         }
 
         if (meta.subCommands().isEmpty()) {
-            throw CommandException.message("Unhandled end of route. Command needs to implement a executor or subcommands");
+            throw CommandException.message("Unhandled end of command route. The command needs to implement a executor or subcommands");
         }
         final Arguments newArgs = args.subArguments();
 
         Optional<AdvancedCommand> command = getCommand(args.asString(0));
         if (command.isPresent()) {
-            command.get().commandRoute(sender, label, newArgs);
+            command.get().commandRoute(sender, args.asString(0), newArgs);
             return;
         }
         throw CommandException.message("error.invalidCommand");
@@ -82,6 +94,21 @@ public abstract class AdvancedCommand implements CommandRoute {
 
     @Override
     public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) {
+        if (!meta().permissions().isEmpty()) {
+            boolean access = false;
+            for (String permission : meta().permissions()) {
+                if (sender.hasPermission(permission)) {
+                    access = true;
+                    break;
+                }
+            }
+            if (!access) {
+                String permissions = String.join(", ", meta().permissions());
+                return Collections.singletonList(localizer.localize("error.permission",
+                        Replacement.create("PERMISSION", permissions)));
+            }
+        }
+
         // Check for end of route
         if (this instanceof IPlayerTabExecutor && sender instanceof Player) {
             return ((IPlayerTabExecutor) this).onTabComplete((Player) sender, label, args);
@@ -146,7 +173,7 @@ public abstract class AdvancedCommand implements CommandRoute {
      * @param sender sender to cast
      * @return player or null if sender is not player
      */
-    protected Player getPlayerFromSender(CommandSender sender) {
+    protected final Player getPlayerFromSender(CommandSender sender) {
         return (sender instanceof Player) ? (Player) sender : null;
     }
 
@@ -154,8 +181,14 @@ public abstract class AdvancedCommand implements CommandRoute {
         return plugin;
     }
 
-    public CommandMeta meta() {
+    public final CommandMeta meta() {
+        Objects.requireNonNull(meta);
         return meta;
     }
 
+    protected final void meta(CommandMeta meta) {
+        if (this.meta != null) throw new IllegalStateException("Meta is already assigned");
+        this.meta = meta;
+        linkMeta();
+    }
 }
