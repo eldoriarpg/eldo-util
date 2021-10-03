@@ -53,7 +53,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
 
     @Override
     public void run() {
-        performCheck();
+        performCheck(true);
     }
 
     /**
@@ -61,10 +61,13 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
      *
      * @return true when the check was successful and a new version is available
      */
-    public final boolean performCheck() {
-        plugin.getLogger().info("§2Checking for new Version...");
+    public final boolean performCheck(boolean silent) {
         // dont check if update is already available
         if (updateAvailable) return true;
+
+        if (!silent) {
+            plugin.getLogger().info("§2Checking for new Version...");
+        }
 
         Optional<String> optLatest = getLatestVersion(data);
         if (optLatest.isPresent()) {
@@ -86,7 +89,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
                 registerListener(new UpdateNotifier(plugin, data.notifyPermission(), latestVersion));
             }
         } else {
-            plugin.getLogger().info("§2Plugin is up to date.");
+            if (!silent) {
+                plugin.getLogger().info("§2Plugin is up to date.");
+            }
         }
         return updateAvailable;
     }
@@ -138,9 +143,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     private void logUpdateMessage() {
         plugin.getLogger().info("§2New version of §6" + plugin.getName() + "§2 available.");
         plugin.getLogger().info("§2Newest version: §3" + latestVersion + "! Current version: §c" + plugin.getDescription().getVersion() + "§2!");
-        if (data.isAutoUpdate()) {
-            plugin.getLogger().info("§2Download new version here: §6" + plugin.getDescription().getWebsite());
-        }
+        plugin.getLogger().info("§2Download new version here: §6" + plugin.getDescription().getWebsite());
     }
 
     private void registerListener(Listener listener) {

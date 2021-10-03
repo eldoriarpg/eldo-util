@@ -3,6 +3,7 @@ package de.eldoria.eldoutilities.utils;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 /**
  * This class contains methods to parse strings to primitve types and other things.
@@ -20,11 +21,11 @@ public final class Parser {
      * @param s string to parse
      * @return optional integer with integer when the parsing was successful.
      */
-    public static OptionalInt parseInt(String s) {
+    public static Optional<Integer> parseInt(String s) {
         try {
-            return OptionalInt.of(Integer.parseInt(s));
+            return Optional.of(Integer.parseInt(s));
         } catch (NumberFormatException e) {
-            return OptionalInt.empty();
+            return Optional.empty();
         }
     }
 
@@ -34,11 +35,11 @@ public final class Parser {
      * @param s string to parse
      * @return optional double with double when the parsing was successful.
      */
-    public static OptionalDouble parseDouble(String s) {
+    public static Optional<Double> parseDouble(String s) {
         try {
-            return OptionalDouble.of(Double.parseDouble(s.replace(",", ".")));
+            return Optional.of(Double.parseDouble(s.replace(",", ".")));
         } catch (NumberFormatException e) {
-            return OptionalDouble.empty();
+            return Optional.empty();
         }
     }
 
@@ -79,14 +80,14 @@ public final class Parser {
     public static OptionalInt parseTimeToTicks(String s) {
         String[] split = s.split(":");
         if (split.length != 2) return OptionalInt.empty();
-        OptionalInt hour = parseInt(split[0]);
-        OptionalInt min = parseInt(split[1]);
+        Optional<Integer> hour = parseInt(split[0]);
+        Optional<Integer> min = parseInt(split[1]);
 
         if (!hour.isPresent() || !min.isPresent()) return OptionalInt.empty();
 
-        int hourTicks = (hour.getAsInt() - 6) * 1000 % 24000;
+        int hourTicks = (hour.get() - 6) * 1000 % 24000;
         if (hourTicks < 0) hourTicks = 24000 + hourTicks;
-        int minTicks = (int) Math.floor(1000 / 60d * min.getAsInt());
+        int minTicks = (int) Math.floor(1000 / 60d * min.get());
 
         return OptionalInt.of(hourTicks + minTicks);
     }
@@ -103,5 +104,13 @@ public final class Parser {
         int min = (int) Math.floor(((time % 1000) + 1) / (1000 / 60d));
         if (min < 10) return hours + ":0" + min;
         return hours + ":" + min;
+    }
+
+    public static <T> Optional<Long> parseLong(String value) {
+        try {
+            return Optional.of(Long.parseLong(value.replace(",", ".")));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
     }
 }

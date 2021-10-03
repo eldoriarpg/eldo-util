@@ -4,6 +4,7 @@ import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.utils.ObjUtil;
 import de.eldoria.eldoutilities.utils.Parser;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -12,6 +13,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -71,9 +73,11 @@ public abstract class EldoConfig {
                 String config;
                 try {
                     config = Files.readAllLines(Paths.get(dataFolder.getAbsolutePath(), "config.yml")).stream().collect(Collectors.joining("\n"));
+                } catch (FileNotFoundException e) {
+                    return Level.INFO;
                 } catch (IOException e) {
-                    // We dont know if the logger already exists...
-                    System.out.println("Could not load config file. Using default log level.");
+                    // We dont know if our logger already exists...
+                    Bukkit.getLogger().log(Level.INFO, "[EldoUtilities] Could not load config file. Using default log level.");
                     return Level.INFO;
                 }
                 Pattern compile = Pattern.compile("^debug:.?([a-zA-Z].*?)$", Pattern.MULTILINE);

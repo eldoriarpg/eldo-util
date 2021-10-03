@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
  * A replacement represents a text placeholder and its replacement.
  */
 public final class Replacement {
+    private static String format = "%%%s%%";
+
     private final String key;
     private String value;
     private boolean caseSensitive;
@@ -25,8 +27,12 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static Replacement create(String key, String value, char... formats) {
-        Replacement replacement = new Replacement("%" + key + "%", value);
+        Replacement replacement = new Replacement(key, value);
         return replacement.addFormatting(formats);
+    }
+
+    public static Replacement create(String key, Double value, char... formats) {
+        return create(key, String.format("%.2f", value), formats);
     }
 
     /**
@@ -86,6 +92,8 @@ public final class Replacement {
      * @return replacement with formatting set
      */
     public Replacement addFormatting(char[] format, char... afterFormat) {
+        if (format.length == 0 && afterFormat.length == 0) return this;
+
         StringBuilder builder = new StringBuilder();
         for (char aChar : format) {
             builder.append("§").append(aChar);
@@ -115,7 +123,7 @@ public final class Replacement {
      * @return Replacement with value changed
      */
     public Replacement matchCase() {
-        this.caseSensitive = false;
+        this.caseSensitive = true;
         return this;
     }
 
@@ -128,8 +136,30 @@ public final class Replacement {
      */
     public String invoke(String string) {
         if (!caseSensitive) {
-            return string.replaceAll("(?i)" + key, value.replaceAll("[\\W]", "\\\\$0"));
+            return string.replaceAll("(?i)" + markedKey(), value.replace("$", "\\$"));
         }
         return string.replace(key, value);
+    }
+
+    private String markedKey() {
+        return String.format(format, key);
+    }
+
+    @Override
+    public String toString() {
+        return "Replacement{" +
+               "key='" + key + '\'' +
+               ", value='" + value + '\'' +
+               ", caseSensitive=" + caseSensitive +
+               '}';
+    }
+
+    /**
+     * Sets the format used to recognize placeholders. This is the string which will be replaced by the replacement value
+     *
+     * @param format format for replacement markers
+     */
+    public static void setFormat(String format) {
+        Replacement.format = format;
     }
 }

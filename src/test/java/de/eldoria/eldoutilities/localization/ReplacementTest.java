@@ -10,7 +10,7 @@ public class ReplacementTest {
 
     @Test
     public void test1() {
-       Assertions.assertEquals("name§r", repCaps.invoke("%ENTITY%"));
-       Assertions.assertEquals("name§r", repLower.invoke("%ENTITY%"));
+       Assertions.assertEquals("name", repCaps.invoke("%ENTITY%"));
+       Assertions.assertEquals("name", repLower.invoke("%ENTITY%"));
     }
 }

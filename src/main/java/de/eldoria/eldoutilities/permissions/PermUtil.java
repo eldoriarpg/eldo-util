@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -28,9 +29,8 @@ public final class PermUtil {
      */
     public static int findHighestIntPermission(Player player, String prefix, int defaultValue) {
         Collection<Integer> permission = findPermissions(player, prefix, true, (string) -> {
-            OptionalInt optionalInt = Parser.parseInt(string);
-            if (optionalInt.isPresent()) return optionalInt.getAsInt();
-            return null;
+            Optional<Integer> optionalInt = Parser.parseInt(string);
+            return optionalInt.orElse(null);
         });
 
         int max = defaultValue;
@@ -51,9 +51,8 @@ public final class PermUtil {
      */
     public static double findHighestDoublePermission(Player player, String prefix, double defaultValue) {
         Collection<Double> permission = findPermissions(player, prefix, true, (string) -> {
-            OptionalDouble optionalInt = Parser.parseDouble(string);
-            if (optionalInt.isPresent()) return optionalInt.getAsDouble();
-            return null;
+            Optional<Double> optionalInt = Parser.parseDouble(string);
+            return optionalInt.orElse(null);
         });
 
         double max = defaultValue;

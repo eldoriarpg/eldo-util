@@ -1,12 +1,6 @@
 import de.eldoria.eldoutilities.localization.Replacement;
-import de.eldoria.eldoutilities.utils.Parser;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 public class ReplacementTest {
     Replacement repCaps = Replacement.create("ENTITY", "name");
@@ -15,7 +9,10 @@ public class ReplacementTest {
 
     @Test
     public void test1() {
-        Assertions.assertEquals("name§r", repCaps.invoke("%ENTITY%"));
-        Assertions.assertEquals("name§r", repLower.invoke("%ENTITY%"));
+        Assertions.assertEquals("name", repCaps.invoke("%ENTITY%"));
+        Assertions.assertEquals("name", repLower.invoke("%ENTITY%"));
+        Assertions.assertEquals("2.20", Replacement.create("NUM", 2.2000).invoke("%NUM%").replace(",", "."));
+        Assertions.assertEquals("2.00", Replacement.create("NUM", 2.0).invoke("%NUM%").replace(",", "."));
+        Assertions.assertEquals("2", Replacement.create("NUM", 2).invoke("%NUM%"));
     }
 }

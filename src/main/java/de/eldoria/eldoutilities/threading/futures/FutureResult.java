@@ -21,6 +21,10 @@ public interface FutureResult<T> {
      */
     void whenComplete(@NotNull Consumer<? super T> callback);
 
+    void whenComplete(@NotNull Consumer<? super T> callback, Consumer<Throwable> throwable);
+
+    void whenComplete(@NotNull Plugin plugin, @NotNull Consumer<? super T> callback, Consumer<Throwable> throwable);
+
     /**
      * Attaches a completion callback to this {@link FutureResult}.
      * <p>

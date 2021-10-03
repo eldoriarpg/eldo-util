@@ -50,8 +50,8 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public class Localizer implements ILocalizer {
-    private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z.]+?)\\$");
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z.]+?)");
+    private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z0-9_.]+?)\\$");
+    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_.]+?)");
 
     private final ResourceBundle fallbackLocaleFile;
     private final Plugin plugin;
@@ -92,26 +92,35 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaults() {
-        Map<String, String> locales = new HashMap<String, String>() {
-            {
-                put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
-                put("error.invalidCommand", "Invalid Command");
-                put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
-                put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
-                put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
-                put("error.invalidNumber", "Invalid number");
-                put("error.invalidLength", "This input is too long. Max: %MAX% chars.");
-                put("error.notAsConsole", "This command can not be executed from console.");
-                put("error.notAsPlayer", "This command can not be executed as player");
-                put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
-                put("dialog.accept", "accept");
-                put("dialog.deny", "deny");
-                put("dialog.add", "add");
-                put("dialog.remove", "remove");
-                put("dialog.leftClickChange", "Left click to change");
-                put("dialog.rightClickRemove", "Right click to remove");
-            }
-        };
+        Map<String, String> locales = new HashMap<>();
+        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
+        locales.put("error.invalidCommand", "Invalid Command");
+        locales.put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
+        locales.put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
+        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
+        locales.put("error.invalidMaterial", "Invalid material.");
+        locales.put("error.invalidNumber", "Invalid number");
+        locales.put("error.invalidBoolean", "Invalid value, %TRUE% or %FALSE%");
+        locales.put("error.invalidLength", "This input is too long. Max: %MAX% chars.");
+        locales.put("error.notOnline", "Invalid player. This player is not online.");
+        locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
+        locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
+        locales.put("error.notAsConsole", "This command can not be executed from console.");
+        locales.put("error.onlyPlayer", "This command can only be used by players.");
+        locales.put("error.onlyConsole", "This command can only be used by console.");
+        locales.put("error.invalidSender", "This command can not be executed from here.");
+        locales.put("error.missingArgument", "Argument %INDEX% is accessed but not present.");
+        locales.put("error.notAsPlayer", "This command can not be executed as player");
+        locales.put("error.tooSmall", "The number is too small. Min: %MIN%");
+        locales.put("error.tooLarge", "The number is too Large. Max: %MAX%");
+        locales.put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
+        locales.put("dialog.accept", "accept");
+        locales.put("dialog.deny", "deny");
+        locales.put("dialog.add", "add");
+        locales.put("dialog.remove", "remove");
+        locales.put("dialog.leftClickChange", "Left click to change");
+        locales.put("dialog.rightClickRemove", "Right click to remove");
+
         addLocaleCodes(locales);
     }
 
@@ -161,14 +170,10 @@ public class Localizer implements ILocalizer {
 
         if (result == null) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
-            return "";
+            result = key;
         }
 
-        for (Replacement replacement : replacements) {
-            result = replacement.invoke(result);
-        }
-
-        return result;
+        return invokeReplacements(result, replacements);
     }
 
     private void createOrUpdateLocaleFiles() {
@@ -324,7 +329,7 @@ public class Localizer implements ILocalizer {
             if (updated) {
                 try (OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                     outputStream.write("# File automatically updated at "
-                            + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
+                                       + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
                     for (Map.Entry<String, String> entry : treemap.entrySet()) {
                         outputStream.write(entry.getKey() + "=" + entry.getValue().replace("\n", "\\n") + "\n");
                     }
@@ -353,11 +358,10 @@ public class Localizer implements ILocalizer {
     }
 
     /**
-     * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
-     * right order.
+     * Translates a String with Placeholders. Can handle multiple messages with replacements.
      *
      * @param message      Message to translate
-     * @param replacements Replacements in the right order.
+     * @param replacements Replacements.
      * @return Replaced Messages
      */
     @Override
@@ -367,8 +371,10 @@ public class Localizer implements ILocalizer {
         }
 
         // If the matcher doesn't find any key we assume its a simple message.
-        if (LOCALIZATION_CODE.matcher(message).matches()) {
-            return getMessage(message, replacements);
+        if (!EMBED_LOCALIZATION_CODE.matcher(message).find()) {
+            if (LOCALIZATION_CODE.matcher(message).matches()) {
+                message = getMessage(message, replacements);
+            }
         }
 
         // find locale codes in message
@@ -378,13 +384,26 @@ public class Localizer implements ILocalizer {
             keys.add(matcher.group(1));
         }
 
-
         String result = message;
         for (String match : keys) {
             //Replace current locale code with result
             result = result.replace("$" + match + "$", getMessage(match, replacements));
         }
+
+        result = invokeReplacements(result, replacements);
+
+        if (EMBED_LOCALIZATION_CODE.matcher(result).find()) {
+            return localize(result, replacements);
+        }
+
         return result;
+    }
+
+    private String invokeReplacements(String message, Replacement... replacements) {
+        for (Replacement replacement : replacements) {
+            message = replacement.invoke(message);
+        }
+        return message;
     }
 
     /**

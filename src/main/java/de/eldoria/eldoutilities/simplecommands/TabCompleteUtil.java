@@ -1,20 +1,36 @@
 package de.eldoria.eldoutilities.simplecommands;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.gson.internal.LinkedHashTreeMap;
 import de.eldoria.eldoutilities.C;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.ArrayUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Bukkit;
-import org.jetbrains.annotations.Nullable;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,7 +40,77 @@ import java.util.stream.Stream;
  * @since 1.0.0
  */
 public final class TabCompleteUtil {
+    private static final Set<String> PLAYER_NAMES = new HashSet<>();
+    private static final Set<String> ONLINE_NAMES = new HashSet<>();
+    private static Instant lastPlayerRefresh = Instant.now();
+    private static final Set<String> smartMats;
+    private static final Map<String, List<String>> smartShortMats;
+    private static final Map<String, List<String>> smartPartMats;
+    private static final Pattern SHORT_NAME = Pattern.compile("(?:(?:^|_)(.))");
+    private static final Cache<String, List<String>> SMART_MAT_RESULTS = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+
     private TabCompleteUtil() {
+    }
+
+    static {
+        smartMats = new LinkedHashSet<>();
+        smartShortMats = new LinkedHashTreeMap<>();
+        smartPartMats = new LinkedHashTreeMap<>();
+
+        for (Material material : Material.values()) {
+            String name = material.name();
+            if (name.startsWith("LEGACY")) continue;
+            smartShortMats.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            smartMats.add(name);
+            for (String part : getParts(material)) {
+                smartPartMats.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            }
+        }
+    }
+
+    private static String getShortName(Material mat) {
+        Matcher matcher = SHORT_NAME.matcher(mat.name());
+        StringBuilder builder = new StringBuilder();
+        while (matcher.find()) {
+            builder.append(matcher.group(1));
+        }
+        return builder.toString();
+    }
+
+    private static Set<String> getParts(Material mat) {
+        return Arrays.stream(mat.name().split("_")).collect(Collectors.toSet());
+    }
+
+    /**
+     * Complete a material with precomputed result maps
+     *
+     * @param value     value to complete
+     * @param lowerCase true to receive results in lower case
+     * @return a list with unique entries
+     */
+    public static List<String> completeMaterial(String value, boolean lowerCase) {
+        value = value.toLowerCase(Locale.ROOT);
+        Set<String> results = new LinkedHashSet<>();
+        // Smart matches on part have the highest priority
+        for (Map.Entry<String, List<String>> entry : smartShortMats.entrySet()) {
+            if (!entry.getKey().startsWith(value)) continue;
+            results.addAll(entry.getValue());
+        }
+
+        // Matches on the start of the value have second prio
+        results.addAll(complete(value, smartMats));
+
+        // Part matches are nice, but have low priority
+        for (Map.Entry<String, List<String>> entry : smartPartMats.entrySet()) {
+            if (!entry.getKey().startsWith(value)) continue;
+            results.addAll(entry.getValue());
+        }
+
+        String finalValue = value.toUpperCase(Locale.ROOT);
+
+        results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
+
+        return results.stream().map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name).collect(Collectors.toList());
     }
 
     /**
@@ -47,8 +133,9 @@ public final class TabCompleteUtil {
      */
     public static List<String> complete(String value, Stream<String> inputs) {
         if (value.isEmpty()) return inputs.collect(Collectors.toList());
+        String lowerValue = value.toLowerCase(Locale.ROOT);
         return inputs
-                .filter(i -> i.toLowerCase().startsWith(value))
+                .filter(i -> i.toLowerCase().startsWith(lowerValue))
                 .collect(Collectors.toList());
     }
 
@@ -128,9 +215,37 @@ public final class TabCompleteUtil {
      * @param value current value
      * @return null as this will enable minecraft to standard completion which is nearly always a player
      */
-    @Nullable
     public static List<String> completePlayers(String value) {
-        return null;
+        if (PLAYER_NAMES.isEmpty()) {
+            PLAYER_NAMES.addAll(
+                    Arrays.stream(Bukkit.getOfflinePlayers())
+                            .filter(p -> Instant.ofEpochMilli(p.getLastPlayed()).isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
+                            .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
+                            .limit(1000)
+                            .map(OfflinePlayer::getName)
+                            .collect(Collectors.toSet()));
+        }
+
+        Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
+        complete.addAll(completeOnlinePlayers(value));
+        return new ArrayList<>(complete);
+    }
+
+    /**
+     * Complete a player
+     *
+     * @param value current value
+     * @return null as this will enable minecraft to standard completion which is nearly always a player
+     */
+    public static List<String> completeOnlinePlayers(String value) {
+        Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
+        if (ONLINE_NAMES.isEmpty() || lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
+            ONLINE_NAMES.clear();
+            ONLINE_NAMES.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
+            lastPlayerRefresh = Instant.now();
+        }
+        complete.addAll(complete(value, ONLINE_NAMES));
+        return new ArrayList<>(complete);
     }
 
 
@@ -186,12 +301,12 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeDouble(String value, double min, double max, ILocalizer loc) {
-        OptionalDouble d = Parser.parseDouble(value);
+        Optional<Double> d = Parser.parseDouble(value);
         if (d.isPresent()) {
-            if (d.getAsDouble() > max || d.getAsDouble() < min) {
+            if (d.get() > max || d.get() < min) {
                 return Collections.singletonList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", min).addFormatting('6'),
-                        Replacement.create("MAX", max).addFormatting('6')));
+                        Replacement.create("MIN", String.format("%.2f", min)).addFormatting('6'),
+                        Replacement.create("MAX", String.format("%.2f", min)).addFormatting('6')));
 
             }
             return Collections.singletonList(min + "-" + max);
@@ -210,15 +325,102 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeInt(String value, int min, int max, ILocalizer loc) {
-        OptionalInt d = Parser.parseInt(value);
+        Optional<Integer> d = Parser.parseInt(value);
         if (d.isPresent()) {
-            if (d.getAsInt() > max || d.getAsInt() < min) {
+            if (d.get() > max || d.get() < min) {
                 return Collections.singletonList(loc.getMessage("error.invalidRange",
                         Replacement.create("MIN", min).addFormatting('6'),
                         Replacement.create("MAX", max).addFormatting('6')));
 
             }
             return Collections.singletonList(min + "-" + max);
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooSmall (%MIN%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param min   min value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMinDouble(String value, double min, ILocalizer loc) {
+        Optional<Double> val = Parser.parseDouble(value);
+        if (val.isPresent()) {
+            if (val.get() < min) {
+                return Collections.singletonList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting('6')));
+
+            }
+            return Collections.singletonList(String.format("%.2f<", min));
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooSmall (%MIN%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param min   min value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMinInt(String value, int min, ILocalizer loc) {
+        Optional<Integer> val = Parser.parseInt(value);
+        if (val.isPresent()) {
+            if (val.get() < min) {
+                return Collections.singletonList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting('6')));
+
+            }
+            return Collections.singletonList(min + "<");
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooLarge (%MAX%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param max   max value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMaxDouble(String value, double max, ILocalizer loc) {
+        Optional<Double> val = Parser.parseDouble(value);
+        if (val.isPresent()) {
+            if (val.get() > max) {
+                return Collections.singletonList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting('6')));
+
+            }
+            return Collections.singletonList(String.format("%.2f", max) + ">");
+        }
+        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+    }
+
+    /**
+     * Checks if the input is a number and inside the range. Requires {@code error.tooLarge (%MAX%)} and
+     * {@code error.invalidNumber} key in locale file
+     *
+     * @param value current value
+     * @param max   max value
+     * @param loc   localizer instance
+     * @return list with range advise or error
+     */
+    public static List<String> completeMaxInt(String value, int max, ILocalizer loc) {
+        Optional<Integer> val = Parser.parseInt(value);
+        if (val.isPresent()) {
+            if (val.get() > max) {
+                return Collections.singletonList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting('6')));
+
+            }
+            return Collections.singletonList(max + ">");
         }
         return Collections.singletonList(loc.getMessage("error.invalidNumber"));
     }

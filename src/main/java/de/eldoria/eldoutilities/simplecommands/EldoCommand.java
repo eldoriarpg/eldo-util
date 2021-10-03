@@ -75,7 +75,7 @@ public abstract class EldoCommand implements TabExecutor {
 
         final String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
-        return getCommand(args[0]).map(c -> c.onCommand(sender, command, label, newArgs)).orElse(false);
+        return getCommand(args[0]).map(c -> c.onCommand(sender, command, args[0], newArgs)).orElse(false);
     }
 
     @Override
@@ -87,7 +87,7 @@ public abstract class EldoCommand implements TabExecutor {
 
         if (args.length == 0) return Collections.emptyList();
 
-        return getCommand(args[0]).map(c -> c.onTabComplete(sender, command, alias, newArgs))
+        return getCommand(args[0]).map(c -> c.onTabComplete(sender, command, args[0], newArgs))
                 .orElse(Collections.singletonList(localizer().getMessage("error.invalidCommand")));
     }
 
@@ -106,7 +106,7 @@ public abstract class EldoCommand implements TabExecutor {
      * @param command  name of the command.
      * @param executor executor
      */
-    public void registerCommand(String command, TabExecutor executor) {
+    public final void registerCommand(String command, TabExecutor executor) {
         subCommands.put(command, executor);
         registeredCommands = new String[subCommands.size()];
         subCommands.keySet().toArray(registeredCommands);
@@ -117,7 +117,7 @@ public abstract class EldoCommand implements TabExecutor {
      *
      * @param defaultCommand executor for default command
      */
-    public void setDefaultCommand(TabExecutor defaultCommand) {
+    public final void setDefaultCommand(TabExecutor defaultCommand) {
         this.defaultCommand = defaultCommand;
     }
 
@@ -126,7 +126,7 @@ public abstract class EldoCommand implements TabExecutor {
      *
      * @return localizer instance
      */
-    protected ILocalizer localizer() {
+    protected final ILocalizer localizer() {
         if (localizer == null || localizer instanceof DummyLocalizer) {
             localizer = ILocalizer.getPluginLocalizer(plugin);
         }
@@ -138,7 +138,7 @@ public abstract class EldoCommand implements TabExecutor {
      *
      * @return message sender instance
      */
-    protected MessageSender messageSender() {
+    protected final MessageSender messageSender() {
         if (messageSender == null || messageSender.isDefault()) {
             messageSender = MessageSender.getPluginMessageSender(plugin);
         }
@@ -257,7 +257,7 @@ public abstract class EldoCommand implements TabExecutor {
      * @return true if the sender is the console
      */
     protected boolean isConsole(CommandSender sender) {
-        return (sender instanceof ConsoleCommandSender);
+        return !(sender instanceof Player);
     }
 
     /**

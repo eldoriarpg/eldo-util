@@ -13,11 +13,11 @@ public class CompletableBukkitFuture {
         return BukkitFutureResult.of(CompletableFuture.supplyAsync(supplier, executor));
     }
 
-    public static BukkitFutureResult<Void> supplyAsync(Runnable supplier) {
+    public static BukkitFutureResult<Void> runAsync(Runnable supplier) {
         return BukkitFutureResult.of(CompletableFuture.runAsync(supplier));
     }
 
-    public static BukkitFutureResult<Void> supplyAsync(Runnable supplier, Executor executor) {
+    public static BukkitFutureResult<Void> runAsync(Runnable supplier, Executor executor) {
         return BukkitFutureResult.of(CompletableFuture.runAsync(supplier, executor));
     }
 }

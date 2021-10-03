@@ -1,5 +1,7 @@
 package de.eldoria.eldoutilities.plugin;
 
+import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
+import de.eldoria.eldoutilities.commands.command.AdvancedCommandAdapter;
 import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
@@ -12,7 +14,10 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.server.ServerCommandEvent;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,6 +27,9 @@ import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,6 +48,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     private BukkitScheduler scheduler;
     private DebugLogger debugLogger;
     private FailsaveCommand failcmd;
+    private ReloadListener reloadListener;
 
     public EldoPlugin() {
         registerSelf(this);
@@ -95,6 +104,18 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
             return;
         }
         getLogger().warning("Command " + command + " not found!");
+    }
+
+    /**
+     * Register a tabexecutor for a command.
+     * <p>
+     * This tabexecutor will handle execution and tab completion.
+     *
+     * @param command  name of command
+     * @param executor command executor
+     */
+    public void registerCommand(String command, AdvancedCommand executor) {
+        registerCommand(command, AdvancedCommandAdapter.wrap(this, executor));
     }
 
     /**
@@ -164,12 +185,38 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     }
 
     @Override
+    public final void onLoad() {
+        logger().config("Loading plugin.");
+        try {
+            onPluginLoad();
+        } catch (Throwable e) {
+            initFailsave("Plugin failed to load.", e);
+        }
+    }
+
+    public void onPluginLoad() throws Throwable {
+
+    }
+
+    @Override
     public final void onEnable() {
+        boolean reload = isLocked();
+        if (reload) {
+            try {
+                logger().config("Detected plugin reload.");
+                onReload();
+            } catch (Throwable e) {
+                initFailsave("Plugin failed to reload.", e);
+            }
+        }
+        reloadListener = new ReloadListener();
+        registerListener(reloadListener);
         EldoUtilities.ignite(instance);
         try {
-            onPluginEnable();
+            logger().config("Detected initial plugin enable.");
+            onPluginEnable(reload);
         } catch (Throwable e) {
-            logger().log(Level.SEVERE, "Plugin failed to load. Initializing failsave mode.", e);
+            initFailsave("Plugin failed to enable.", e);
             for (String cmd : getDescription().getCommands().keySet()) {
                 try {
                     registerCommand(cmd, failcmd);
@@ -178,54 +225,107 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
                 }
             }
         }
+        logger().config("Scheduling post startup");
         new BukkitRunnable() {
             @Override
             public void run() {
                 try {
-                    onPostStart();
+                    onPostStart(reload);
                 } catch (Throwable e) {
-                    logger().log(Level.SEVERE, "Plugin post start failed. Initializing failsave mode.", e);
-                    FailsaveCommand failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
-                    for (String cmd : getDescription().getCommands().keySet()) {
-                        try {
-                            if (getCommand(cmd) != null && getCommand(cmd).getExecutor() == null) {
-                                registerCommand(cmd, failcmd);
-                            }
-                        } catch (Throwable ex) {
-                            logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
-                        }
-                    }
+                    initFailsave("Plugin post start failed.", e);
                 }
             }
         }.runTaskLater(this, 1);
+        removeLock();
+    }
+
+    private void initFailsave(String message, Throwable e) {
+        logger().log(Level.SEVERE, message, e);
+        logger().log(Level.SEVERE, "Initializing failsave mode.");
+        FailsaveCommand failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        for (String cmd : getDescription().getCommands().keySet()) {
+            try {
+                registerCommand(cmd, failcmd);
+            } catch (Throwable ex) {
+                logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
+            }
+        }
+    }
+
+    private void onReload() {
+        try {
+            logger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
+            logger().severe("Detected server reload.");
+            logger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
+            logger().severe("Please do not report any bugs caused by reloading the server.");
+            logger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
+            onPluginReload();
+        } catch (Throwable e) {
+            initFailsave("Plugin failed to reload.", e);
+        }
+    }
+
+    public void onPluginReload() throws Throwable {
     }
 
     /**
      * Called when the server has started completely.
+     *
+     * @param reload
      */
-    public void onPostStart() {
+    public void onPostStart(boolean reload) throws Throwable {
     }
 
     /**
      * Called when this plugin is enabled
+     *
+     * @param reload
      */
-    public void onPluginEnable() {
+    public void onPluginEnable(boolean reload) throws Throwable {
     }
 
     @Override
     public final void onDisable() {
+        if (reloadListener.isReload()) {
+            logger().severe("Plugin is disabled by server reload.");
+            createLock();
+        }
         EldoUtilities.shutdown();
         try {
             onPluginDisable();
         } catch (Throwable e) {
-            logger().log(Level.SEVERE, "Plugin failed to shutdown correct.", e);
+            logger().log(Level.SEVERE, "Plugin failed to shutdown correctly.", e);
+        }
+    }
+
+    private Path getLockFile() {
+        return getDataFolder().toPath().resolve("lock");
+    }
+
+    private void createLock() {
+        try {
+            Files.createFile(getLockFile());
+        } catch (IOException e) {
+            logger().config("Could not create lock file");
+        }
+    }
+
+    private boolean isLocked() {
+        return Files.exists(getLockFile());
+    }
+
+    private void removeLock() {
+        try {
+            Files.deleteIfExists(getLockFile());
+        } catch (IOException e) {
+            logger().config("Could not resolve lock");
         }
     }
 
     /**
      * Called when this plugin is disabled.
      */
-    public void onPluginDisable() {
+    public void onPluginDisable() throws Throwable {
     }
 
     @Override
@@ -236,5 +336,29 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return failcmd.onCommand(sender, command, label, args);
+    }
+
+    private static class ReloadListener implements Listener {
+        private boolean reload;
+
+        @EventHandler
+        public void onCommand(PlayerCommandPreprocessEvent event) {
+            if (event.getPlayer().hasPermission("bukkit.command.reload") || event.getPlayer().isOp()) {
+                if (event.getMessage().startsWith("/reload")) {
+                    reload = true;
+                }
+            }
+        }
+
+        @EventHandler
+        public void onServercommand(ServerCommandEvent event) {
+            if (event.getCommand().startsWith("reload")) {
+                reload = true;
+            }
+        }
+
+        public boolean isReload() {
+            return reload;
+        }
     }
 }
