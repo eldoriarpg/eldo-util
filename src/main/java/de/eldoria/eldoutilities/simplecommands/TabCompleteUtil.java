@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,9 +38,12 @@ import java.util.stream.Stream;
  *
  * @since 1.0.0
  */
+@SuppressWarnings("unused")
 public final class TabCompleteUtil {
     private static final Set<String> PLAYER_NAMES = new HashSet<>();
     private static final Set<String> ONLINE_NAMES = new HashSet<>();
+    public static final char HIGHLIGHT = '6';
+    public static final long OFFLINE_PLAYER_CACHE_SIZE = 1000L;
     private static Instant lastPlayerRefresh = Instant.now();
     private static final Set<String> smartMats;
     private static final Map<String, List<String>> smartShortMats;
@@ -50,6 +52,7 @@ public final class TabCompleteUtil {
     private static final Cache<String, List<String>> SMART_MAT_RESULTS = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
 
     private TabCompleteUtil() {
+        throw new UnsupportedOperationException("This is a utility class.");
     }
 
     static {
@@ -110,7 +113,9 @@ public final class TabCompleteUtil {
 
         results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
-        return results.stream().map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name).collect(Collectors.toList());
+        return results.stream()
+                .map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -121,7 +126,8 @@ public final class TabCompleteUtil {
      * @return list of strings
      */
     public static List<String> complete(String value, String... inputs) {
-        return ArrayUtil.startingWithInArray(value, inputs).collect(Collectors.toList());
+        return ArrayUtil.startingWithInArray(value, inputs)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -136,7 +142,7 @@ public final class TabCompleteUtil {
         String lowerValue = value.toLowerCase(Locale.ROOT);
         return inputs
                 .filter(i -> i.toLowerCase().startsWith(lowerValue))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -221,7 +227,7 @@ public final class TabCompleteUtil {
                     Arrays.stream(Bukkit.getOfflinePlayers())
                             .filter(p -> Instant.ofEpochMilli(p.getLastPlayed()).isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
                             .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
-                            .limit(1000)
+                            .limit(OFFLINE_PLAYER_CACHE_SIZE)
                             .map(OfflinePlayer::getName)
                             .collect(Collectors.toSet()));
         }
@@ -302,16 +308,16 @@ public final class TabCompleteUtil {
      */
     public static List<String> completeDouble(String value, double min, double max, ILocalizer loc) {
         Optional<Double> d = Parser.parseDouble(value);
+        List<String> result = new ArrayList<>();
         if (d.isPresent()) {
             if (d.get() > max || d.get() < min) {
-                return Collections.singletonList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", String.format("%.2f", min)).addFormatting('6'),
-                        Replacement.create("MAX", String.format("%.2f", min)).addFormatting('6')));
-
+                return singleEntryList(loc.getMessage("error.invalidRange",
+                        Replacement.create("MIN", String.format("%.2f", min)).addFormatting(HIGHLIGHT),
+                        Replacement.create("MAX", String.format("%.2f", min)).addFormatting(HIGHLIGHT)));
             }
-            return Collections.singletonList(min + "-" + max);
+            return singleEntryList(min + "-" + max);
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
 
     /**
@@ -328,14 +334,13 @@ public final class TabCompleteUtil {
         Optional<Integer> d = Parser.parseInt(value);
         if (d.isPresent()) {
             if (d.get() > max || d.get() < min) {
-                return Collections.singletonList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", min).addFormatting('6'),
-                        Replacement.create("MAX", max).addFormatting('6')));
-
+                return singleEntryList(loc.getMessage("error.invalidRange",
+                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT),
+                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
             }
-            return Collections.singletonList(min + "-" + max);
+            return singleEntryList(min + "-" + max);
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
 
     /**
@@ -351,13 +356,13 @@ public final class TabCompleteUtil {
         Optional<Double> val = Parser.parseDouble(value);
         if (val.isPresent()) {
             if (val.get() < min) {
-                return Collections.singletonList(loc.getMessage("error.tooLow",
-                        Replacement.create("MIN", min).addFormatting('6')));
+                return singleEntryList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT)));
 
             }
-            return Collections.singletonList(String.format("%.2f<", min));
+            return singleEntryList(String.format("%.2f<", min));
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
 
     /**
@@ -373,14 +378,15 @@ public final class TabCompleteUtil {
         Optional<Integer> val = Parser.parseInt(value);
         if (val.isPresent()) {
             if (val.get() < min) {
-                return Collections.singletonList(loc.getMessage("error.tooLow",
-                        Replacement.create("MIN", min).addFormatting('6')));
+                return singleEntryList(loc.getMessage("error.tooLow",
+                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT)));
 
             }
-            return Collections.singletonList(min + "<");
+            return singleEntryList(min + "<");
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
+
     /**
      * Checks if the input is a number and inside the range. Requires {@code error.tooLarge (%MAX%)} and
      * {@code error.invalidNumber} key in locale file
@@ -394,13 +400,13 @@ public final class TabCompleteUtil {
         Optional<Double> val = Parser.parseDouble(value);
         if (val.isPresent()) {
             if (val.get() > max) {
-                return Collections.singletonList(loc.getMessage("error.tooLarge",
-                        Replacement.create("MAX", max).addFormatting('6')));
+                return singleEntryList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
 
             }
-            return Collections.singletonList(String.format("%.2f", max) + ">");
+            return singleEntryList(String.format("%.2f", max) + ">");
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
 
     /**
@@ -416,13 +422,13 @@ public final class TabCompleteUtil {
         Optional<Integer> val = Parser.parseInt(value);
         if (val.isPresent()) {
             if (val.get() > max) {
-                return Collections.singletonList(loc.getMessage("error.tooLarge",
-                        Replacement.create("MAX", max).addFormatting('6')));
+                return singleEntryList(loc.getMessage("error.tooLarge",
+                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
 
             }
-            return Collections.singletonList(max + ">");
+            return singleEntryList(max + ">");
         }
-        return Collections.singletonList(loc.getMessage("error.invalidNumber"));
+        return singleEntryList(loc.getMessage("error.invalidNumber"));
     }
 
     /**
@@ -437,9 +443,15 @@ public final class TabCompleteUtil {
      */
     public static List<String> completeFreeInput(String value, int maxLength, String defaultComplete, ILocalizer loc) {
         if (value.length() > maxLength) {
-            return Collections.singletonList(loc.getMessage("error.invalidLength",
-                    Replacement.create("MAX", maxLength).addFormatting('6')));
+            return singleEntryList(loc.getMessage("error.invalidLength",
+                    Replacement.create("MAX", maxLength).addFormatting(HIGHLIGHT)));
         }
-        return Collections.singletonList(defaultComplete);
+        return singleEntryList(defaultComplete);
+    }
+
+    public static <T> List<T> singleEntryList(T value) {
+        List<T> list = new ArrayList<>();
+        list.add(value);
+        return list;
     }
 }
