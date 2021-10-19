@@ -15,16 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unused")
 public class Arguments implements Iterable<String> {
@@ -116,6 +113,9 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public @NotNull String asString(int index) throws IndexOutOfBoundsException {
+        if (index < 0) {
+            return args[args.length - index];
+        }
         return args[index];
     }
 
