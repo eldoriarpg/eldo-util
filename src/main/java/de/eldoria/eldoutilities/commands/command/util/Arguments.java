@@ -15,13 +15,19 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unused")
-public class Arguments {
+public class Arguments implements Iterable<String> {
     private final FlagContainer flags;
     Plugin plugin;
     private String[] args;
@@ -649,5 +655,23 @@ public class Arguments {
      */
     public <T> Optional<T> getFlagValueIfPresent(@NotNull String flag, Function<String, T> map) {
         return flags.getIfPresent(flag, map);
+    }
+
+    @NotNull
+    @Override
+    public Iterator<String> iterator() {
+        return args().iterator();
+    }
+
+    public Spliterator<String> spliterator() {
+        return args().spliterator();
+    }
+
+    public Stream<String> stream() {
+        return args().stream();
+    }
+
+    public Stream<String> parallelStream() {
+        return args().parallelStream();
     }
 }
