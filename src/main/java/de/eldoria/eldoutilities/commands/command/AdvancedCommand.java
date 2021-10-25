@@ -93,7 +93,7 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     @Override
-    public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) {
+    public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) throws CommandException {
         if (!meta().permissions().isEmpty()) {
             boolean access = false;
             for (String permission : meta().permissions()) {
@@ -129,9 +129,12 @@ public abstract class AdvancedCommand implements CommandRoute {
 
         final Arguments newArgs = args.subArguments();
 
+        Optional<AdvancedCommand> command = getCommand(args.asString(0));
+        if(!command.isPresent()){
+            return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
+        }
         // forward
-        return getCommand(args.asString(0)).map(c -> c.tabCompleteRoute(sender, args.asString(0), newArgs))
-                .orElse(Collections.singletonList(localizer().getMessage("error.invalidCommand")));
+        return command.get().tabCompleteRoute(sender, args.asString(0), args);
     }
 
     private Optional<AdvancedCommand> getCommand(String command) {

@@ -12,6 +12,7 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -53,7 +54,14 @@ public class AdvancedCommandAdapter implements TabExecutor {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         Arguments arguments = Arguments.create(plugin, args);
-        return advancedCommand.tabCompleteRoute(sender, label, arguments);
+        List<String> strings;
+        try {
+            strings = advancedCommand.tabCompleteRoute(sender, label, arguments);
+        } catch (CommandException e) {
+            strings = Collections.singletonList(localizer.localize(e.getMessage(), e.replacements()));
+            plugin.getLogger().log(Level.CONFIG, "Command exception occured.", e);
+        }
+        return strings;
     }
 
     /**

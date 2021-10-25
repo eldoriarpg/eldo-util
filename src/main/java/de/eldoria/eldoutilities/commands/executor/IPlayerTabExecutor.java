@@ -13,7 +13,7 @@ public interface IPlayerTabExecutor {
     void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException;
 
     @Nullable
-    default List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args){
+    default List<String> onTabComplete(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException{
         return Collections.emptyList();
     }
 }

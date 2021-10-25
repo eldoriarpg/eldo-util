@@ -301,6 +301,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * Called when this plugin is enabled
      *
      * @param reload indicated that the call was caused by a server reload
+     * @param reload
      */
     public void onPluginEnable(boolean reload) throws Throwable {
     }
