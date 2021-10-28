@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @since 1.1.0
  */
 public abstract class EldoConfig {
-    private static final Map<Class<? extends Plugin>, EldoConfig> PLUGIN_MAIN_CONFIGS = new HashMap<>();
+    private static EldoConfig instanceConfig = null;
     protected final Plugin plugin;
     private final Path pluginData;
     private final Map<String, FileConfiguration> configs = new HashMap<>();
@@ -44,8 +44,11 @@ public abstract class EldoConfig {
 
     public EldoConfig(Plugin plugin) {
         this.plugin = plugin;
+        if(instanceConfig == null){
+            instanceConfig = this;
+        }
         pluginData = plugin.getDataFolder().toPath();
-        PLUGIN_MAIN_CONFIGS.putIfAbsent(plugin.getClass(), this);
+        config = plugin.getConfig();
         plugin.saveDefaultConfig();
         // TODO: This is just here for backwards compatibility reasons after a stupid choice
         ConfigurationSerialization.registerClass(MapEntry.class, "eldoUtilitiesMapEntry");
@@ -136,18 +139,6 @@ public abstract class EldoConfig {
             return Level.ALL;
         }
         return Level.INFO;
-    }
-
-    /**
-     * Get the main config.
-     * <p>
-     * Also refered as the config.yml
-     *
-     * @param clazz class of plugin to retrieve the main config
-     * @return file configuration for the main config.
-     */
-    public static EldoConfig getMainConfig(Class<? extends Plugin> clazz) {
-        return PLUGIN_MAIN_CONFIGS.get(clazz);
     }
 
     /**
@@ -328,8 +319,8 @@ public abstract class EldoConfig {
      *
      * @return file configuration for the main config.
      */
-    public final EldoConfig getMainConfig() {
-        return PLUGIN_MAIN_CONFIGS.get(plugin.getClass());
+    public static EldoConfig getMainConfig() {
+        return instanceConfig;
     }
 
     /**
@@ -379,7 +370,7 @@ public abstract class EldoConfig {
     }
 
     public boolean isMainConfig() {
-        return PLUGIN_MAIN_CONFIGS.get(plugin.getClass()) == this;
+        return instanceConfig == this;
     }
 
     private void validateMainConfigEntry() {
