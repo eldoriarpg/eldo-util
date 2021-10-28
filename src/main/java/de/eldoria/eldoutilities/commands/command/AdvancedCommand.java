@@ -127,14 +127,12 @@ public abstract class AdvancedCommand implements CommandRoute {
             return TabCompleteUtil.complete(args.asString(0), meta.registeredCommands());
         }
 
-        final Arguments newArgs = args.subArguments();
-
         Optional<AdvancedCommand> command = getCommand(args.asString(0));
         if(!command.isPresent()){
             return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
         }
         // forward
-        return command.get().tabCompleteRoute(sender, args.asString(0), args);
+        return command.get().tabCompleteRoute(sender, args.asString(0), args.subArguments());
     }
 
     private Optional<AdvancedCommand> getCommand(String command) {
