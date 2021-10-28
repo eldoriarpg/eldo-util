@@ -58,7 +58,7 @@ public class AdvancedCommandAdapter implements TabExecutor {
         try {
             strings = advancedCommand.tabCompleteRoute(sender, label, arguments);
         } catch (CommandException e) {
-            strings = Collections.singletonList(localizer.localize(e.getMessage(), e.replacements()));
+            strings = Collections.singletonList(localizer().localize(e.getMessage(), e.replacements()));
             plugin.getLogger().log(Level.CONFIG, "Command exception occured.", e);
         }
         return strings;
