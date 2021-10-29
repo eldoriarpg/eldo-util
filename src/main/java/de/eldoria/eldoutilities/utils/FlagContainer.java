@@ -28,7 +28,6 @@ public class FlagContainer {
      * Create a new flag container based on the arguments
      *
      * @param args args
-     *
      * @return new flag container with parsed args
      */
     public static FlagContainer of(String[] args) {
@@ -82,7 +81,6 @@ public class FlagContainer {
      * Check if a flag is present in the container.
      *
      * @param flag flag to check
-     *
      * @return true if flag is present
      */
     public boolean has(@NotNull String flag) {
@@ -93,7 +91,6 @@ public class FlagContainer {
      * Check if the flag has a value defined.
      *
      * @param flag flag to check
-     *
      * @return true if a value is present
      */
     public boolean hasValue(String flag) {
@@ -106,7 +103,6 @@ public class FlagContainer {
      * @param flag flag to retrieve
      * @param map  function to map the string
      * @param <T>  type of flag
-     *
      * @return flag parsed with the function.
      */
     public <T> T get(@NotNull String flag, Function<@Nullable String, T> map) {
@@ -117,7 +113,6 @@ public class FlagContainer {
      * Get the value for the flag.
      *
      * @param flag flag to retrieve
-     *
      * @return flag value
      */
     @Nullable
@@ -129,7 +124,6 @@ public class FlagContainer {
      * Get the flag value if the value is present
      *
      * @param flag flag to retrieve
-     *
      * @return flag value in an optional if present
      */
     public Optional<String> getIfPresent(String flag) {
@@ -144,7 +138,6 @@ public class FlagContainer {
      * @param flag flag to retrieve
      * @param map  function to map the flag
      * @param <T>  type of returned optional
-     *
      * @return flag value parsed and wrapped into an optional
      */
     public <T> Optional<T> getIfPresent(@NotNull String flag, Function<String, T> map) {

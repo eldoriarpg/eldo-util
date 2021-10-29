@@ -114,7 +114,7 @@ public class Arguments implements Iterable<String> {
      */
     public @NotNull String asString(int index) throws IndexOutOfBoundsException {
         if (index < 0) {
-            return args[args.length - index];
+            return args[args.length + index];
         }
         return args[index];
     }
@@ -673,5 +673,14 @@ public class Arguments implements Iterable<String> {
 
     public Stream<String> parallelStream() {
         return args().parallelStream();
+    }
+
+    @Override
+    public String toString() {
+        return "Arguments{" +
+               "flags=" + flags +
+               ", plugin=" + plugin.getName() +
+               ", args=" + Arrays.toString(args) +
+               '}';
     }
 }
