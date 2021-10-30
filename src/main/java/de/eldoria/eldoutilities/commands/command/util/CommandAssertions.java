@@ -104,14 +104,26 @@ public final class CommandAssertions {
      * @throws CommandException when the user has none of the required permissions
      */
     public static void permission(CommandSender sender, CommandMeta meta, boolean silent) throws CommandException {
-        if (meta.permissions().isEmpty()) return;
-        for (String permission : meta.permissions()) {
+        permission(sender, silent, meta.permissions().toArray(new String[0]));
+    }
+
+    /**
+     * Checks if the user has at least one of the permissions in {@link CommandMeta#permissions()}.
+     *
+     * @param sender      sender
+     * @param silent      true if the permission error should not be reported
+     * @param permissions permissions to check
+     * @throws CommandException when the user has none of the required permissions
+     */
+    public static void permission(CommandSender sender, boolean silent, String... permissions) throws CommandException {
+        if (permissions.length == 0) return;
+        for (String permission : permissions) {
             if (sender.hasPermission(permission)) return;
         }
         if (silent) {
             throw CommandException.silent();
         }
-        throw CommandException.message("error.permission", Replacement.create("permission", meta.permissions()));
+        throw CommandException.message("error.permission", Replacement.create("permission", String.join(", ", permissions)));
     }
 
     /**
