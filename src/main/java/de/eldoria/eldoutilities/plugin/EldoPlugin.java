@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  *
  * @since 1.1.0
  */
-public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
+public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     private static EldoPlugin instance;
     private DebugLogger debugLogger;
     private FailsaveCommand failcmd;
@@ -77,6 +77,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     }
 
     @Override
+    @NotNull
     public Logger getLogger() {
         if (debugLogger == null) {
             debugLogger = new DebugLogger(this, super.getLogger());
@@ -85,7 +86,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         return debugLogger;
     }
 
-    protected void setLoggerLevel() {
+    protected final void setLoggerLevel() {
         getLogger().setLevel(EldoConfig.getLogLevel());
     }
 
@@ -97,7 +98,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param command     name of command
      * @param tabExecutor command executor
      */
-    public void registerCommand(String command, TabExecutor tabExecutor) {
+    public final void registerCommand(String command, TabExecutor tabExecutor) {
         PluginCommand cmd = getCommand(command);
         if (cmd != null) {
             cmd.setExecutor(tabExecutor);
@@ -113,7 +114,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @param command command
      */
-    public void registerCommand(AdvancedCommand command) {
+    public final void registerCommand(AdvancedCommand command) {
         registerCommand(command.meta().name(), command);
     }
 
@@ -125,7 +126,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param command  name of command
      * @param executor command executor
      */
-    public void registerCommand(String command, AdvancedCommand executor) {
+    public final void registerCommand(String command, AdvancedCommand executor) {
         registerCommand(command, AdvancedCommandAdapter.wrap(this, executor));
     }
 
@@ -134,7 +135,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @param listener listener to register
      */
-    public void registerListener(Listener... listener) {
+    public final void registerListener(Listener... listener) {
         for (Listener l : listener) {
             getPluginManager().registerEvents(l, this);
         }
@@ -149,7 +150,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param period Period in server ticks of the task
      * @return Task id number (-1 if scheduling failed)
      */
-    public int scheduleRepeatingTask(Runnable task, int period) {
+    public final int scheduleRepeatingTask(Runnable task, int period) {
         return scheduleRepeatingTask(task, 100, period);
     }
 
@@ -163,7 +164,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param period Period in server ticks of the task
      * @return Task id number (-1 if scheduling failed)
      */
-    public int scheduleRepeatingTask(Runnable task, int delay, int period) {
+    public final int scheduleRepeatingTask(Runnable task, int delay, int period) {
         return getScheduler().scheduleSyncRepeatingTask(this, task, delay, period);
     }
 
@@ -172,7 +173,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @return plugin manager
      */
-    public PluginManager getPluginManager() {
+    public final PluginManager getPluginManager() {
         return getServer().getPluginManager();
     }
 
@@ -181,7 +182,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @return scheduler instance
      */
-    public BukkitScheduler getScheduler() {
+    public final BukkitScheduler getScheduler() {
         return getServer().getScheduler();
     }
 
@@ -301,7 +302,6 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * Called when this plugin is enabled
      *
      * @param reload indicated that the call was caused by a server reload
-     * @param reload
      */
     public void onPluginEnable(boolean reload) throws Throwable {
     }
@@ -362,7 +362,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return failcmd.onCommand(sender, command, label, args);
     }
 
