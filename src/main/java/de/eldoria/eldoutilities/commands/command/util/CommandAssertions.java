@@ -56,9 +56,26 @@ public final class CommandAssertions {
      */
     public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args) throws CommandException {
         long required = Arrays.stream(args).filter(Argument::isRequired).count();
-        String argumentString = Arrays.stream(args).map(arg -> String.format(arg.isRequired() ? "<%s>" : "[%s]", arg.name())).collect(Collectors.joining(" "));
+        String argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString).addFormatting('6'));
+    }
+
+    /**
+     * Checks that the arguments have the required length.
+     * 
+     * This method will not create a command call chain.
+     *
+     * @param args      arguments
+     * @param arguments arguments which are required and optional in correct order
+     * @throws CommandException when the arguments are not sufficient.
+     * @see CommandAssertions#invalidArguments(CommandMeta, String[]) 
+     */
+    public static void invalidArguments(Arguments arguments, Argument... args) throws CommandException {
+        long required = Arrays.stream(args).filter(Argument::isRequired).count();
+        String argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
+        isFalse(arguments.size() < required, "error.invalidArguments",
+                Replacement.create("SYNTAX", argumentString).addFormatting('6'));
     }
 
     /**
