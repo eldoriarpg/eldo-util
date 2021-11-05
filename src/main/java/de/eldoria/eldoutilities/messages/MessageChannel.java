@@ -1,5 +1,6 @@
 package de.eldoria.eldoutilities.messages;
 
+import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.messages.channeldata.BossBarData;
 import de.eldoria.eldoutilities.messages.channeldata.ChannelData;
@@ -83,7 +84,7 @@ public interface MessageChannel<T extends ChannelData> {
             BossBar bossBar = bossBarData.create(barKey, message);
             bossBar.setProgress(1);
             bossBar.addPlayer((Player) target);
-            EldoUtilities.getDelayedActions().schedule(() -> {
+            Bukkit.getScheduler().runTaskLater(EldoUtilities.getInstanceOwner(), () ->{
                 bossBar.removeAll();
                 Bukkit.removeBossBar(barKey);
             }, bossBarData.getDuration());

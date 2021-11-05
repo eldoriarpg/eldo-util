@@ -66,8 +66,8 @@ public abstract class EldoConfig {
      *
      * @return true if plugin is in debug state.
      */
-    public static Level getLogLevel() {
-        return ObjUtil.nonNull(EldoUtilities.getInstanceOwner(), instance -> {
+    public static Level getLogLevel(Plugin plugin) {
+        return ObjUtil.nonNull(EldoUtilities.getInstanceOwner(plugin.getClass()), instance -> {
             // we probably want to load the config before the plugin is enabled.
             // Since we use the configuration serializable we cant load the config directly if the plugin is not enabled.
             String debug;

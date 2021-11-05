@@ -2,6 +2,7 @@ package de.eldoria.eldoutilities.conversation;
 
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.messages.MessageType;
+import org.bukkit.Bukkit;
 import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationAbandonedEvent;
 import org.bukkit.conversations.ConversationAbandonedListener;
@@ -49,7 +50,7 @@ public class ConversationRequester implements ConversationAbandonedListener, Con
             @Override
             public @Nullable Prompt acceptInput(@NotNull ConversationContext context, @Nullable String input) {
                 if (validation.test(input)) {
-                    EldoUtilities.getDelayedActions().schedule(() -> callback.accept(input), 0);
+                    Bukkit.getScheduler().runTask(context.getPlugin(), () -> callback.accept(input));
                     return null;
                 }
                 return this;
@@ -73,7 +74,7 @@ public class ConversationRequester implements ConversationAbandonedListener, Con
         conversation.addConversationAbandonedListener(this);
 
         if (timeout > 0) {
-            EldoUtilities.getDelayedActions().schedule(() -> {
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
                 if (sessions.containsKey(player)) {
                     if (sessions.get(player) == sessionId) {
                         conversation.abandon(new ConversationAbandonedEvent(conversation, this));
