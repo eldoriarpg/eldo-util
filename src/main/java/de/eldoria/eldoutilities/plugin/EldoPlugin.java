@@ -61,7 +61,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     private static void registerSelf(EldoPlugin eldoPlugin) {
         instance = eldoPlugin;
-        for (Class<? extends ConfigurationSerializable> clazz : eldoPlugin.getConfigSerialization()) {
+        for (var clazz : eldoPlugin.getConfigSerialization()) {
             ConfigurationSerialization.registerClass(clazz);
         }
         EldoUtilities.preWarm(instance);
@@ -99,7 +99,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      * @param tabExecutor command executor
      */
     public final void registerCommand(String command, TabExecutor tabExecutor) {
-        PluginCommand cmd = getCommand(command);
+        var cmd = getCommand(command);
         if (cmd != null) {
             cmd.setExecutor(tabExecutor);
             return;
@@ -136,7 +136,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      * @param listener listener to register
      */
     public final void registerListener(Listener... listener) {
-        for (Listener l : listener) {
+        for (var l : listener) {
             getPluginManager().registerEvents(l, this);
         }
     }
@@ -206,8 +206,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     @Override
     public final void onEnable() {
-        Instant start = Instant.now();
-        boolean reload = isLocked();
+        var start = Instant.now();
+        var reload = isLocked();
         if (reload) {
             try {
                 logger().config("Detected plugin reload.");
@@ -228,7 +228,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             onPluginEnable();
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
-            for (String cmd : getDescription().getCommands().keySet()) {
+            for (var cmd : getDescription().getCommands().keySet()) {
                 try {
                     registerCommand(cmd, failcmd);
                 } catch (Throwable ex) {
@@ -241,7 +241,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         new BukkitRunnable() {
             @Override
             public void run() {
-                Instant start = Instant.now();
+                var start = Instant.now();
                 try {
                     onPostStart(reload);
                     onPostStart();
@@ -249,21 +249,21 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                     initFailsave("Plugin post start failed.", e);
                     return;
                 }
-                long until = start.until(Instant.now(), ChronoUnit.MILLIS);
+                var until = start.until(Instant.now(), ChronoUnit.MILLIS);
                 logger().info("Post startup done. Required " + until + " ms.");
 
             }
         }.runTaskLater(this, 1);
         removeLock();
-        long until = start.until(Instant.now(), ChronoUnit.MILLIS);
+        var until = start.until(Instant.now(), ChronoUnit.MILLIS);
         logger().info("Enabled. Required " + until + " ms.");
     }
 
     private void initFailsave(String message, Throwable e) {
         logger().log(Level.SEVERE, message, e);
         logger().log(Level.SEVERE, "Initializing failsave mode.");
-        FailsaveCommand failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
-        for (String cmd : getDescription().getCommands().keySet()) {
+        var failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        for (var cmd : getDescription().getCommands().keySet()) {
             try {
                 registerCommand(cmd, failcmd);
             } catch (Throwable ex) {

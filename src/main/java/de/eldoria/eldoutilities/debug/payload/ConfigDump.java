@@ -33,9 +33,9 @@ public class ConfigDump extends EntryData {
      * @return configs as an array.
      */
     public static EntryData[] create(Plugin plugin, DebugSettings settings) {
-        Path root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
+        var root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
 
-        EldoConfig mainConfig = EldoConfig.getMainConfig();
+        var mainConfig = EldoConfig.getMainConfig();
 
         Set<String> configs = new LinkedHashSet<>();
         if (mainConfig != null) {
@@ -50,9 +50,9 @@ public class ConfigDump extends EntryData {
         }
 
         List<ConfigDump> dumps = new LinkedList<>();
-        for (String config : configs) {
-            File currentConfig = Paths.get(root.toString(), config).toFile();
-            String content = "Could not read";
+        for (var config : configs) {
+            var currentConfig = Paths.get(root.toString(), config).toFile();
+            var content = "Could not read";
             if (currentConfig.exists()) {
                 try {
                     content = Files.readAllLines(currentConfig.toPath(), StandardCharsets.UTF_8).stream()

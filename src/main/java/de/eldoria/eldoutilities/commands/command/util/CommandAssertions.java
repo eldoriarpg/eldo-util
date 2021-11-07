@@ -55,8 +55,8 @@ public final class CommandAssertions {
      * @throws CommandException when the arguments are not sufficient.
      */
     public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args) throws CommandException {
-        long required = Arrays.stream(args).filter(Argument::isRequired).count();
-        String argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
+        var required = Arrays.stream(args).filter(Argument::isRequired).count();
+        var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString).addFormatting('6'));
     }
@@ -72,8 +72,8 @@ public final class CommandAssertions {
      * @see CommandAssertions#invalidArguments(CommandMeta, String[]) 
      */
     public static void invalidArguments(Arguments arguments, Argument... args) throws CommandException {
-        long required = Arrays.stream(args).filter(Argument::isRequired).count();
-        String argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
+        var required = Arrays.stream(args).filter(Argument::isRequired).count();
+        var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
                 Replacement.create("SYNTAX", argumentString).addFormatting('6'));
     }
@@ -106,7 +106,7 @@ public final class CommandAssertions {
      * @throws CommandException when the sender is not listed
      */
     public static void sender(CommandSender sender, CommandMeta meta) throws CommandException {
-        for (Class<? extends CommandSender> clazz : meta.allowedSender()) {
+        for (var clazz : meta.allowedSender()) {
             if (sender.getClass().isInstance(clazz)) return;
         }
         throw CommandException.message("Invalid sender");
@@ -134,7 +134,7 @@ public final class CommandAssertions {
      */
     public static void permission(CommandSender sender, boolean silent, String... permissions) throws CommandException {
         if (permissions.length == 0) return;
-        for (String permission : permissions) {
+        for (var permission : permissions) {
             if (sender.hasPermission(permission)) return;
         }
         if (silent) {

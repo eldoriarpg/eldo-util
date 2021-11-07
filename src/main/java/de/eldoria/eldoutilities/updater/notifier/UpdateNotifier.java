@@ -21,7 +21,7 @@ public class UpdateNotifier extends Notifier {
     @Override
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        PluginDescriptionFile description = plugin.getDescription();
+        var description = plugin.getDescription();
         // send to operator.
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission(permission)) {
             MessageSender.getPluginMessageSender(plugin).sendMessage(event.getPlayer(), "New version of §b" + plugin.getName() + "§r available.\n"

@@ -27,7 +27,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static Replacement create(String key, String value, char... formats) {
-        Replacement replacement = new Replacement(key, value);
+        var replacement = new Replacement(key, value);
         return replacement.addFormatting(formats);
     }
 
@@ -94,12 +94,12 @@ public final class Replacement {
     public Replacement addFormatting(char[] format, char... afterFormat) {
         if (format.length == 0 && afterFormat.length == 0) return this;
 
-        StringBuilder builder = new StringBuilder();
-        for (char aChar : format) {
+        var builder = new StringBuilder();
+        for (var aChar : format) {
             builder.append("§").append(aChar);
         }
         builder.append(value).append("§r");
-        for (char aChar : afterFormat) {
+        for (var aChar : afterFormat) {
             builder.append("§").append(aChar);
         }
         value = builder.toString();

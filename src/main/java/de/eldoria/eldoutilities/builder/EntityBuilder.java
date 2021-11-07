@@ -59,7 +59,7 @@ public final class EntityBuilder {
      * @since 1.1.0
      */
     public EntityBuilder withPassenger(@NotNull Entity... passengers) {
-        for (Entity passenger : passengers) {
+        for (var passenger : passengers) {
             entity.addPassenger(passenger);
         }
         return this;

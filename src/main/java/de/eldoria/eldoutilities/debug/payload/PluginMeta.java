@@ -17,15 +17,15 @@ public final class PluginMeta extends PluginMetaData {
      * @return plugin meta instance for plugin
      */
     public static PluginMetaData create(Plugin plugin) {
-        String name = plugin.getName();
-        PluginDescriptionFile descr = plugin.getDescription();
-        String version = descr.getVersion();
-        boolean enabled = plugin.isEnabled();
-        String main = descr.getMain();
-        String[] authors = descr.getAuthors().toArray(new String[0]);
-        String[] loadBefore = descr.getLoadBefore().toArray(new String[0]);
-        String[] dependencies = descr.getDepend().toArray(new String[0]);
-        String[] softDependencies = descr.getSoftDepend().toArray(new String[0]);
+        var name = plugin.getName();
+        var descr = plugin.getDescription();
+        var version = descr.getVersion();
+        var enabled = plugin.isEnabled();
+        var main = descr.getMain();
+        var authors = descr.getAuthors().toArray(new String[0]);
+        var loadBefore = descr.getLoadBefore().toArray(new String[0]);
+        var dependencies = descr.getDepend().toArray(new String[0]);
+        var softDependencies = descr.getSoftDepend().toArray(new String[0]);
         String[] provides;
         // TODO: Replace this with proper version detection
         try {

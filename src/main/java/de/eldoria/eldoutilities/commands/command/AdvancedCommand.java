@@ -39,7 +39,7 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     private void linkMeta() {
-        for (AdvancedCommand cmd : meta.subCommands().values()) {
+        for (var cmd : meta.subCommands().values()) {
             cmd.meta().parent(this);
         }
     }
@@ -82,9 +82,9 @@ public abstract class AdvancedCommand implements CommandRoute {
         if (meta.subCommands().isEmpty()) {
             throw CommandException.message("Unhandled end of command route. The command needs to implement a executor or subcommands");
         }
-        final Arguments newArgs = args.subArguments();
+        final var newArgs = args.subArguments();
 
-        Optional<AdvancedCommand> command = getCommand(args.asString(0));
+        var command = getCommand(args.asString(0));
         if (command.isPresent()) {
             command.get().commandRoute(sender, args.asString(0), newArgs);
             return;
@@ -95,15 +95,15 @@ public abstract class AdvancedCommand implements CommandRoute {
     @Override
     public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) throws CommandException {
         if (!meta().permissions().isEmpty()) {
-            boolean access = false;
-            for (String permission : meta().permissions()) {
+            var access = false;
+            for (var permission : meta().permissions()) {
                 if (sender.hasPermission(permission)) {
                     access = true;
                     break;
                 }
             }
             if (!access) {
-                String permissions = String.join(", ", meta().permissions());
+                var permissions = String.join(", ", meta().permissions());
                 return Collections.singletonList(localizer.localize("error.permission",
                         Replacement.create("PERMISSION", permissions)));
             }
@@ -127,7 +127,7 @@ public abstract class AdvancedCommand implements CommandRoute {
             return TabCompleteUtil.complete(args.asString(0), meta.registeredCommands());
         }
 
-        Optional<AdvancedCommand> command = getCommand(args.asString(0));
+        var command = getCommand(args.asString(0));
         if(!command.isPresent()){
             return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
         }
@@ -136,7 +136,7 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     private Optional<AdvancedCommand> getCommand(String command) {
-        for (AdvancedCommand entry : meta.subCommands().values()) {
+        for (var entry : meta.subCommands().values()) {
             if (entry.meta().isCommand(command)) {
                 return Optional.of(entry);
             }

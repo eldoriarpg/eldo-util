@@ -20,8 +20,8 @@ public final class ERandom {
      */
     public static Collection<Vector> getRandomVector(int count) {
         List<Vector> vecs = new ArrayList<>();
-        ThreadLocalRandom current = ThreadLocalRandom.current();
-        for (int i = 0; i < count; i++) {
+        var current = ThreadLocalRandom.current();
+        for (var i = 0; i < count; i++) {
             vecs.add(getRandomVector(current));
         }
         return vecs;
@@ -40,9 +40,9 @@ public final class ERandom {
      */
     public static Vector getRandomVector(Random random) {
         while (true) {
-            double x = random.nextGaussian();
-            double y = random.nextGaussian();
-            double z = random.nextGaussian();
+            var x = random.nextGaussian();
+            var y = random.nextGaussian();
+            var z = random.nextGaussian();
             if (x + y + z != 0) {
                 return new Vector(x, y, z).normalize();
             }

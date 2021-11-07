@@ -59,7 +59,7 @@ public class ArmorStandWrapper implements ConfigurationSerializable {
         this.leftLegPose = eulerAngleToVector(armorStand.getLeftLegPose());
         this.rightLegPose = eulerAngleToVector(armorStand.getRightLegPose());
 
-        EntityEquipment equipment = armorStand.getEquipment();
+        var equipment = armorStand.getEquipment();
         this.helmet = equipment.getHelmet();
         this.chestPlate = equipment.getChestplate();
         this.leggins = equipment.getLeggings();
@@ -118,7 +118,7 @@ public class ArmorStandWrapper implements ConfigurationSerializable {
                     e.setRightLegPose(vectorToEulerAngle(rightLegPose));
                 })
                 .with(e -> {
-                    EntityEquipment eq = e.getEquipment();
+                    var eq = e.getEquipment();
                     eq.setHelmet(helmet);
                     eq.setChestplate(chestPlate);
                     eq.setLeggings(leggins);

@@ -65,7 +65,7 @@ public class EldoConversation extends Conversation {
             }
 
             // Test for conversation abandonment based on input
-            for (ConversationCanceller canceller : cancellers) {
+            for (var canceller : cancellers) {
                 if (canceller.cancelBasedOnInput(context, input)) {
                     abandon(new ConversationAbandonedEvent(this, canceller));
                     return;
@@ -87,7 +87,7 @@ public class EldoConversation extends Conversation {
         if (currentPrompt == null) {
             abandon(new ConversationAbandonedEvent(this));
         } else {
-            String promptText = currentPrompt.getPromptText(context);
+            var promptText = currentPrompt.getPromptText(context);
             promptText = localizer.localize(promptText);
             promptText = messageType.forceColor(promptText);
             context.getForWhom().sendRawMessage(pluginPrefix + promptText);

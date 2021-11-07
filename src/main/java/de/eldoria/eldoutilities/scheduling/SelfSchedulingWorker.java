@@ -46,7 +46,7 @@ public abstract class SelfSchedulingWorker<V, T extends Collection<V>> extends R
     public final void run() {
         if (!tasks.isEmpty()) {
             tick();
-            for (V task : tasks) {
+            for (var task : tasks) {
                 execute(task);
             }
         } else {
@@ -75,7 +75,7 @@ public abstract class SelfSchedulingWorker<V, T extends Collection<V>> extends R
     @Override
     public final void shutdown() {
         super.shutdown();
-        for (V task : tasks) {
+        for (var task : tasks) {
             execute(task);
         }
         tasks.clear();

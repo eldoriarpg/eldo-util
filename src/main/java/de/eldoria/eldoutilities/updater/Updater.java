@@ -69,7 +69,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
             plugin.getLogger().info("§2Checking for new Version...");
         }
 
-        Optional<String> optLatest = getLatestVersion(data);
+        var optLatest = getLatestVersion(data);
         if (optLatest.isPresent()) {
             latestVersion = optLatest.get();
             updateAvailable = evaluate(this.latestVersion);

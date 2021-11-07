@@ -75,7 +75,7 @@ public class CommandMetaBuilder {
 
     public CommandMetaBuilder withSubCommand(AdvancedCommand advancedCommand) {
         subCommands.put(advancedCommand.meta().name(), advancedCommand);
-        for (String alias : advancedCommand.meta().aliases()) {
+        for (var alias : advancedCommand.meta().aliases()) {
             subCommands.put(alias, advancedCommand);
         }
         return this;
@@ -103,7 +103,7 @@ public class CommandMetaBuilder {
     public CommandMetaBuilder buildSubCommands(BiConsumer<List<AdvancedCommand>, CommandMetaBuilder> commandConsumer) {
         List<AdvancedCommand> subCommands = new ArrayList<>();
         commandConsumer.accept(subCommands, this);
-        for (AdvancedCommand subCommand : subCommands) {
+        for (var subCommand : subCommands) {
             withSubCommand(subCommand);
         }
         return this;

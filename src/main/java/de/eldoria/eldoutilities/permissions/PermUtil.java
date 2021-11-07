@@ -28,12 +28,12 @@ public final class PermUtil {
      * @return highest permission value or default value
      */
     public static int findHighestIntPermission(Player player, String prefix, int defaultValue) {
-        Collection<Integer> permission = findPermissions(player, prefix, true, (string) -> {
-            Optional<Integer> optionalInt = Parser.parseInt(string);
+        var permission = findPermissions(player, prefix, true, (string) -> {
+            var optionalInt = Parser.parseInt(string);
             return optionalInt.orElse(null);
         });
 
-        int max = defaultValue;
+        var max = defaultValue;
         for (int num : permission) {
             max = Math.max(max, num);
         }
@@ -50,12 +50,12 @@ public final class PermUtil {
      * @return highest permission value or default value
      */
     public static double findHighestDoublePermission(Player player, String prefix, double defaultValue) {
-        Collection<Double> permission = findPermissions(player, prefix, true, (string) -> {
-            Optional<Double> optionalInt = Parser.parseDouble(string);
+        var permission = findPermissions(player, prefix, true, (string) -> {
+            var optionalInt = Parser.parseDouble(string);
             return optionalInt.orElse(null);
         });
 
-        double max = defaultValue;
+        var max = defaultValue;
         for (double num : permission) {
             max = Math.max(max, num);
         }
@@ -85,13 +85,13 @@ public final class PermUtil {
      * @return collection which contains all matchin permission. Contains no null values.
      */
     public static <T> Collection<@NotNull T> findPermissions(Player player, String prefix, boolean truncate, Function<String, T> parse) {
-        Set<PermissionAttachmentInfo> permissions = player.getEffectivePermissions();
+        var permissions = player.getEffectivePermissions();
 
         Set<T> matches = new HashSet<>();
 
-        for (PermissionAttachmentInfo permission : permissions) {
+        for (var permission : permissions) {
             if (!permission.getValue()) continue;
-            String perm = permission.getPermission();
+            var perm = permission.getPermission();
             if (perm.toLowerCase().startsWith(prefix)) {
                 if (truncate) {
                     perm = perm.replace(prefix, "");

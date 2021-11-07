@@ -178,9 +178,9 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
 
     @Override
     public List<T> allSync() {
-        try (Connection conn = dataSource.getConnection()) {
+        try (var conn = dataSource.getConnection()) {
             autoCommit(conn);
-            List<T> results = executeAndGetLast(conn).retrieveResults(conn);
+            var results = executeAndGetLast(conn).retrieveResults(conn);
             commit(conn);
             return results;
         } catch (QueryExecutionException e) {
@@ -205,9 +205,9 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
 
     @Override
     public Optional<T> firstSync() {
-        try (Connection conn = dataSource.getConnection()) {
+        try (var conn = dataSource.getConnection()) {
             autoCommit(conn);
-            Optional<T> result = executeAndGetLast(conn).retrieveResult(conn);
+            var result = executeAndGetLast(conn).retrieveResult(conn);
             commit(conn);
             return result;
         } catch (SQLException e) {
@@ -230,9 +230,9 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
 
     @Override
     public int executeSync() {
-        try (Connection conn = dataSource.getConnection()) {
+        try (var conn = dataSource.getConnection()) {
             autoCommit(conn);
-            int update = executeAndGetLast(conn).update(conn);
+            var update = executeAndGetLast(conn).update(conn);
             commit(conn);
             return update;
         } catch (SQLException e) {
@@ -297,9 +297,9 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
 
         public List<T> retrieveResults(Connection conn) throws SQLException {
             List<T> results = new ArrayList<>();
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (var stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
-                ResultSet resultSet = stmt.executeQuery();
+                var resultSet = stmt.executeQuery();
                 while (resultSet.next()) {
                     results.add(resultMapper.apply(resultSet));
                 }
@@ -310,9 +310,9 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
         }
 
         public Optional<T> retrieveResult(Connection conn) throws SQLException {
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (var stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
-                ResultSet resultSet = stmt.executeQuery();
+                var resultSet = stmt.executeQuery();
                 if (resultSet.next()) {
                     return Optional.ofNullable(resultMapper.apply(resultSet));
                 }
@@ -323,7 +323,7 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
         }
 
         public void execute(Connection conn) throws SQLException {
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (var stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
                 stmt.execute();
             } catch (SQLException e) {
@@ -332,7 +332,7 @@ public class QueryBuilder<T> implements ConfigurationStage<T>, QueryStage<T>, St
         }
 
         public int update(Connection conn) throws SQLException {
-            try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            try (var stmt = conn.prepareStatement(query)) {
                 statementConsumer.accept(stmt);
                 return stmt.executeUpdate();
             } catch (SQLException e) {

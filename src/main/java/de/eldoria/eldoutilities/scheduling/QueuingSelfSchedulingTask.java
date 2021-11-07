@@ -39,7 +39,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     @Override
     public final void run() {
         tick();
-        long start = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
         long duration = 0;
 
         while (!tasks.isEmpty() && proceed(tasks.peek()) && duration < MAX_DURATION_TARGET) {
@@ -81,7 +81,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     @Override
     public final void shutdown() {
         super.shutdown();
-        for (T task : tasks) {
+        for (var task : tasks) {
             execute(task);
         }
         tasks.clear();

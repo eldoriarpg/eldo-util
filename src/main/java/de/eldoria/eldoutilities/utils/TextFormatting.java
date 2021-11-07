@@ -22,11 +22,9 @@ public final class TextFormatting {
         if (string.length() >= fill) {
             return string;
         }
-        int charsToFill = fill - string.length();
-        StringBuilder builder = new StringBuilder(string);
-        for (int i = 0; i < charsToFill; i++) {
-            builder.append(" ");
-        }
+        var charsToFill = fill - string.length();
+        var builder = new StringBuilder(string);
+        builder.append(" ".repeat(charsToFill));
         return builder.toString();
     }
 
@@ -40,11 +38,11 @@ public final class TextFormatting {
      * @return range as string
      */
     public static String getRangeAsString(String delimiter, String[] source, int from, int to) {
-        int finalTo = to;
+        var finalTo = to;
         if (to < 1) {
             finalTo = source.length + to;
         }
-        int finalFrom = from;
+        var finalFrom = from;
         if (from < 0) {
             finalFrom = source.length + from;
         }
@@ -70,15 +68,15 @@ public final class TextFormatting {
             return string;
         }
         if (!keepWords) {
-            String substring = string.substring(0, Math.max(0, maxChars - endSequence.length()));
+            var substring = string.substring(0, Math.max(0, maxChars - endSequence.length()));
             return (substring + endSequence).trim();
         }
 
-        String[] split = string.split("\\s");
+        var split = string.split("\\s");
 
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
 
-        for (String s : split) {
+        for (var s : split) {
             if (builder.length() + s.length() + 1 + endSequence.length() > maxChars) {
                 return builder.toString().trim() + endSequence;
             }

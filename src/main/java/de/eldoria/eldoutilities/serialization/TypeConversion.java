@@ -20,7 +20,7 @@ public final class TypeConversion {
      * @return UUID as byte array
      */
     public static byte[] getBytesFromUUID(UUID uuid) {
-        ByteBuffer bb = ByteBuffer.wrap(new byte[16]);
+        var bb = ByteBuffer.wrap(new byte[16]);
         bb.putLong(uuid.getMostSignificantBits());
         bb.putLong(uuid.getLeastSignificantBits());
 
@@ -34,9 +34,9 @@ public final class TypeConversion {
      * @return byte array as UUID
      */
     public static UUID getUUIDFromBytes(byte[] bytes) {
-        ByteBuffer byteBuffer = ByteBuffer.wrap(bytes);
-        Long high = byteBuffer.getLong();
-        Long low = byteBuffer.getLong();
+        var byteBuffer = ByteBuffer.wrap(bytes);
+        var high = byteBuffer.getLong();
+        var low = byteBuffer.getLong();
 
         return new UUID(high, low);
     }

@@ -25,7 +25,7 @@ public final class SpigotUpdateChecker extends Updater<SpigotUpdateData> {
     protected Optional<String> getLatestVersion(SpigotUpdateData data) {
         HttpURLConnection con;
         try {
-            URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + data.getSpigotId());
+            var url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + data.getSpigotId());
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setConnectTimeout(5000);
@@ -35,10 +35,10 @@ public final class SpigotUpdateChecker extends Updater<SpigotUpdateData> {
             return Optional.empty();
         }
 
-        StringBuilder newestVersionRequest = new StringBuilder();
-        try (InputStream stream = con.getInputStream();
-             BufferedReader in = new BufferedReader(new InputStreamReader(stream))) {
-            String inputLine = in.readLine();
+        var newestVersionRequest = new StringBuilder();
+        try (var stream = con.getInputStream();
+             var in = new BufferedReader(new InputStreamReader(stream))) {
+            var inputLine = in.readLine();
             while (inputLine != null) {
                 newestVersionRequest.append(inputLine);
                 inputLine = in.readLine();

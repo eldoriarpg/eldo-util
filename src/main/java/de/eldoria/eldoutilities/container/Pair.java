@@ -43,7 +43,7 @@ public class Pair<A, B> {
         if (this == o) return true;
         if (!(o instanceof Pair)) return false;
 
-        Pair<?, ?> pair = (Pair<?, ?>) o;
+        var pair = (Pair<?, ?>) o;
 
         if (!Objects.equals(first, pair.first)) return false;
         return Objects.equals(second, pair.second);
@@ -51,7 +51,7 @@ public class Pair<A, B> {
 
     @Override
     public int hashCode() {
-        int result = first != null ? first.hashCode() : 0;
+        var result = first != null ? first.hashCode() : 0;
         result = 31 * result + (second != null ? second.hashCode() : 0);
         return result;
     }

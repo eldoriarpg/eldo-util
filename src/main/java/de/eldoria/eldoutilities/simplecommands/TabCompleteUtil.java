@@ -60,20 +60,20 @@ public final class TabCompleteUtil {
         smartShortMats = new LinkedHashTreeMap<>();
         smartPartMats = new LinkedHashTreeMap<>();
 
-        for (Material material : Material.values()) {
-            String name = material.name();
+        for (var material : Material.values()) {
+            var name = material.name();
             if (name.startsWith("LEGACY")) continue;
             smartShortMats.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
             smartMats.add(name);
-            for (String part : getParts(material)) {
+            for (var part : getParts(material)) {
                 smartPartMats.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
             }
         }
     }
 
     private static String getShortName(Material mat) {
-        Matcher matcher = SHORT_NAME.matcher(mat.name());
-        StringBuilder builder = new StringBuilder();
+        var matcher = SHORT_NAME.matcher(mat.name());
+        var builder = new StringBuilder();
         while (matcher.find()) {
             builder.append(matcher.group(1));
         }
@@ -95,7 +95,7 @@ public final class TabCompleteUtil {
         value = value.toLowerCase(Locale.ROOT);
         Set<String> results = new LinkedHashSet<>();
         // Smart matches on part have the highest priority
-        for (Map.Entry<String, List<String>> entry : smartShortMats.entrySet()) {
+        for (var entry : smartShortMats.entrySet()) {
             if (!entry.getKey().startsWith(value)) continue;
             results.addAll(entry.getValue());
         }
@@ -104,12 +104,12 @@ public final class TabCompleteUtil {
         results.addAll(complete(value, smartMats));
 
         // Part matches are nice, but have low priority
-        for (Map.Entry<String, List<String>> entry : smartPartMats.entrySet()) {
+        for (var entry : smartPartMats.entrySet()) {
             if (!entry.getKey().startsWith(value)) continue;
             results.addAll(entry.getValue());
         }
 
-        String finalValue = value.toUpperCase(Locale.ROOT);
+        var finalValue = value.toUpperCase(Locale.ROOT);
 
         results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
@@ -139,7 +139,7 @@ public final class TabCompleteUtil {
      */
     public static List<String> complete(String value, Stream<String> inputs) {
         if (value.isEmpty()) return inputs.collect(Collectors.toList());
-        String lowerValue = value.toLowerCase(Locale.ROOT);
+        var lowerValue = value.toLowerCase(Locale.ROOT);
         return inputs
                 .filter(i -> i.toLowerCase().startsWith(lowerValue))
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -307,7 +307,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeDouble(String value, double min, double max, ILocalizer loc) {
-        Optional<Double> d = Parser.parseDouble(value);
+        var d = Parser.parseDouble(value);
         List<String> result = new ArrayList<>();
         if (d.isPresent()) {
             if (d.get() > max || d.get() < min) {
@@ -331,7 +331,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeInt(String value, int min, int max, ILocalizer loc) {
-        Optional<Integer> d = Parser.parseInt(value);
+        var d = Parser.parseInt(value);
         if (d.isPresent()) {
             if (d.get() > max || d.get() < min) {
                 return singleEntryList(loc.getMessage("error.invalidRange",
@@ -353,7 +353,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeMinDouble(String value, double min, ILocalizer loc) {
-        Optional<Double> val = Parser.parseDouble(value);
+        var val = Parser.parseDouble(value);
         if (val.isPresent()) {
             if (val.get() < min) {
                 return singleEntryList(loc.getMessage("error.tooLow",
@@ -375,7 +375,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeMinInt(String value, int min, ILocalizer loc) {
-        Optional<Integer> val = Parser.parseInt(value);
+        var val = Parser.parseInt(value);
         if (val.isPresent()) {
             if (val.get() < min) {
                 return singleEntryList(loc.getMessage("error.tooLow",
@@ -397,7 +397,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeMaxDouble(String value, double max, ILocalizer loc) {
-        Optional<Double> val = Parser.parseDouble(value);
+        var val = Parser.parseDouble(value);
         if (val.isPresent()) {
             if (val.get() > max) {
                 return singleEntryList(loc.getMessage("error.tooLarge",
@@ -419,7 +419,7 @@ public final class TabCompleteUtil {
      * @return list with range advise or error
      */
     public static List<String> completeMaxInt(String value, int max, ILocalizer loc) {
-        Optional<Integer> val = Parser.parseInt(value);
+        var val = Parser.parseInt(value);
         if (val.isPresent()) {
             if (val.get() > max) {
                 return singleEntryList(loc.getMessage("error.tooLarge",

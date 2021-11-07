@@ -20,12 +20,12 @@ public final class KebabNamingStrategy implements NamingStrategy {
 
     @Override
     public String adapt(Class<?> type) {
-        Class<?> actualType = type;
+        var actualType = type;
         if (type.isAnonymousClass()) {
             actualType = type.getSuperclass();
         }
         return KEY_LOOKUP_CACHE.computeIfAbsent(actualType, clazz -> {
-            String configKey = annotation(clazz).map(ConfigKey::value).orElse(clazz.getSimpleName());
+            var configKey = annotation(clazz).map(ConfigKey::value).orElse(clazz.getSimpleName());
             return PATTERN.matcher(configKey).replaceAll("$1-$2").toLowerCase();
         });
     }

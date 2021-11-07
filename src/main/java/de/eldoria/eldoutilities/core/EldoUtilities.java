@@ -38,10 +38,6 @@ import java.util.logging.Logger;
 public final class EldoUtilities {
     private static Plugin mainOwner;
     private static Map<Class<? extends Plugin>, Plugin> instanceOwners = new LinkedHashMap<>();
-    private static DelayedActions delayedActions;
-    private static InventoryActionHandler inventoryActionHandler;
-    private static AsyncSyncingCallbackExecutor asyncSyncingCallbackExecutor;
-    private static ConversationRequester conversationRequester;
     private static ConfigFileWrapper configuration;
 
     private EldoUtilities() {
@@ -53,9 +49,9 @@ public final class EldoUtilities {
 
     public static void preWarm(Plugin eldoPlugin) {
         instanceOwners.put(eldoPlugin.getClass(), eldoPlugin);
-        for (Class<? extends ConfigurationSerializable> clazz : getConfigSerialization()) {
+        for (var clazz : getConfigSerialization()) {
             if (clazz.isAnnotationPresent(PluginSerializationName.class)) {
-                PluginSerializationName annotation = clazz.getAnnotation(PluginSerializationName.class);
+                var annotation = clazz.getAnnotation(PluginSerializationName.class);
                 ConfigurationSerialization.registerClass(clazz,
                         annotation.value().replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
             } else {
@@ -71,15 +67,15 @@ public final class EldoUtilities {
                             Bukkit.getScheduler().runTaskLater(plugin, () -> performLateCleanUp(plugin), 5);
                             return null;
                         });
-        Path path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        var path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
         configuration = ConfigFileWrapper.forFile(plugin, path);
     }
 
     private static void performLateCleanUp(Plugin plugin) {
-        Iterator<KeyedBossBar> bossBars = Bukkit.getBossBars();
+        var bossBars = Bukkit.getBossBars();
         while (bossBars.hasNext()) {
-            KeyedBossBar bar = bossBars.next();
-            NamespacedKey key = bar.getKey();
+            var bar = bossBars.next();
+            var key = bar.getKey();
             if (!key.getNamespace().equalsIgnoreCase(plugin.getName())) continue;
             if (key.getKey().startsWith(MessageChannel.KEY_PREFIX)) {
                 logger().config("Removed boss bar with key" + key);
@@ -90,20 +86,6 @@ public final class EldoUtilities {
     }
 
     public static void shutdown() {
-        if (delayedActions != null) {
-            delayedActions.shutdown();
-            delayedActions = null;
-        }
-        if (asyncSyncingCallbackExecutor != null) {
-            asyncSyncingCallbackExecutor.shutdown();
-            asyncSyncingCallbackExecutor = null;
-        }
-        if (inventoryActionHandler != null) {
-            inventoryActionHandler = null;
-        }
-        if (conversationRequester != null) {
-            conversationRequester = null;
-        }
     }
 
     public static List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
@@ -114,7 +96,7 @@ public final class EldoUtilities {
 
     public static ConfigFileWrapper getConfiguration() {
         if (configuration == null) {
-            Path config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+            var config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
             configuration = ConfigFileWrapper.forFile(config);
         }
         return configuration;
@@ -136,7 +118,7 @@ public final class EldoUtilities {
             return mainOwner;
         }
 
-        for (Map.Entry<Class<? extends Plugin>, Plugin> entry : instanceOwners.entrySet()) {
+        for (var entry : instanceOwners.entrySet()) {
             return entry.getValue();
         }
 

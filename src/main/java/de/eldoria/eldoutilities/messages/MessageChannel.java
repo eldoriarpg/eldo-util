@@ -24,7 +24,7 @@ public interface MessageChannel<T extends ChannelData> {
     /**
      * Default implementation for a chat message
      */
-    MessageChannel<? extends ChannelData> CHAT = new MessageChannel<ChannelData>() {
+    MessageChannel<? extends ChannelData> CHAT = new MessageChannel<>() {
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             target.sendMessage(message);
@@ -40,7 +40,7 @@ public interface MessageChannel<T extends ChannelData> {
      * Default implementation for a title message
      */
     MessageChannel<TitleData> TITLE = (message, sender, target, data) -> {
-        TitleData titleData = data;
+        var titleData = data;
         if (titleData == null) titleData = TitleData.DEFAULT;
         if (target instanceof Player) {
             ((Player) target).sendTitle(message, titleData.getOtherLine(), titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
@@ -53,7 +53,7 @@ public interface MessageChannel<T extends ChannelData> {
      * Default implementation for a subtitle message
      */
     MessageChannel<TitleData> SUBTITLE = (message, sender, target, data) -> {
-        TitleData titleData = data;
+        var titleData = data;
         if (titleData == null) titleData = TitleData.DEFAULT;
         if (target instanceof Player) {
             ((Player) target).sendTitle(titleData.getOtherLine(), message, titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
@@ -74,14 +74,14 @@ public interface MessageChannel<T extends ChannelData> {
     };
 
     MessageChannel<BossBarData> BOSS_BAR = (message, sender, target, data) -> {
-        BossBarData bossBarData = data;
+        var bossBarData = data;
         if (bossBarData == null) {
             bossBarData = BossBarData.DEFAULT;
         }
         if (target instanceof Player) {
-            String key = KEY_PREFIX + target.getName() + ThreadLocalRandom.current().nextInt(10000, 99999);
-            NamespacedKey barKey = new NamespacedKey(EldoUtilities.getInstanceOwner(), key);
-            BossBar bossBar = bossBarData.create(barKey, message);
+            var key = KEY_PREFIX + target.getName() + ThreadLocalRandom.current().nextInt(10000, 99999);
+            var barKey = new NamespacedKey(EldoUtilities.getInstanceOwner(), key);
+            var bossBar = bossBarData.create(barKey, message);
             bossBar.setProgress(1);
             bossBar.addPlayer((Player) target);
             Bukkit.getScheduler().runTaskLater(EldoUtilities.getInstanceOwner(), () ->{
@@ -93,7 +93,7 @@ public interface MessageChannel<T extends ChannelData> {
         }
     };
 
-    MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<ChannelData>() {
+    MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<>() {
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             Bukkit.broadcastMessage(message);

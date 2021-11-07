@@ -37,7 +37,7 @@ public class SimpleSampleImplementation {
     }
 
     @SerializableAs("NestedClass")
-    public class NestedClass implements ConfigurationSerializable {
+    public static class NestedClass implements ConfigurationSerializable {
         private final String someString = "Amazing";
         private final String someOtherString = "Much default";
 

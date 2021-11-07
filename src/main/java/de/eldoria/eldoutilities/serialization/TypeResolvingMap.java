@@ -141,7 +141,7 @@ public final class TypeResolvingMap extends AbstractMap<String, Object> {
     @SuppressWarnings("unchecked")
     public @NotNull <K, V> Map<K, V> getMap(String key, BiFunction<String, V, K> keyOrValueToKey) {
         List<MapEntry> mapObjects = getValue(key);
-        HashMap<K, V> results = new HashMap<>();
+        var results = new HashMap<K, V>();
         if (mapObjects == null) {
             return results;
         }

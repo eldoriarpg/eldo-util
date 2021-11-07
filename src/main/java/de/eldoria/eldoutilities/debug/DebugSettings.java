@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public final class DebugSettings {
-    public static final List<Filter> DEFAULT_FILTER = new ArrayList<Filter>() {{
+    public static final List<Filter> DEFAULT_FILTER = new ArrayList<>() {{
         add(new Filter(Pattern.compile("/([0-9]{1,3}\\.){3}[0-9]{1,3}(:[0-9]{1,5})"), "/127.0.0.1"));
         add(new Filter(Pattern.compile("(?i)(password:).*?$", Pattern.MULTILINE), "$1 *******"));
         add(new Filter(Pattern.compile("(?i)(user:).*?$", Pattern.MULTILINE), "$1 *****"));
@@ -38,7 +38,7 @@ public final class DebugSettings {
     }
 
     public String applyFilter(String text) {
-        for (Filter filter : filters) {
+        for (var filter : filters) {
             text = filter.apply(text);
         }
         return text;

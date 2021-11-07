@@ -60,10 +60,10 @@ public class ConversationRequester implements ConversationAbandonedListener, Con
 
     public void requestInput(Player player, String text, Predicate<String> validation, int timeout, Consumer<String> callback) {
         Map<Object, Object> data = new HashMap<>();
-        long sessionId = System.currentTimeMillis();
+        var sessionId = System.currentTimeMillis();
         data.put("id", sessionId);
         sessions.put(player, sessionId);
-        EldoConversation conversation = EldoConversation.builder(plugin, player,
+        var conversation = EldoConversation.builder(plugin, player,
                 getSimplePromt(text, validation, callback))
                 .ofType(MessageType.NORMAL)
                 .withInitalValues(data)
@@ -86,9 +86,9 @@ public class ConversationRequester implements ConversationAbandonedListener, Con
 
     @Override
     public void conversationAbandoned(@NotNull ConversationAbandonedEvent abandonedEvent) {
-        Object id = abandonedEvent.getContext().getSessionData("id");
+        var id = abandonedEvent.getContext().getSessionData("id");
         if (id != null) {
-            Long aLong = sessions.get(abandonedEvent.getContext().getForWhom());
+            var aLong = sessions.get(abandonedEvent.getContext().getForWhom());
             if (aLong != null && aLong.equals(id)) {
                 sessions.remove(abandonedEvent.getContext().getForWhom());
             }

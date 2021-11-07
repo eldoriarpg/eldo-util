@@ -73,7 +73,7 @@ public abstract class EldoCommand implements TabExecutor {
             return true;
         }
 
-        final String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
+        final var newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
         return getCommand(args[0]).map(c -> c.onCommand(sender, command, args[0], newArgs)).orElse(false);
     }
@@ -83,7 +83,7 @@ public abstract class EldoCommand implements TabExecutor {
         if (args.length == 1) {
             return ArrayUtil.startingWithInArray(args[0], registeredCommands).collect(Collectors.toList());
         }
-        final String[] newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
+        final var newArgs = args.length > 1 ? Arrays.copyOfRange(args, 1, args.length) : new String[0];
 
         if (args.length == 0) return Collections.emptyList();
 
@@ -92,7 +92,7 @@ public abstract class EldoCommand implements TabExecutor {
     }
 
     private Optional<TabExecutor> getCommand(String command) {
-        for (Map.Entry<String, TabExecutor> entry : subCommands.entrySet()) {
+        for (var entry : subCommands.entrySet()) {
             if (entry.getKey().equalsIgnoreCase(command)) {
                 return Optional.ofNullable(entry.getValue());
             }
@@ -227,7 +227,7 @@ public abstract class EldoCommand implements TabExecutor {
         if (player == null) {
             return false;
         }
-        for (String permission : permissions) {
+        for (var permission : permissions) {
             if (player.hasPermission(permission)) {
                 return false;
             }

@@ -29,7 +29,7 @@ public class BiVersionFunction<A, B, R> {
      * @throws UnsupportedVersionException when no function is defined for the server version.
      */
     public R apply(A a, B b) {
-        BiFunction<A, B, R> function = functions.get(ServerVersion.CURRENT_VERSION);
+        var function = functions.get(ServerVersion.CURRENT_VERSION);
         if (function == null) {
             throw new UnsupportedVersionException();
         }

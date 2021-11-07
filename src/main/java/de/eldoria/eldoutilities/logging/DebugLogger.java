@@ -29,7 +29,7 @@ public class DebugLogger extends Logger {
 
     @Override
     public void log(LogRecord record) {
-        int level = record.getLevel().intValue();
+        var level = record.getLevel().intValue();
         // check if the level is lover than info.
         // if thats the case we need to change it.
         if (level < 800) {

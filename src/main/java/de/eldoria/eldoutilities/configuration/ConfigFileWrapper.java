@@ -81,7 +81,7 @@ public final class ConfigFileWrapper {
      * @return new instance
      */
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, Map<String, Object> defaultMap) {
-        YamlConfiguration defaults = new YamlConfiguration();
+        var defaults = new YamlConfiguration();
         defaultMap.forEach(defaults::set);
         return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), defaults);
     }
@@ -95,7 +95,7 @@ public final class ConfigFileWrapper {
      * @return new instance
      */
     public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, Path filePath, Map<String, Object> defaultMap) {
-        YamlConfiguration defaults = new YamlConfiguration();
+        var defaults = new YamlConfiguration();
         defaultMap.forEach(defaults::set);
         return new ConfigFileWrapper(plugin, filePath, defaults);
     }

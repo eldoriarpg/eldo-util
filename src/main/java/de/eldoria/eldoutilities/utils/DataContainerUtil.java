@@ -33,7 +33,7 @@ public final class DataContainerUtil {
     public static <T, Z> void setIfAbsent(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         if (holder == null) return;
 
-        PersistentDataContainer container = holder.getPersistentDataContainer();
+        var container = holder.getPersistentDataContainer();
         if (container.has(key, type)) return;
 
         container.set(key, type, value);
@@ -52,7 +52,7 @@ public final class DataContainerUtil {
     public static <T, Z> void setIfAbsent(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         if (holder == null) return;
 
-        ItemMeta itemMeta = holder.getItemMeta();
+        var itemMeta = holder.getItemMeta();
         setIfAbsent(itemMeta, key, type, value);
         holder.setItemMeta(itemMeta);
     }
@@ -71,7 +71,7 @@ public final class DataContainerUtil {
     public static @Nullable <T, Z> Z compute(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Function<@Nullable Z, Z> map) {
         if (holder == null) return null;
 
-        PersistentDataContainer container = holder.getPersistentDataContainer();
+        var container = holder.getPersistentDataContainer();
         if (!container.has(key, type)) {
             container.set(key, type, map.apply(null));
             return container.get(key, type);
@@ -96,8 +96,8 @@ public final class DataContainerUtil {
     public static @Nullable <T, Z> Z compute(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> map) {
         if (holder == null) return null;
 
-        ItemMeta itemMeta = holder.getItemMeta();
-        Z compute = compute(itemMeta, key, type, map);
+        var itemMeta = holder.getItemMeta();
+        var compute = compute(itemMeta, key, type, map);
         holder.setItemMeta(itemMeta);
         return compute;
     }
@@ -139,8 +139,8 @@ public final class DataContainerUtil {
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
     public static @Nullable <T, Z> Z computeIfAbsent(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         if (holder == null) return null;
-        ItemMeta itemMeta = holder.getItemMeta();
-        Z z = computeIfAbsent(itemMeta, key, type, value);
+        var itemMeta = holder.getItemMeta();
+        var z = computeIfAbsent(itemMeta, key, type, value);
         holder.setItemMeta(itemMeta);
 
         return z;
@@ -184,8 +184,8 @@ public final class DataContainerUtil {
     public static @Nullable <T, Z> Z computeIfPresent(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> mappingFunction) {
         if (holder == null) return null;
 
-        ItemMeta itemMeta = holder.getItemMeta();
-        Z z = computeIfPresent(itemMeta, key, type, mappingFunction);
+        var itemMeta = holder.getItemMeta();
+        var z = computeIfPresent(itemMeta, key, type, mappingFunction);
         holder.setItemMeta(itemMeta);
 
         return z;
@@ -204,7 +204,7 @@ public final class DataContainerUtil {
     public static <T, Z> Optional<Z> get(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return Optional.empty();
 
-        PersistentDataContainer container = holder.getPersistentDataContainer();
+        var container = holder.getPersistentDataContainer();
         if (container.has(key, type)) {
             return Optional.ofNullable(container.get(key, type));
         }
@@ -284,7 +284,7 @@ public final class DataContainerUtil {
      */
     public static <T, Z> void putValue(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         if (holder == null) return;
-        ItemMeta itemMeta = holder.getItemMeta();
+        var itemMeta = holder.getItemMeta();
         putValue(itemMeta, key, type, value);
         holder.setItemMeta(itemMeta);
     }
@@ -316,7 +316,7 @@ public final class DataContainerUtil {
      */
     public static <T, Z> boolean hasKey(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return false;
-        ItemMeta itemMeta = holder.getItemMeta();
+        var itemMeta = holder.getItemMeta();
         return hasKey(itemMeta, key, type);
     }
 
@@ -332,7 +332,7 @@ public final class DataContainerUtil {
      */
     public static <T, Z> boolean remove(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return false;
-        PersistentDataContainer container = holder.getPersistentDataContainer();
+        var container = holder.getPersistentDataContainer();
         if (container.has(key, type)) {
             container.remove(key);
             return true;
@@ -352,7 +352,7 @@ public final class DataContainerUtil {
      */
     public static <T, Z> boolean remove(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return false;
-        ItemMeta itemMeta = holder.getItemMeta();
+        var itemMeta = holder.getItemMeta();
         if (remove(itemMeta, key, type)) {
             holder.setItemMeta(itemMeta);
             return true;

@@ -42,7 +42,7 @@ public class Arguments implements Iterable<String> {
      * @return new argument instance
      */
     public static Arguments create(Plugin plugin, String[] args) {
-        FlagContainer flags = FlagContainer.of(args);
+        var flags = FlagContainer.of(args);
         return new Arguments(plugin, args, flags);
     }
 
@@ -396,7 +396,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public Player asPlayer(int index) throws CommandException, IndexOutOfBoundsException {
-        Player player = plugin.getServer().getPlayer(asString(index));
+        var player = plugin.getServer().getPlayer(asString(index));
         if (player == null) throw CommandException.message("error.notOnline");
         return player;
     }
@@ -425,8 +425,8 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public OfflinePlayer asOfflinePlayer(int index) throws CommandException, IndexOutOfBoundsException {
-        String name = asString(index);
-        for (OfflinePlayer player : plugin.getServer().getOfflinePlayers()) {
+        var name = asString(index);
+        for (var player : plugin.getServer().getOfflinePlayers()) {
             if (name.equalsIgnoreCase(player.getName())) return player;
         }
         throw CommandException.message("error.unkownPlayer");
@@ -456,8 +456,8 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public World asWorld(int index) throws CommandException, IndexOutOfBoundsException {
-        String name = asString(index);
-        World world = plugin.getServer().getWorld(name);
+        var name = asString(index);
+        var world = plugin.getServer().getWorld(name);
         if (world == null) throw CommandException.message("error.unkownWorld");
         return world;
     }
@@ -579,7 +579,7 @@ public class Arguments implements Iterable<String> {
     }
 
     private <T> Optional<T> parseArg(int index, Function<String, Optional<T>> map) {
-        String value = asString(index);
+        var value = asString(index);
         return map.apply(value);
     }
 

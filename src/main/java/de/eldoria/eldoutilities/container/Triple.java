@@ -48,7 +48,7 @@ public class Triple<A, B, C> {
         if (this == o) return true;
         if (!(o instanceof Triple)) return false;
 
-        Triple<?, ?, ?> triple = (Triple<?, ?, ?>) o;
+        var triple = (Triple<?, ?, ?>) o;
 
         if (!Objects.equals(first, triple.first)) return false;
         if (!Objects.equals(second, triple.second)) return false;
@@ -57,7 +57,7 @@ public class Triple<A, B, C> {
 
     @Override
     public int hashCode() {
-        int result = first != null ? first.hashCode() : 0;
+        var result = first != null ? first.hashCode() : 0;
         result = 31 * result + (second != null ? second.hashCode() : 0);
         result = 31 * result + (third != null ? third.hashCode() : 0);
         return result;

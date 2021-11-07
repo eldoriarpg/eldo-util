@@ -9,9 +9,9 @@ val publishData = PublishData(project)
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.11.0"
+version = "1.12.0"
 description = "Utility Library for spigot plugins used by the eldoria team."
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
     mavenCentral()
@@ -67,7 +67,7 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    compileTestJava{
+    compileTestJava {
         options.encoding = "UTF-8"
     }
     test {
@@ -76,10 +76,10 @@ tasks {
             events("passed", "skipped", "failed")
         }
     }
-    shadowJar{
-    relocate("org.bstats", shadebase + "bstats")
-    mergeServiceFiles()
-    archiveClassifier.set("")
+    shadowJar {
+        relocate("org.bstats", shadebase + "bstats")
+        mergeServiceFiles()
+        archiveClassifier.set("")
     }
 }
 

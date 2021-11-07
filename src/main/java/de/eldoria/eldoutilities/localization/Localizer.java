@@ -136,9 +136,9 @@ public class Localizer implements ILocalizer {
             checked = true;
         }
 
-        String localeFile = localesPrefix + "_" + language + ".properties";
+        var localeFile = localesPrefix + "_" + language + ".properties";
 
-        try (InputStream stream = Files.newInputStream(Paths.get(plugin.getDataFolder().toString(), localesPath, localeFile))) {
+        try (var stream = Files.newInputStream(Paths.get(plugin.getDataFolder().toString(), localesPath, localeFile))) {
             this.localeFile = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Could not load locale file " + Paths.get(localesPath, localeFile), e);
@@ -177,31 +177,27 @@ public class Localizer implements ILocalizer {
     }
 
     private void createOrUpdateLocaleFiles() {
-        Path messages = Paths.get(plugin.getDataFolder().toString(), localesPath);
+        var messages = Paths.get(plugin.getDataFolder().toString(), localesPath);
 
-        // Make sure that the messages directory exists.
-        if (!messages.toFile().exists()) {
-            boolean mkdir = messages.toFile().mkdir();
-            if (!mkdir) {
-                plugin.getLogger().log(Level.WARNING, "Failed to create locale directory.");
-                return;
-            }
+        try {
+            Files.createDirectories(messages);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not create message directory.", e);
         }
 
-
         // Create the property files if they do not exists.
-        for (String includedLocale : includedLocales) {
-            String filename = localesPrefix + "_" + includedLocale + ".properties";
+        for (var includedLocale : includedLocales) {
+            var filename = localesPrefix + "_" + includedLocale + ".properties";
 
-            File localeFile = Paths.get(messages.toString(), filename).toFile();
+            var localeFile = Paths.get(messages.toString(), filename).toFile();
             if (localeFile.exists()) {
                 continue;
             }
 
-            StringBuilder builder = new StringBuilder();
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(
+            var builder = new StringBuilder();
+            try (var bufferedReader = new BufferedReader(new InputStreamReader(
                     plugin.getResource(filename), StandardCharsets.UTF_8))) {
-                String line = bufferedReader.readLine();
+                var line = bufferedReader.readLine();
                 while (line != null) {
                     builder.append(line).append("\n");
                     line = bufferedReader.readLine();
@@ -213,7 +209,7 @@ public class Localizer implements ILocalizer {
                 continue;
             }
 
-            try (OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(localeFile), StandardCharsets.UTF_8)) {
+            try (var outputStream = new OutputStreamWriter(new FileOutputStream(localeFile), StandardCharsets.UTF_8)) {
                 outputStream.write(builder.toString());
 
             } catch (IOException e) {
@@ -226,8 +222,8 @@ public class Localizer implements ILocalizer {
         List<File> localeFiles = new ArrayList<>();
 
         // Load all property files
-        try (Stream<Path> message = Files.list(messages)) {
-            for (Path path : message.collect(Collectors.toList())) {
+        try (var message = Files.list(messages)) {
+            for (var path : message.collect(Collectors.toList())) {
                 // skip directories. why should they be there anyway?
                 if (path.toFile().isDirectory()) {
                     continue;
@@ -264,10 +260,10 @@ public class Localizer implements ILocalizer {
         defaultKeys.addAll(runtimeLocaleCodes.keySet());
 
         // Update keys of existing files.
-        for (File file : localeFiles) {
+        for (var file : localeFiles) {
 
             // try to search for a included updated version.
-            Locale currLocale = extractLocale(file.getName());
+            var currLocale = extractLocale(file.getName());
             @Nullable ResourceBundle refBundle = null;
 
             if (currLocale != null) {
@@ -290,10 +286,10 @@ public class Localizer implements ILocalizer {
             // TODO: Preserve commands for properties.
             // load the external property file.
             Map<String, String> treemap = new TreeMap<>(String::compareToIgnoreCase);
-            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-                String line = bufferedReader.readLine();
+            try (var bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
+                var line = bufferedReader.readLine();
                 while (line != null) {
-                    String[] split = line.split("=", 2);
+                    var split = line.split("=", 2);
                     if (split.length == 2) {
                         treemap.put(split[0], split[1]);
                     }
@@ -304,13 +300,13 @@ public class Localizer implements ILocalizer {
                 continue;
             }
 
-            Set<String> keys = treemap.keySet();
+            var keys = treemap.keySet();
 
-            boolean updated = false;
+            var updated = false;
             // check if ref key is in locale
-            for (String currKey : defaultKeys) {
+            for (var currKey : defaultKeys) {
                 if (keys.contains(currKey)) continue;
-                String value = "";
+                var value = "";
                 if (refBundle != null) {
                     value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
                 }
@@ -327,10 +323,10 @@ public class Localizer implements ILocalizer {
 
             // Write to file if updated.
             if (updated) {
-                try (OutputStreamWriter outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                try (var outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
                     outputStream.write("# File automatically updated at "
                                        + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
-                    for (Map.Entry<String, String> entry : treemap.entrySet()) {
+                    for (var entry : treemap.entrySet()) {
                         outputStream.write(entry.getKey() + "=" + entry.getValue().replace("\n", "\\n") + "\n");
                     }
                 } catch (IOException e) {
@@ -345,10 +341,10 @@ public class Localizer implements ILocalizer {
     }
 
     private Locale extractLocale(String filename) {
-        Matcher matcher = localePattern.matcher(filename);
+        var matcher = localePattern.matcher(filename);
         if (matcher.find()) {
-            String group = matcher.group(1);
-            String[] s = group.split("_");
+            var group = matcher.group(1);
+            var s = group.split("_");
             if (s.length == 1) {
                 return new Locale(s[0]);
             }
@@ -378,14 +374,14 @@ public class Localizer implements ILocalizer {
         }
 
         // find locale codes in message
-        Matcher matcher = EMBED_LOCALIZATION_CODE.matcher(message);
+        var matcher = EMBED_LOCALIZATION_CODE.matcher(message);
         List<String> keys = new ArrayList<>();
         while (matcher.find()) {
             keys.add(matcher.group(1));
         }
 
-        String result = message;
-        for (String match : keys) {
+        var result = message;
+        for (var match : keys) {
             //Replace current locale code with result
             result = result.replace("$" + match + "$", getMessage(match, replacements));
         }
@@ -400,7 +396,7 @@ public class Localizer implements ILocalizer {
     }
 
     private String invokeReplacements(String message, Replacement... replacements) {
-        for (Replacement replacement : replacements) {
+        for (var replacement : replacements) {
             message = replacement.invoke(message);
         }
         return message;
