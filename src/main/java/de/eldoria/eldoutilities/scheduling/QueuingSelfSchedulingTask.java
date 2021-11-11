@@ -10,17 +10,27 @@ import java.util.function.Predicate;
 public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     private static final int MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
     private final Queue<T> tasks;
+    private final int maxDurationTarget;
     private int idleTicks;
     private int maxIdleTicks = 200;
 
     public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks) {
-        this(plugin);
+        this(plugin, maxIdleTicks, MAX_DURATION_TARGET);
+    }
+
+    public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks, int maxDurationTarget) {
+        this(plugin, maxDurationTarget);
         this.maxIdleTicks = maxIdleTicks;
     }
 
     public QueuingSelfSchedulingTask(Plugin plugin) {
+        this(plugin, MAX_DURATION_TARGET);
+    }
+
+    public QueuingSelfSchedulingTask(Plugin plugin, int maxDurationTarget) {
         super(plugin);
         tasks = getQueueImplementation();
+        this.maxDurationTarget = Math.max(0, Math.min(maxDurationTarget, MAX_DURATION_TARGET));
     }
 
     /**
@@ -42,7 +52,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
         var start = System.currentTimeMillis();
         long duration = 0;
 
-        while (!tasks.isEmpty() && proceed(tasks.peek()) && duration < MAX_DURATION_TARGET) {
+        while (!tasks.isEmpty() && proceed(tasks.peek()) && duration < maxDurationTarget) {
             execute(tasks.poll());
             duration = System.currentTimeMillis() - start;
         }
