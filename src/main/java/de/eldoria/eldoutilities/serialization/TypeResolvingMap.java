@@ -4,6 +4,7 @@ import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.serialization.wrapper.MapEntry;
 import de.eldoria.eldoutilities.utils.EnumUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -91,8 +92,8 @@ public final class TypeResolvingMap extends AbstractMap<String, Object> {
      * @param <T>          type of return value
      * @return value of key or default value
      */
-    public <T extends Enum<T>> T getValueOrDefault(String key, T defaultValue, Class<T> clazz) {
-        return EnumUtil.parse(getValueOrDefault(key, defaultValue.name()), clazz, defaultValue);
+    public <T extends Enum<T>> T getValueOrDefault(String key, @Nullable T defaultValue, Class<T> clazz) {
+        return EnumUtil.parse(getValueOrDefault(key, defaultValue == null ? "" : defaultValue.name()), clazz, defaultValue);
     }
 
     /**
