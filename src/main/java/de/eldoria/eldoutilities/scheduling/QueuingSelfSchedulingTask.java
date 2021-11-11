@@ -8,29 +8,22 @@ import java.util.Queue;
 import java.util.function.Predicate;
 
 public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
-    private static final int MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
+    protected static final int DEFAULT_MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
+    protected static final int DEFAULT_MAX_IDLE_TICKS = 200;
     private final Queue<T> tasks;
-    private final int maxDurationTarget;
     private int idleTicks;
-    private int maxIdleTicks = 200;
-
-    public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks) {
-        this(plugin, maxIdleTicks, MAX_DURATION_TARGET);
-    }
+    private int maxIdleTicks;
+    private int maxDurationTarget;
 
     public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks, int maxDurationTarget) {
-        this(plugin, maxDurationTarget);
+        super(plugin);
+        tasks = getQueueImplementation();
         this.maxIdleTicks = maxIdleTicks;
+        this.maxDurationTarget = Math.max(0, Math.min(maxDurationTarget, DEFAULT_MAX_DURATION_TARGET));
     }
 
     public QueuingSelfSchedulingTask(Plugin plugin) {
-        this(plugin, MAX_DURATION_TARGET);
-    }
-
-    public QueuingSelfSchedulingTask(Plugin plugin, int maxDurationTarget) {
-        super(plugin);
-        tasks = getQueueImplementation();
-        this.maxDurationTarget = Math.max(0, Math.min(maxDurationTarget, MAX_DURATION_TARGET));
+        this(plugin, DEFAULT_MAX_IDLE_TICKS, DEFAULT_MAX_DURATION_TARGET);
     }
 
     /**
@@ -94,7 +87,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
         for (var task : tasks) {
             execute(task);
         }
-        tasks.clear();
+        clear();
     }
 
     protected boolean remove(T o) {
@@ -104,4 +97,9 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     protected boolean removeIf(Predicate<? super T> filter) {
         return tasks.removeIf(filter);
     }
+
+    protected void clear() {
+        tasks.clear();
+    }
+
 }
