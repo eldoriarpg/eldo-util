@@ -12,8 +12,8 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     protected static final int DEFAULT_MAX_IDLE_TICKS = 200;
     private final Queue<T> tasks;
     private int idleTicks;
-    private int maxIdleTicks;
-    private int maxDurationTarget;
+    private final int maxIdleTicks;
+    private final int maxDurationTarget;
 
     public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks, int maxDurationTarget) {
         super(plugin);
