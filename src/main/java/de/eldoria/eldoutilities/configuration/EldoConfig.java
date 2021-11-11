@@ -12,19 +12,19 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -44,7 +44,7 @@ public abstract class EldoConfig {
 
     public EldoConfig(Plugin plugin) {
         this.plugin = plugin;
-        if(instanceConfig == null){
+        if (instanceConfig == null) {
             instanceConfig = this;
         }
         pluginData = plugin.getDataFolder().toPath();
@@ -183,11 +183,42 @@ public abstract class EldoConfig {
     }
 
     private void readConfigs() {
-        plugin.reloadConfig();
-        config = plugin.getConfig();
+        try {
+            plugin.saveDefaultConfig();
+            plugin.reloadConfig();
+            config = plugin.getConfig();
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load config.yml.", e);
+            backupAndRemoveCorruptedFile(plugin.getDataFolder().toPath().resolve("config.yml"));
+            readConfigs();
+        }
         setIfAbsent("debug", "INFO");
         for (var entry : configs.entrySet()) {
             loadConfig(Paths.get(entry.getKey()), null, true);
+        }
+    }
+
+    private void backupAndRemoveCorruptedFile(Path path) {
+        var time = DateTimeFormatter.ofPattern("yyMMddHHmmss").format(LocalDateTime.now());
+        var matcher = Pattern.compile("(?<name>.*)\\.(?<type>.+?)$").matcher(path.getFileName().toString());
+        String name;
+        if (matcher.find()) {
+            name = String.format("%s-%s.%s", matcher.group("name"), time, matcher.group("type"));
+        } else {
+            plugin.getLogger().severe("Could not determine file type.");
+            name = path.getFileName() + time + ".backup";
+        }
+        var newLoc = path.getParent().resolve(name);
+        plugin.getLogger().warning("Attempting to backup " + path + " to " + newLoc);
+        try {
+            Files.copy(path, newLoc, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not create backup.", e);
+        }
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not remove old file.");
         }
     }
 
@@ -248,6 +279,16 @@ public abstract class EldoConfig {
      * @throws ExternalConfigException When load config is invoked on a eldo config which is not the main config.
      */
     protected final FileConfiguration loadConfig(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
+        try {
+            return loadConfigWrapped(Paths.get(configPath.toString()), null, true);
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load " + configPath, e);
+            backupAndRemoveCorruptedFile(configPath);
+            return loadConfig(configPath, defaultCreator, reload);
+        }
+    }
+
+    private FileConfiguration loadConfigWrapped(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
         validateMainConfigEntry();
         var configFile = configPath.toFile();
 
