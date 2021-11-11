@@ -87,7 +87,15 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
         for (var task : tasks) {
             execute(task);
         }
-        clear();
+        tasks.clear();
+    }
+
+    /**
+     * Clear all the queued objects and cancel the task. It can be scheduled again after this.
+     */
+    public void clear() {
+        tasks.clear();
+        super.cancel();
     }
 
     protected boolean remove(T o) {
@@ -96,10 +104,6 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
 
     protected boolean removeIf(Predicate<? super T> filter) {
         return tasks.removeIf(filter);
-    }
-
-    protected void clear() {
-        tasks.clear();
     }
 
 }
