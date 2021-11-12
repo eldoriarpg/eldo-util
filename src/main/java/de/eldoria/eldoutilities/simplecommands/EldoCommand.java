@@ -30,7 +30,9 @@ import java.util.stream.Collectors;
  * Features automatic tab completion and sub commands.
  *
  * @since 1.1.0
+ * @deprecated Use {@link de.eldoria.eldoutilities.commands.command.AdvancedCommand} instead
  */
+@Deprecated
 public abstract class EldoCommand implements TabExecutor {
     private final Map<String, TabExecutor> subCommands = new HashMap<>();
     private final Plugin plugin;

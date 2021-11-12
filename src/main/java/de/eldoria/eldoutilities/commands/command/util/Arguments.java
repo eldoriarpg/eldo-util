@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -141,6 +142,18 @@ public class Arguments implements Iterable<String> {
     }
 
     /**
+     * Get the argument as string
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return argument as string
+     */
+    public @NotNull String asString(int index, Supplier<String> def) {
+        if (hasArg(index)) return asString(index);
+        return def.get();
+    }
+
+    /**
      * Get the argument as integer
      *
      * @param index index of argument
@@ -167,6 +180,19 @@ public class Arguments implements Iterable<String> {
     }
 
     /**
+     * Get the argument as integer
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as integer
+     * @throws CommandException when the argument is not an integer
+     */
+    public int asInt(int index, Supplier<Integer> def) throws CommandException {
+        if (hasArg(index)) return asInt(index);
+        return def.get();
+    }
+
+    /**
      * @param index index of argument
      * @return index as long
      * @throws CommandException          when the argument is not a long
@@ -190,6 +216,17 @@ public class Arguments implements Iterable<String> {
 
     /**
      * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as long
+     * @throws CommandException when the argument is not a long
+     */
+    public long asLong(int index, Supplier<Long> def) throws CommandException {
+        if (hasArg(index)) return asLong(index);
+        return def.get();
+    }
+
+    /**
+     * @param index index of argument
      * @return index as double
      * @throws CommandException          when the argument is not a double
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
@@ -208,6 +245,17 @@ public class Arguments implements Iterable<String> {
     public double asDouble(int index, double def) throws CommandException {
         if (hasArg(index)) return asDouble(index);
         return def;
+    }
+
+    /**
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as double
+     * @throws CommandException when the argument is not a double
+     */
+    public double asDouble(int index, Supplier<Double> def) throws CommandException {
+        if (hasArg(index)) return asDouble(index);
+        return def.get();
     }
 
     /**
@@ -243,9 +291,35 @@ public class Arguments implements Iterable<String> {
      * @return index as boolean
      * @throws CommandException when the argument is not a boolean
      */
+    public boolean asBoolean(int index, Supplier<Boolean> def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index);
+        return def.get();
+    }
+
+    /**
+     * Get the argument as a boolean
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as boolean
+     * @throws CommandException when the argument is not a boolean
+     */
     public boolean asBoolean(int index, String aTrue, String aFalse, boolean def) throws CommandException {
         if (hasArg(index)) return asBoolean(index, aTrue, aFalse);
         return def;
+    }
+
+    /**
+     * Get the argument as a boolean
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as boolean
+     * @throws CommandException when the argument is not a boolean
+     */
+    public boolean asBoolean(int index, String aTrue, String aFalse, Supplier<Boolean> def) throws CommandException {
+        if (hasArg(index)) return asBoolean(index, aTrue, aFalse);
+        return def.get();
     }
 
     /**
@@ -300,6 +374,22 @@ public class Arguments implements Iterable<String> {
      * <p>
      * This will send a custom message without listing all possible values.
      *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as material
+     * @throws CommandException when the argument is not a material
+     */
+    @NotNull
+    public Material asMaterial(int index, Supplier<Material> def) throws CommandException {
+        if (hasArg(index)) return asMaterial(index);
+        return def.get();
+    }
+
+    /**
+     * Get the argument as a material.
+     * <p>
+     * This will send a custom message without listing all possible values.
+     *
      * @param index        index of argument
      * @param stripStrings if true underscores will be removed before checking
      * @return index as material
@@ -327,6 +417,23 @@ public class Arguments implements Iterable<String> {
     public Material asMaterial(int index, boolean stripStrings, Material def) throws CommandException {
         if (hasArg(index)) return asMaterial(index, stripStrings);
         return def;
+    }
+
+    /**
+     * Get the argument as a material.
+     * <p>
+     * This will send a custom message without listing all possible values.
+     *
+     * @param index        index of argument
+     * @param def          returned if the index is not valid
+     * @param stripStrings if true underscores will be removed before checking
+     * @return index as material
+     * @throws CommandException when the argument is not a material
+     */
+    @NotNull
+    public Material asMaterial(int index, boolean stripStrings, Supplier<Material> def) throws CommandException {
+        if (hasArg(index)) return asMaterial(index, stripStrings);
+        return def.get();
     }
 
     /**
@@ -358,6 +465,22 @@ public class Arguments implements Iterable<String> {
     public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, T def) throws CommandException {
         if (hasArg(index)) return asEnum(index, clazz);
         return def;
+    }
+
+    /**
+     * Get the argument as an enum
+     *
+     * @param index index of argument
+     * @param clazz enum clazz to parse
+     * @param def   returned if the index is not valid
+     * @param <T>   type of enum
+     * @return index as enum value
+     * @throws CommandException When the string could not be parsed to an enum
+     */
+    @NotNull
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, Supplier<T> def) throws CommandException {
+        if (hasArg(index)) return asEnum(index, clazz);
+        return def.get();
     }
 
     /**
@@ -396,6 +519,23 @@ public class Arguments implements Iterable<String> {
     }
 
     /**
+     * Get the argument as an enum
+     *
+     * @param index        index of argument
+     * @param clazz        enum clazz to parse
+     * @param stripStrings if true underscores will be removed before checking
+     * @param def          returned if the index is not valid
+     * @param <T>          type of enum
+     * @return index as enum value
+     * @throws CommandException When the string could not be parsed to an enum
+     */
+    @NotNull
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, Supplier<T> def) throws CommandException {
+        if (hasArg(index)) return asEnum(index, clazz, stripStrings);
+        return def.get();
+    }
+
+    /**
      * Get the argument as a player
      *
      * @param index index of argument
@@ -422,6 +562,20 @@ public class Arguments implements Iterable<String> {
     public Player asPlayer(int index, Player def) throws CommandException {
         if (hasArg(index)) return asPlayer(index);
         return def;
+    }
+
+    /**
+     * Get the argument as a player
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as player
+     * @throws CommandException when no player with this name is online
+     */
+    @NotNull
+    public Player asPlayer(int index, Supplier<Player> def) throws CommandException {
+        if (hasArg(index)) return asPlayer(index);
+        return def.get();
     }
 
     /**
@@ -456,6 +610,20 @@ public class Arguments implements Iterable<String> {
     }
 
     /**
+     * Get the argument as a offline player
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as offline player
+     * @throws CommandException when no player with this name was on this server previously
+     */
+    @NotNull
+    public OfflinePlayer asOfflinePlayer(int index, Supplier<OfflinePlayer> def) throws CommandException {
+        if (hasArg(index)) return asOfflinePlayer(index);
+        return def.get();
+    }
+
+    /**
      * Get the argument as a world
      *
      * @param index index of argument
@@ -483,6 +651,20 @@ public class Arguments implements Iterable<String> {
     public World asWorld(int index, World def) throws CommandException {
         if (hasArg(index)) return asWorld(index);
         return def;
+    }
+
+    /**
+     * Get the argument as a world
+     *
+     * @param index index of argument
+     * @param def   returned if the index is not valid
+     * @return index as world
+     * @throws CommandException When the string is not the name of a world
+     */
+    @NotNull
+    public World asWorld(int index, Supplier<World> def) throws CommandException {
+        if (hasArg(index)) return asWorld(index);
+        return def.get();
     }
 
     /**
