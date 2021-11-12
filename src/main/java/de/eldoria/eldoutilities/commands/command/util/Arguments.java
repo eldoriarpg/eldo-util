@@ -107,7 +107,7 @@ public class Arguments implements Iterable<Input> {
     public void parseQuoted() {
         args.clear();
         for (var s : ArgumentUtils.parseQuotedArgs(rawArgs)) {
-            if (FLAG.matcher(s).find()) break;
+            if (FlagContainer.isFlag(s)) break;
             args.add(Input.of(plugin, s));
         }
     }

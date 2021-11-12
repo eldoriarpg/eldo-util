@@ -42,6 +42,10 @@ public class FlagContainer {
         return flagContainer;
     }
 
+    public static boolean isFlag(String value) {
+        return FLAG.matcher(value).matches() || NAMED_FLAG.matcher(value).matches();
+    }
+
     private void parse() {
         for (var arg : args) {
             if (FLAG.matcher(arg).matches()) {
