@@ -1,5 +1,9 @@
 package de.eldoria.eldoutilities.utils;
 
+import de.eldoria.eldoutilities.commands.command.util.Input;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import de.eldoria.eldoutilities.functions.ThrowingFunction;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,13 +18,15 @@ import java.util.regex.Pattern;
 public class FlagContainer {
     private static final Pattern FLAG = Pattern.compile("-([a-zA-Z]+?)");
     private static final Pattern NAMED_FLAG = Pattern.compile("--([a-zA-Z-])+?");
-    private final Map<String, String> flags = new HashMap<>();
+    private final Map<String, Input> flags = new HashMap<>();
 
     private final List<String> flagArgs = new LinkedList<>();
+    private final Plugin plugin;
     private final String[] args;
     private String currFlag = null;
 
-    private FlagContainer(String[] args) {
+    private FlagContainer(Plugin plugin, String[] args) {
+        this.plugin = plugin;
         this.args = args;
     }
 
@@ -30,8 +36,8 @@ public class FlagContainer {
      * @param args args
      * @return new flag container with parsed args
      */
-    public static FlagContainer of(String[] args) {
-        var flagContainer = new FlagContainer(args);
+    public static FlagContainer of(Plugin plugin, String[] args) {
+        var flagContainer = new FlagContainer(plugin, args);
         flagContainer.parse();
         return flagContainer;
     }
@@ -65,7 +71,7 @@ public class FlagContainer {
 
     private void flushFlag() {
         if (currFlag != null) {
-            flags.put(currFlag, flagArgs.isEmpty() ? null : String.join(" ", flagArgs));
+            flags.put(currFlag, flagArgs.isEmpty() ? null : Input.of(plugin,String.join(" ", flagArgs)));
             flagArgs.clear();
             currFlag = null;
         }
@@ -105,8 +111,9 @@ public class FlagContainer {
      * @param <T>  type of flag
      * @return flag parsed with the function.
      */
-    public <T> T get(@NotNull String flag, Function<@Nullable String, T> map) {
-        return map.apply(get(flag));
+    public <T> T get(@NotNull String flag, ThrowingFunction<@Nullable Input, T, CommandException> map) throws CommandException {
+        var input = get(flag);
+        return map.apply(input);
     }
 
     /**
@@ -116,7 +123,7 @@ public class FlagContainer {
      * @return flag value
      */
     @Nullable
-    public String get(String flag) {
+    public Input get(String flag) {
         return flags.get(flag);
     }
 
@@ -126,7 +133,7 @@ public class FlagContainer {
      * @param flag flag to retrieve
      * @return flag value in an optional if present
      */
-    public Optional<String> getIfPresent(String flag) {
+    public Optional<Input> getIfPresent(String flag) {
         return Optional.ofNullable(get(flag));
     }
 
@@ -140,7 +147,7 @@ public class FlagContainer {
      * @param <T>  type of returned optional
      * @return flag value parsed and wrapped into an optional
      */
-    public <T> Optional<T> getIfPresent(@NotNull String flag, Function<String, T> map) {
+    public <T> Optional<T> getIfPresent(@NotNull String flag, Function<Input, T> map) {
         return getIfPresent(flag).map(map);
     }
 }

@@ -234,6 +234,17 @@ public final class ArgumentUtils {
     public static String getMessage(String[] strings, int from) {
         return getMessage(strings, from, 0);
     }
+    /**
+     * Get a message from string array from 'from' to array.length().
+     *
+     * @param strings array of strings.
+     * @param from    start index (included). Use negative counts to count from the last index.
+     *
+     * @return array sequence as string
+     */
+    public static String getMessage(List<String> strings, int from) {
+        return getMessage(strings.toArray(new String[0]), from, 0);
+    }
 
     /**
      * Get a message from string array from 'from' to 'to'.
@@ -246,6 +257,19 @@ public final class ArgumentUtils {
      */
     public static String getMessage(String[] strings, int from, int to) {
         return TextFormatting.getRangeAsString(" ", strings, from, to);
+    }
+
+    /**
+     * Get a message from string array from 'from' to 'to'.
+     *
+     * @param strings array of strings.
+     * @param from    start index (included). Use negative counts to count from the last index.
+     * @param to      end index (excluded). Use negative counts to count from the last index.
+     *
+     * @return array sequence as string
+     */
+    public static String getMessage(List<String> strings, int from, int to) {
+        return TextFormatting.getRangeAsString(" ", strings.toArray(new String[0]), from, to);
     }
 
     /**

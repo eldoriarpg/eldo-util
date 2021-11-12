@@ -10,6 +10,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -256,6 +258,10 @@ public final class CommandAssertions {
 
     public static void missingArgument(String[] args, int index) throws CommandException {
         isTrue(args.length > index, "error.missingArgument", Replacement.create("index", index));
+    }
+
+    public static void missingArgument(Collection<?> args, int index) throws CommandException {
+        isTrue(args.size()> index, "error.missingArgument", Replacement.create("index", index));
     }
 
     /**

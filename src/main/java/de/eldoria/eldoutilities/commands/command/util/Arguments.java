@@ -1,38 +1,41 @@
 package de.eldoria.eldoutilities.commands.command.util;
 
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
-import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.ArgumentUtils;
-import de.eldoria.eldoutilities.utils.EnumUtil;
 import de.eldoria.eldoutilities.utils.FlagContainer;
-import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
-public class Arguments implements Iterable<String> {
+public class Arguments implements Iterable<Input> {
+    private static final Pattern FLAG = Pattern.compile("^-[a-zA-Z]");
     private final FlagContainer flags;
-    Plugin plugin;
-    private String[] args;
+    private final Plugin plugin;
+    private final String[] rawArgs;
+    private final List<Input> args = new ArrayList<>();
 
     private Arguments(Plugin plugin, String[] args, FlagContainer flags) {
-        this.args = args;
+        this.plugin = plugin;
+        this.rawArgs = args;
         this.flags = flags;
+        splitArgs();
     }
 
     /**
@@ -43,7 +46,7 @@ public class Arguments implements Iterable<String> {
      * @return new argument instance
      */
     public static Arguments create(Plugin plugin, String[] args) {
-        var flags = FlagContainer.of(args);
+        var flags = FlagContainer.of(plugin, args);
         return new Arguments(plugin, args, flags);
     }
 
@@ -64,7 +67,7 @@ public class Arguments implements Iterable<String> {
      * @return true if enough arguments are present
      */
     public boolean hasArg(int index) {
-        return args.length > index;
+        return args.size() > index;
     }
 
     /**
@@ -73,7 +76,7 @@ public class Arguments implements Iterable<String> {
      * @return the amount of arguments
      */
     public int size() {
-        return args.length;
+        return args.size();
     }
 
     /**
@@ -82,7 +85,7 @@ public class Arguments implements Iterable<String> {
      * @return the amount of arguments
      */
     public boolean sizeIs(int i) {
-        return args.length == i;
+        return args.size() == i;
     }
 
     /**
@@ -91,7 +94,7 @@ public class Arguments implements Iterable<String> {
      * @return true if empty
      */
     public boolean isEmpty() {
-        return args.length == 0;
+        return args.isEmpty();
     }
 
     /**
@@ -102,17 +105,28 @@ public class Arguments implements Iterable<String> {
      * Use {@link #splitArgs()} to revert this change
      */
     public void parseQuoted() {
-        args = ArgumentUtils.parseQuotedArgs(args);
+        args.clear();
+        for (var s : ArgumentUtils.parseQuotedArgs(rawArgs)) {
+            if (FLAG.matcher(s).find()) break;
+            args.add(Input.of(plugin, s));
+        }
     }
 
     /**
      * Splits the arguments if they were grouped by {@link #parseQuoted()}
      */
     public void splitArgs() {
-        args = Arrays.stream(args)
-                .map(arg -> arg.contains(" ") ? String.format("\"%s\"", arg) : arg)
-                .collect(Collectors.joining(" "))
-                .split(" ");
+        for (var s : Arrays.stream(rawArgs).collect(Collectors.toList())) {
+            if (FLAG.matcher(s).find()) break;
+            args.add(Input.of(plugin, s));
+        }
+    }
+
+    public Input get(int index) {
+        if (index < 0) {
+            return args.get(size() + index);
+        }
+        return args.get(index);
     }
 
     /**
@@ -123,10 +137,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public @NotNull String asString(int index) throws IndexOutOfBoundsException {
-        if (index < 0) {
-            return args[args.length + index];
-        }
-        return args[index];
+        return get(index).asString();
     }
 
     /**
@@ -162,8 +173,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public int asInt(int index) throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseInt(asString(index))
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return get(index).asInt();
     }
 
     /**
@@ -199,8 +209,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public long asLong(int index) throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseLong(asString(index))
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return get(index).asLong();
     }
 
     /**
@@ -232,8 +241,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public double asDouble(int index) throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseDouble(asString(index))
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return get(index).asDouble();
     }
 
     /**
@@ -267,7 +275,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public boolean asBoolean(int index) throws CommandException, IndexOutOfBoundsException {
-        return asBoolean(index, "true", "false");
+        return get(index).asBoolean();
     }
 
     /**
@@ -333,9 +341,7 @@ public class Arguments implements Iterable<String> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     public boolean asBoolean(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseBoolean(asString(index), aTrue, aFalse)
-                .orElseThrow(() -> CommandException.message("error.invalidBoolean",
-                        Replacement.create("true", aTrue), Replacement.create("false", aFalse)));
+        return get(index).asBoolean(aTrue, aFalse);
     }
 
     /**
@@ -398,8 +404,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public Material asMaterial(int index, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
-        return EnumUtil.parse(asString(index), Material.class, stripStrings)
-                .orElseThrow(() -> CommandException.message("error.invalidMaterial"));
+        return get(0).asMaterial(stripStrings);
     }
 
     /**
@@ -448,7 +453,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public <T extends Enum<T>> T asEnum(int index, Class<T> clazz) throws CommandException, IndexOutOfBoundsException {
-        return asEnum(index, clazz, false);
+        return get(index).asEnum(clazz, false);
     }
 
     /**
@@ -496,9 +501,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
-        return EnumUtil.parse(asString(index), clazz, stripStrings)
-                .orElseThrow(() -> CommandException.message("error.invalidEnumValue",
-                        Replacement.create("VALUES", EnumUtil.enumValues(clazz)).addFormatting('6')));
+        return get(index).asEnum(clazz, stripStrings);
     }
 
     /**
@@ -545,9 +548,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public Player asPlayer(int index) throws CommandException, IndexOutOfBoundsException {
-        var player = plugin.getServer().getPlayer(asString(index));
-        if (player == null) throw CommandException.message("error.notOnline");
-        return player;
+        return get(index).asPlayer();
     }
 
     /**
@@ -588,11 +589,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public OfflinePlayer asOfflinePlayer(int index) throws CommandException, IndexOutOfBoundsException {
-        var name = asString(index);
-        for (var player : plugin.getServer().getOfflinePlayers()) {
-            if (name.equalsIgnoreCase(player.getName())) return player;
-        }
-        throw CommandException.message("error.unkownPlayer");
+        return get(index).asOfflinePlayer();
     }
 
     /**
@@ -633,10 +630,7 @@ public class Arguments implements Iterable<String> {
      */
     @NotNull
     public World asWorld(int index) throws CommandException, IndexOutOfBoundsException {
-        var name = asString(index);
-        var world = plugin.getServer().getWorld(name);
-        if (world == null) throw CommandException.message("error.unkownWorld");
-        return world;
+        return get(index).asWorld();
     }
 
     /**
@@ -673,7 +667,7 @@ public class Arguments implements Iterable<String> {
      * @param from the first index to be returned
      * @return a list of arguments
      */
-    public List<String> args(int from) {
+    public List<Input> args(int from) {
         return ArgumentUtils.getRangeAsList(args, from);
     }
 
@@ -714,7 +708,7 @@ public class Arguments implements Iterable<String> {
      * @return range as string
      */
     public String join(String delimiter) {
-        return String.join(delimiter, args);
+        return args.stream().map(Input::asString).collect(Collectors.joining(delimiter));
     }
 
     /**
@@ -725,7 +719,7 @@ public class Arguments implements Iterable<String> {
      * @return range as string
      */
     public String join(String delimiter, int from) {
-        return ArgumentUtils.getMessage(args, from);
+        return ArgumentUtils.getMessage(args.stream().map(Input::asString).collect(Collectors.toList()), from);
     }
 
     /**
@@ -737,7 +731,7 @@ public class Arguments implements Iterable<String> {
      * @return range as string
      */
     public String join(String delimiter, int from, int to) {
-        return ArgumentUtils.getMessage(args, from, to);
+        return ArgumentUtils.getMessage(args.stream().map(Input::asString).collect(Collectors.toList()), from, to);
     }
 
     /**
@@ -745,8 +739,8 @@ public class Arguments implements Iterable<String> {
      *
      * @return arguments as list
      */
-    public List<String> args() {
-        return Arrays.asList(args);
+    public List<Input> args() {
+        return Collections.unmodifiableList(args);
     }
 
     /**
@@ -754,8 +748,8 @@ public class Arguments implements Iterable<String> {
      *
      * @return new arguments array
      */
-    public String[] asArray() {
-        return args.clone();
+    public Input[] asArray() {
+        return args.toArray(new Input[0]);
     }
 
     /**
@@ -765,7 +759,7 @@ public class Arguments implements Iterable<String> {
      * @param to   to exclusive
      * @return arguments as list
      */
-    public List<String> args(int from, int to) {
+    public List<Input> args(int from, int to) {
         return ArgumentUtils.getRangeAsList(args, from, to);
     }
 
@@ -780,89 +774,38 @@ public class Arguments implements Iterable<String> {
      * @return arguments without the first arguments.
      */
     public Arguments subArguments() {
-        return Arguments.create(plugin, ArgumentUtils.getRangeAsList(args, 1).toArray(new String[0]));
+        return subArguments(1);
     }
 
     /**
-     * Checks if the command has a flag
+     * Get the subarguments. This will return all arguments except the first one.
      *
-     * @param flag flag to check
-     * @return true when flag is present
+     * @param nesting the amount of arguments which should get removed
+     * @return arguments without the first arguments.
      */
-    public boolean hasFlag(@NotNull String flag) {
-        return flags.has(flag);
+    public Arguments subArguments(int nesting) {
+        return Arguments.create(plugin, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
     }
 
-    /**
-     * Check if the flag has a value.
-     *
-     * @param flag flag to check
-     * @return true when the flag is present and has a value
-     */
-    public boolean hasFlagValue(String flag) {
-        return flags.hasValue(flag);
-    }
-
-    /**
-     * Get the value of a flag
-     *
-     * @param flag flag
-     * @param map  function to map the value
-     * @param <T>  type of value
-     * @return parsed flag
-     */
-    public <T> T getFlag(@NotNull String flag, Function<@Nullable String, T> map) {
-        return flags.get(flag, map);
-    }
-
-    /**
-     * Get the string value of a flag
-     *
-     * @param flag flag
-     * @return value of flag when present
-     */
-    @Nullable
-    public String getFlag(String flag) {
-        return flags.get(flag);
-    }
-
-    /**
-     * Get the value of a flag if present
-     *
-     * @param flag flag
-     * @return optional value
-     */
-    public Optional<String> getFlagValueIfPresent(String flag) {
-        return flags.getIfPresent(flag);
-    }
-
-    /**
-     * Get the value of a flag is present
-     *
-     * @param flag flag
-     * @param map  value parser
-     * @param <T>  value of return type
-     * @return optional parsed value
-     */
-    public <T> Optional<T> getFlagValueIfPresent(@NotNull String flag, Function<String, T> map) {
-        return flags.getIfPresent(flag, map);
+    public FlagContainer flags() {
+        return flags;
     }
 
     @NotNull
     @Override
-    public Iterator<String> iterator() {
+    public Iterator<Input> iterator() {
         return args().iterator();
     }
 
-    public Spliterator<String> spliterator() {
+    public Spliterator<Input> spliterator() {
         return args().spliterator();
     }
 
-    public Stream<String> stream() {
+    public Stream<Input> stream() {
         return args().stream();
     }
 
-    public Stream<String> parallelStream() {
+    public Stream<Input> parallelStream() {
         return args().parallelStream();
     }
 
@@ -871,7 +814,7 @@ public class Arguments implements Iterable<String> {
         return "Arguments{" +
                "flags=" + flags +
                ", plugin=" + plugin.getName() +
-               ", args=" + Arrays.toString(args) +
+               ", args=" + Arrays.toString(rawArgs) +
                '}';
     }
 }
