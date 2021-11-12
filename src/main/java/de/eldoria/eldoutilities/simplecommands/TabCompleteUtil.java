@@ -4,6 +4,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.gson.internal.LinkedHashTreeMap;
 import de.eldoria.eldoutilities.C;
+import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
+import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.ArrayUtil;
@@ -24,11 +26,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,7 +42,6 @@ import java.util.stream.Stream;
 public final class TabCompleteUtil {
     private static final Set<String> PLAYER_NAMES = new HashSet<>();
     private static final Set<String> ONLINE_NAMES = new HashSet<>();
-    public static final char HIGHLIGHT = '6';
     public static final long OFFLINE_PLAYER_CACHE_SIZE = 1000L;
     private static Instant lastPlayerRefresh = Instant.now();
     private static final Set<String> smartMats;
@@ -250,7 +249,7 @@ public final class TabCompleteUtil {
             ONLINE_NAMES.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
             lastPlayerRefresh = Instant.now();
         }
-        complete.addAll(complete(value, ONLINE_NAMES));
+        complete.addAll(complete(value, ONLINE_NAMES.stream()));
         return new ArrayList<>(complete);
     }
 
@@ -303,21 +302,14 @@ public final class TabCompleteUtil {
      * @param value current value
      * @param min   min value
      * @param max   max value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeDouble(String value, double min, double max, ILocalizer loc) {
+    public static List<String> completeDouble(String value, double min, double max) throws CommandException {
+        CommandAssertions.isDouble(value);
         var d = Parser.parseDouble(value);
         List<String> result = new ArrayList<>();
-        if (d.isPresent()) {
-            if (d.get() > max || d.get() < min) {
-                return singleEntryList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", String.format("%.2f", min)).addFormatting(HIGHLIGHT),
-                        Replacement.create("MAX", String.format("%.2f", min)).addFormatting(HIGHLIGHT)));
-            }
-            return singleEntryList(min + "-" + max);
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.range(d.get(), min, max);
+        return singleEntryList(min + "-" + max);
     }
 
     /**
@@ -327,20 +319,13 @@ public final class TabCompleteUtil {
      * @param value current value
      * @param min   min value
      * @param max   max value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeInt(String value, int min, int max, ILocalizer loc) {
+    public static List<String> completeInt(String value, int min, int max) throws CommandException {
+        CommandAssertions.isInteger(value);
         var d = Parser.parseInt(value);
-        if (d.isPresent()) {
-            if (d.get() > max || d.get() < min) {
-                return singleEntryList(loc.getMessage("error.invalidRange",
-                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT),
-                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
-            }
-            return singleEntryList(min + "-" + max);
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.range(d.get(), min, max);
+        return singleEntryList(min + "-" + max);
     }
 
     /**
@@ -349,20 +334,13 @@ public final class TabCompleteUtil {
      *
      * @param value current value
      * @param min   min value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeMinDouble(String value, double min, ILocalizer loc) {
+    public static List<String> completeMinDouble(String value, double min) throws CommandException {
+        CommandAssertions.isDouble(value);
         var val = Parser.parseDouble(value);
-        if (val.isPresent()) {
-            if (val.get() < min) {
-                return singleEntryList(loc.getMessage("error.tooLow",
-                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT)));
-
-            }
-            return singleEntryList(String.format("%.2f<", min));
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.min(val.get(), min);
+        return singleEntryList(String.format("%.2f<", min));
     }
 
     /**
@@ -371,20 +349,13 @@ public final class TabCompleteUtil {
      *
      * @param value current value
      * @param min   min value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeMinInt(String value, int min, ILocalizer loc) {
+    public static List<String> completeMinInt(String value, int min) throws CommandException {
+        CommandAssertions.isInteger(value);
         var val = Parser.parseInt(value);
-        if (val.isPresent()) {
-            if (val.get() < min) {
-                return singleEntryList(loc.getMessage("error.tooLow",
-                        Replacement.create("MIN", min).addFormatting(HIGHLIGHT)));
-
-            }
-            return singleEntryList(min + "<");
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.min(val.get(), min);
+        return singleEntryList(min + "<");
     }
 
     /**
@@ -393,20 +364,13 @@ public final class TabCompleteUtil {
      *
      * @param value current value
      * @param max   max value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeMaxDouble(String value, double max, ILocalizer loc) {
+    public static List<String> completeMaxDouble(String value, double max) throws CommandException {
+        CommandAssertions.isDouble(value);
         var val = Parser.parseDouble(value);
-        if (val.isPresent()) {
-            if (val.get() > max) {
-                return singleEntryList(loc.getMessage("error.tooLarge",
-                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
-
-            }
-            return singleEntryList(String.format("%.2f", max) + ">");
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.max(val.get(), max);
+        return singleEntryList(String.format("%.2f", max) + ">");
     }
 
     /**
@@ -415,20 +379,13 @@ public final class TabCompleteUtil {
      *
      * @param value current value
      * @param max   max value
-     * @param loc   localizer instance
      * @return list with range advise or error
      */
-    public static List<String> completeMaxInt(String value, int max, ILocalizer loc) {
+    public static List<String> completeMaxInt(String value, int max) throws CommandException {
+        CommandAssertions.isInteger(value);
         var val = Parser.parseInt(value);
-        if (val.isPresent()) {
-            if (val.get() > max) {
-                return singleEntryList(loc.getMessage("error.tooLarge",
-                        Replacement.create("MAX", max).addFormatting(HIGHLIGHT)));
-
-            }
-            return singleEntryList(max + ">");
-        }
-        return singleEntryList(loc.getMessage("error.invalidNumber"));
+        CommandAssertions.max(val.get(), max);
+        return singleEntryList(max + ">");
     }
 
     /**
@@ -438,14 +395,10 @@ public final class TabCompleteUtil {
      * @param value           value to check
      * @param maxLength       max length of string
      * @param defaultComplete default completion output
-     * @param loc             localizer instance
      * @return list of string with length 1
      */
-    public static List<String> completeFreeInput(String value, int maxLength, String defaultComplete, ILocalizer loc) {
-        if (value.length() > maxLength) {
-            return singleEntryList(loc.getMessage("error.invalidLength",
-                    Replacement.create("MAX", maxLength).addFormatting(HIGHLIGHT)));
-        }
+    public static List<String> completeFreeInput(String value, int maxLength, String defaultComplete) throws CommandException {
+        CommandAssertions.invalidLength(value, maxLength);
         return singleEntryList(defaultComplete);
     }
 

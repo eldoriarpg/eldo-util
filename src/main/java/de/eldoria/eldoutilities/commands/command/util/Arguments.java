@@ -76,6 +76,15 @@ public class Arguments implements Iterable<String> {
     }
 
     /**
+     * Size of the arguments.
+     *
+     * @return the amount of arguments
+     */
+    public boolean sizeIs(int i) {
+        return args.length == i;
+    }
+
+    /**
      * Checks if no arguments are present
      *
      * @return true if empty
