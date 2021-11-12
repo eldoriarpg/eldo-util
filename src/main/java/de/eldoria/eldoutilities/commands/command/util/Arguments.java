@@ -117,7 +117,7 @@ public class Arguments implements Iterable<Input> {
      */
     public void splitArgs() {
         for (var s : Arrays.stream(rawArgs).collect(Collectors.toList())) {
-            if (FLAG.matcher(s).find()) break;
+            if (FlagContainer.isFlag(s)) break;
             args.add(Input.of(plugin, s));
         }
     }
