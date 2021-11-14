@@ -8,19 +8,22 @@ import java.util.Queue;
 import java.util.function.Predicate;
 
 public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
-    private static final int MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
+    protected static final int DEFAULT_MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
+    protected static final int DEFAULT_MAX_IDLE_TICKS = 200;
     private final Queue<T> tasks;
     private int idleTicks;
-    private int maxIdleTicks = 200;
+    private final int maxIdleTicks;
+    private final int maxDurationTarget;
 
-    public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks) {
-        this(plugin);
+    public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks, int maxDurationTarget) {
+        super(plugin);
+        tasks = getQueueImplementation();
         this.maxIdleTicks = maxIdleTicks;
+        this.maxDurationTarget = Math.max(0, Math.min(maxDurationTarget, DEFAULT_MAX_DURATION_TARGET));
     }
 
     public QueuingSelfSchedulingTask(Plugin plugin) {
-        super(plugin);
-        tasks = getQueueImplementation();
+        this(plugin, DEFAULT_MAX_IDLE_TICKS, DEFAULT_MAX_DURATION_TARGET);
     }
 
     /**
@@ -42,7 +45,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
         var start = System.currentTimeMillis();
         long duration = 0;
 
-        while (!tasks.isEmpty() && proceed(tasks.peek()) && duration < MAX_DURATION_TARGET) {
+        while (!tasks.isEmpty() && proceed(tasks.peek()) && duration < maxDurationTarget) {
             execute(tasks.poll());
             duration = System.currentTimeMillis() - start;
         }
@@ -87,6 +90,14 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
         tasks.clear();
     }
 
+    /**
+     * Clear all the queued objects and cancel the task. It can be scheduled again after this.
+     */
+    public void clear() {
+        tasks.clear();
+        super.cancel();
+    }
+
     protected boolean remove(T o) {
         return tasks.remove(o);
     }
@@ -94,4 +105,5 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     protected boolean removeIf(Predicate<? super T> filter) {
         return tasks.removeIf(filter);
     }
+
 }
