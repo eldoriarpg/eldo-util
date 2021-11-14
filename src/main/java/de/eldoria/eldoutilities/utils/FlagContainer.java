@@ -7,10 +7,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -18,12 +17,15 @@ import java.util.regex.Pattern;
 public class FlagContainer {
     private static final Pattern FLAG = Pattern.compile("-([a-zA-Z]+?)");
     private static final Pattern NAMED_FLAG = Pattern.compile("--([a-zA-Z-])+?");
-    private final Map<String, Input> flags = new HashMap<>();
+    private final LinkedHashMap<String, Input> flags = new LinkedHashMap<>();
 
     private final List<String> flagArgs = new LinkedList<>();
     private final Plugin plugin;
     private final String[] args;
     private String currFlag = null;
+
+    private String lastFlag = null;
+    private Input lastFlagArgs = null;
 
     private FlagContainer(Plugin plugin, String[] args) {
         this.plugin = plugin;
@@ -75,7 +77,9 @@ public class FlagContainer {
 
     private void flushFlag() {
         if (currFlag != null) {
-            flags.put(currFlag, flagArgs.isEmpty() ? null : Input.of(plugin,String.join(" ", flagArgs)));
+            lastFlag = currFlag;
+            lastFlagArgs = flagArgs.isEmpty() ? null : Input.of(plugin, String.join(" ", flagArgs));
+            flags.put(currFlag, flagArgs.isEmpty() ? null : Input.of(plugin, String.join(" ", flagArgs)));
             flagArgs.clear();
             currFlag = null;
         }
@@ -84,6 +88,7 @@ public class FlagContainer {
     private void addSingleFlags(String flags) {
         for (var c : flags.toCharArray()) {
             this.flags.put(String.valueOf(c), null);
+            currFlag = String.valueOf(c);
         }
     }
 
@@ -153,5 +158,21 @@ public class FlagContainer {
      */
     public <T> Optional<T> getIfPresent(@NotNull String flag, Function<Input, T> map) {
         return getIfPresent(flag).map(map);
+    }
+
+    public String lastFlag() {
+        return lastFlag;
+    }
+
+    public Input lastFlagArgs() {
+        return lastFlagArgs;
+    }
+
+    public boolean hasLastFlagArg() {
+        return lastFlagArgs != null;
+    }
+
+    public boolean isEmpty() {
+        return flags.isEmpty();
     }
 }
