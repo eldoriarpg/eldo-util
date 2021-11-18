@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @since 1.1.0
  */
 public abstract class EldoConfig {
-    private static EldoConfig instanceConfig = null;
+    private static final Map<Plugin, EldoConfig> INSTANCE_CONFIG = new HashMap<>();
     protected final Plugin plugin;
     private final Path pluginData;
     private final Map<String, FileConfiguration> configs = new HashMap<>();
@@ -44,9 +44,7 @@ public abstract class EldoConfig {
 
     public EldoConfig(Plugin plugin) {
         this.plugin = plugin;
-        if (instanceConfig == null) {
-            instanceConfig = this;
-        }
+        INSTANCE_CONFIG.putIfAbsent(plugin, this);
         pluginData = plugin.getDataFolder().toPath();
         config = plugin.getConfig();
         plugin.saveDefaultConfig();
@@ -360,8 +358,8 @@ public abstract class EldoConfig {
      *
      * @return file configuration for the main config.
      */
-    public static EldoConfig getMainConfig() {
-        return instanceConfig;
+    public static EldoConfig getMainConfig(Plugin plugin) {
+        return INSTANCE_CONFIG.get(plugin);
     }
 
     /**
@@ -397,7 +395,7 @@ public abstract class EldoConfig {
 
     public Map<String, FileConfiguration> getConfigs() {
         Map<String, FileConfiguration> configs = new LinkedHashMap<>();
-        configs.put(Paths.get(plugin.getDataFolder().toPath().toString(), "config.yml").toString(), getMainConfig().getConfig());
+        configs.put(Paths.get(plugin.getDataFolder().toPath().toString(), "config.yml").toString(), getMainConfig(plugin).getConfig());
         configs.putAll(this.configs);
         return configs;
     }
@@ -411,7 +409,7 @@ public abstract class EldoConfig {
     }
 
     public boolean isMainConfig() {
-        return instanceConfig == this;
+        return INSTANCE_CONFIG.get(plugin) == this;
     }
 
     private void validateMainConfigEntry() {

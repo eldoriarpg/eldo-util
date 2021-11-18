@@ -35,7 +35,7 @@ public class ConfigDump extends EntryData {
     public static EntryData[] create(Plugin plugin, DebugSettings settings) {
         var root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
 
-        var mainConfig = EldoConfig.getMainConfig();
+        var mainConfig = EldoConfig.getMainConfig(plugin);
 
         Set<String> configs = new LinkedHashSet<>();
         if (mainConfig != null) {
