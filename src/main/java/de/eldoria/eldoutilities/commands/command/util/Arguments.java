@@ -6,6 +6,7 @@ import de.eldoria.eldoutilities.utils.FlagContainer;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +29,13 @@ public class Arguments implements Iterable<Input> {
     private static final Pattern FLAG = Pattern.compile("^-[a-zA-Z]");
     private final FlagContainer flags;
     private final Plugin plugin;
+    private final CommandSender sender;
     private final String[] rawArgs;
     private final List<Input> args = new ArrayList<>();
 
-    private Arguments(Plugin plugin, String[] args, FlagContainer flags) {
+    private Arguments(Plugin plugin, CommandSender sender, String[] args, FlagContainer flags) {
         this.plugin = plugin;
+        this.sender = sender;
         this.rawArgs = args;
         this.flags = flags;
         splitArgs();
@@ -45,9 +48,9 @@ public class Arguments implements Iterable<Input> {
      * @param args   argument array
      * @return new argument instance
      */
-    public static Arguments create(Plugin plugin, String[] args) {
+    public static Arguments create(Plugin plugin, CommandSender sender, String[] args) {
         var flags = FlagContainer.of(plugin, args);
-        return new Arguments(plugin, args, flags);
+        return new Arguments(plugin, sender, args, flags);
     }
 
     /**
@@ -784,11 +787,20 @@ public class Arguments implements Iterable<Input> {
      * @return arguments without the first arguments.
      */
     public Arguments subArguments(int nesting) {
-        return Arguments.create(plugin, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
+        return Arguments.create(plugin, sender, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
     }
 
     public FlagContainer flags() {
         return flags;
+    }
+
+    public Input last() {
+        if (isEmpty()) return null;
+        return get(size() - 1);
+    }
+
+    public CommandSender sender() {
+        return sender;
     }
 
     @NotNull

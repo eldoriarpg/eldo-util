@@ -46,14 +46,14 @@ public class AdvancedCommandAdapter implements TabExecutor {
     }
 
     private void executeCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) throws CommandException {
-        var arguments = Arguments.create(plugin, args);
+        var arguments = Arguments.create(plugin, sender, args);
         advancedCommand.commandRoute(sender, label, arguments);
     }
 
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        var arguments = Arguments.create(plugin, args);
+        var arguments = Arguments.create(plugin, sender, args);
         List<String> strings;
         try {
             strings = advancedCommand.tabCompleteRoute(sender, label, arguments);
