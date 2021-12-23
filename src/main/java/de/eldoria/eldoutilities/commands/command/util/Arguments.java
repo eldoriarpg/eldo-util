@@ -407,7 +407,7 @@ public class Arguments implements Iterable<Input> {
      */
     @NotNull
     public Material asMaterial(int index, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
-        return get(0).asMaterial(stripStrings);
+        return get(index).asMaterial(stripStrings);
     }
 
     /**
