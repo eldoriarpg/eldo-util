@@ -36,11 +36,11 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
 
     @Override
     protected Optional<String> getLatestVersion(ButlerUpdateData data) {
-        Plugin plugin = data.plugin();
+        var plugin = data.plugin();
 
         HttpURLConnection con;
         try {
-            URL url = new URL(data.host() + "/check?version=" + plugin.getDescription().getVersion() + "&id=" + data.butlerId() + "&devbuild=" + false);
+            var url = new URL(data.host() + "/check?version=" + plugin.getDescription().getVersion() + "&id=" + data.butlerId() + "&devbuild=" + false);
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
         } catch (IOException e) {
@@ -65,9 +65,9 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
         }
 
 
-        try (BufferedReader br = new BufferedReader(
+        try (var br = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             String responseLine;
             while ((responseLine = br.readLine()) != null) {
                 builder.append(responseLine.trim());
@@ -85,7 +85,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
     @Override
     protected boolean update() {
         if (response == null) return false;
-        Plugin plugin = getData().plugin();
+        var plugin = getData().plugin();
         plugin.getLogger().info("§2>------------------------<");
         plugin.getLogger().info("§2> Performing auto update <");
         plugin.getLogger().info("§2>------------------------<");
@@ -102,8 +102,8 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
 
         plugin.getLogger().info("§2Downloaded new file.");
 
-        String plugins = plugin.getDataFolder().getParent();
-        File updateDirectory = new File(Paths.get(plugins, "update").toString());
+        var plugins = plugin.getDataFolder().getParent();
+        var updateDirectory = new File(Paths.get(plugins, "update").toString());
         if (!updateDirectory.exists()) {
             if (!updateDirectory.mkdirs()) {
                 plugin.getLogger().warning("§cCould not create update directory.");
@@ -130,8 +130,8 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
             return false;
         }
 
-        File updateFile = Paths.get(updateDirectory.getAbsolutePath(), pluginFile.getName()).toFile();
-        try (InputStream input = url.openStream()) {
+        var updateFile = Paths.get(updateDirectory.getAbsolutePath(), pluginFile.getName()).toFile();
+        try (var input = url.openStream()) {
             Files.copy(input, updateFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Could not create update file.", e);

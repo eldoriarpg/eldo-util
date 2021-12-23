@@ -29,13 +29,13 @@ public class ShapedRecipeWrapper implements ConfigurationSerializable {
         key = recipe.getKey();
         shape = Arrays.asList(recipe.getShape());
         choices = new HashMap<>();
-        for (Map.Entry<Character, RecipeChoice> entry : recipe.getChoiceMap().entrySet()) {
+        for (var entry : recipe.getChoiceMap().entrySet()) {
             choices.put(entry.getKey(), RecipeChoiceWrapper.wrap(entry.getValue()));
         }
     }
 
     public ShapedRecipeWrapper(Map<String, Object> objectMap) {
-        TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+        var map = SerializationUtil.mapOf(objectMap);
         result = map.getValue("result");
         group = map.getValue("group");
         key = new NamespacedKey((String) map.getValue("namespace"), map.getValue("key"));
@@ -44,10 +44,10 @@ public class ShapedRecipeWrapper implements ConfigurationSerializable {
     }
 
     public ShapedRecipe getRecipe() {
-        ShapedRecipe recipe = new ShapedRecipe(key, result);
+        var recipe = new ShapedRecipe(key, result);
         recipe.shape(shape.toArray(new String[0]));
         recipe.setGroup(group);
-        for (Map.Entry<Character, RecipeChoiceWrapper> entry : choices.entrySet()) {
+        for (var entry : choices.entrySet()) {
             recipe.setIngredient(entry.getKey(), entry.getValue().toChoice());
         }
         return recipe;
@@ -86,7 +86,7 @@ public class ShapedRecipeWrapper implements ConfigurationSerializable {
             }
 
             public MaterialChoiceWrapper(Map<String, Object> objectMap) {
-                TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+                var map = SerializationUtil.mapOf(objectMap);
                 materials = map.getValueOrDefault("materials", Collections.emptyList(), Material.class);
             }
 
@@ -112,7 +112,7 @@ public class ShapedRecipeWrapper implements ConfigurationSerializable {
             }
 
             public ExactChoiceWrapper(Map<String, Object> objectMap) {
-                TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+                var map = SerializationUtil.mapOf(objectMap);
                 choices = map.getValue("choices");
             }
 

@@ -20,9 +20,9 @@ public class EldoMetrics extends Metrics {
      */
     public EldoMetrics(JavaPlugin plugin, int serviceId) {
         super(plugin, serviceId);
-        File bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
-        File configFile = new File(bStatsFolder, "config.yml");
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+        var bStatsFolder = new File(plugin.getDataFolder().getParentFile(), "bStats");
+        var configFile = new File(bStatsFolder, "config.yml");
+        var config = YamlConfiguration.loadConfiguration(configFile);
         enabled = config.getBoolean("enabled", true);
     }
 

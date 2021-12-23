@@ -56,7 +56,7 @@ public final class InventoryActions {
     }
 
     public void onInventoryClose(InventoryCloseEvent event) {
-        for (Map.Entry<Integer, ActionItem> entry : actions.entrySet()) {
+        for (var entry : actions.entrySet()) {
             entry.getValue().onInventoryClose(inventory.getItem(entry.getKey()));
         }
         onClose.accept(event);

@@ -13,7 +13,7 @@ public interface ITabExecutor {
     void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) throws CommandException;
 
     @Nullable
-    default List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args){
+    default List<String> onTabComplete(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) throws CommandException{
         return Collections.emptyList();
     }
 }

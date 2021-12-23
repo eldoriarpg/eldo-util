@@ -40,7 +40,7 @@ public final class AttributeUtil {
      * @param target    target value which should be retrieved via {@link AttributeInstance#getValue()}
      */
     public static void setAttributeValue(@NotNull LivingEntity entity, @NotNull Attribute attribute, @NotNull double target) {
-        AttributeInstance a = entity.getAttribute(attribute);
+        var a = entity.getAttribute(attribute);
         if (a == null) {
             EldoUtilities.logger().log(Level.WARNING, "[EldoUtilities] Attempted to set attribute "
                             + attribute + " for " + entity.getType() + ", but Attribute is not present on this type.",
@@ -60,8 +60,8 @@ public final class AttributeUtil {
      * @param attribute attribute to change
      */
     public static void syncAttributeValue(LivingEntity source, LivingEntity target, Attribute attribute) {
-        AttributeInstance sourceAttribute = source.getAttribute(attribute);
-        AttributeInstance targetAttribute = target.getAttribute(attribute);
+        var sourceAttribute = source.getAttribute(attribute);
+        var targetAttribute = target.getAttribute(attribute);
 
         if (sourceAttribute == null) {
             EldoUtilities.logger().log(Level.WARNING, "Attempted to sync attribute "
@@ -86,7 +86,7 @@ public final class AttributeUtil {
     }
 
     public static double getAttributeValue(LivingEntity entity, Attribute attribute) {
-        AttributeInstance entityAttribute = entity.getAttribute(attribute);
+        var entityAttribute = entity.getAttribute(attribute);
         if (entityAttribute == null) {
             return 0;
         }

@@ -37,7 +37,7 @@ public class InventoryActionHandler implements Listener {
 
     public static InventoryActionHandler create(Plugin plugin) {
         return PLUGIN_HANDLER.computeIfAbsent(plugin.getClass(), k -> {
-            InventoryActionHandler handler = new InventoryActionHandler();
+            var handler = new InventoryActionHandler();
             Bukkit.getPluginManager().registerEvents(handler, plugin);
             return handler;
         });
@@ -46,7 +46,7 @@ public class InventoryActionHandler implements Listener {
 
     public static InventoryActionHandler create(EldoPlugin plugin, Runnable onClose) {
         return PLUGIN_HANDLER.computeIfAbsent(plugin.getClass(), k -> {
-            InventoryActionHandler handler = new InventoryActionHandler(onClose);
+            var handler = new InventoryActionHandler(onClose);
             plugin.registerListener(handler);
             return handler;
         });
@@ -65,13 +65,13 @@ public class InventoryActionHandler implements Listener {
      * @return inventory wrapped into inventory actions.
      */
     public InventoryActions wrap(Player player, Inventory inventory) {
-        InventoryActions inventoryActions = InventoryActions.of(inventory);
+        var inventoryActions = InventoryActions.of(inventory);
         inventories.put(player.getUniqueId(), inventoryActions);
         return inventoryActions;
     }
 
     public InventoryActions wrap(Player player, Inventory inventory, Consumer<InventoryCloseEvent> onClose) {
-        InventoryActions inventoryActions = InventoryActions.of(inventory, onClose);
+        var inventoryActions = InventoryActions.of(inventory, onClose);
         inventories.put(player.getUniqueId(), inventoryActions);
         return inventoryActions;
     }

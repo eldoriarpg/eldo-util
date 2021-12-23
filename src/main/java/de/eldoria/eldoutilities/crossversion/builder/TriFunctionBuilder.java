@@ -21,7 +21,7 @@ public class TriFunctionBuilder<A, B, C, R> {
      * @return builder instance with function applied for versions
      */
     public TriFunctionBuilder<A, B, C, R> addVersionFunction(TriFunction<A, B, C, R> function, ServerVersion... version) {
-        for (ServerVersion serverVersion : version) {
+        for (var serverVersion : version) {
             functions.put(serverVersion, function);
         }
         return this;

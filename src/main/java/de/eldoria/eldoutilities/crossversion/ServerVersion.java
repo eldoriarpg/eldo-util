@@ -60,13 +60,13 @@ public enum ServerVersion {
      * @return version of server
      */
     public static ServerVersion getVersion() {
-        Optional<Triple<Integer, Integer, Integer>> version = extractVersion();
+        var version = extractVersion();
 
         if (!version.isPresent()) {
             return MC_UNKOWN;
         }
 
-        for (ServerVersion value : values()) {
+        for (var value : values()) {
             if (value.version.first.equals(version.get().first)) {
                 if (value.version.second.equals(version.get().second)) {
                     return value;
@@ -85,12 +85,12 @@ public enum ServerVersion {
      * @return optional version of server if the version could be determined
      */
     public static Optional<Triple<Integer, Integer, Integer>> extractVersion() {
-        Matcher matcher = VERSION_PATTERN.matcher(Bukkit.getServer().getBukkitVersion());
+        var matcher = VERSION_PATTERN.matcher(Bukkit.getServer().getBukkitVersion());
 
         if (matcher.find()) {
-            int major = Integer.parseInt(matcher.group(1));
-            int minor = Integer.parseInt(matcher.group(2));
-            int patch = Integer.parseInt(matcher.group(3) == null ? "0" : matcher.group(3));
+            var major = Integer.parseInt(matcher.group(1));
+            var minor = Integer.parseInt(matcher.group(2));
+            var patch = Integer.parseInt(matcher.group(3) == null ? "0" : matcher.group(3));
             return Optional.of(new Triple<>(major, minor, patch));
         }
         return Optional.empty();
@@ -105,12 +105,12 @@ public enum ServerVersion {
      * @return true when the version is between oldest and newest version or equal to the oldest or newest.
      */
     public static boolean between(ServerVersion oldest, ServerVersion newest, ServerVersion current) {
-        Integer currentMajor = current.version.first;
-        Integer oldestMajor = oldest.version.first;
-        Integer newestMajor = newest.version.first;
-        Integer currentMinor = current.version.second;
-        Integer oldestMinor = oldest.version.second;
-        Integer newestMinor = newest.version.second;
+        var currentMajor = current.version.first;
+        var oldestMajor = oldest.version.first;
+        var newestMajor = newest.version.first;
+        var currentMinor = current.version.second;
+        var oldestMinor = oldest.version.second;
+        var newestMinor = newest.version.second;
         if (currentMajor < oldestMajor || currentMajor > newestMajor) return false;
         return currentMinor >= oldestMinor && currentMinor <= newestMinor;
     }

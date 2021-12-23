@@ -54,7 +54,7 @@ public class IteratingTask<T> extends BukkitRunnable {
 
     @Override
     public final void run() {
-        long start = System.currentTimeMillis();
+        var start = System.currentTimeMillis();
         long duration;
         do {
             T next;

@@ -26,8 +26,8 @@ public final class ProjectileUtil {
         // Check if the item is a projectile. If not this is not necessary
         if (!(entity instanceof Projectile)) return new ProjectileSender();
 
-        Projectile projectile = (Projectile) entity;
-        ProjectileSource source = projectile.getShooter();
+        var projectile = (Projectile) entity;
+        var source = projectile.getShooter();
 
         if (source == null) return new ProjectileSender();
 
@@ -37,7 +37,7 @@ public final class ProjectileUtil {
         }
         // in some cases it could also be a block. Eg. dispenser
         if (source instanceof BlockProjectileSource) {
-            Block damager = ((BlockProjectileSource) source).getBlock();
+            var damager = ((BlockProjectileSource) source).getBlock();
             return new ProjectileSender(damager);
         }
 

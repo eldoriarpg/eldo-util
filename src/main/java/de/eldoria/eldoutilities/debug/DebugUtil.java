@@ -11,6 +11,7 @@ import de.eldoria.eldoutilities.messages.MessageChannel;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.messages.MessageType;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -52,44 +53,43 @@ public final class DebugUtil {
      * @param settings settings for debug dispatching
      */
     public static void dispatchDebug(CommandSender sender, Plugin plugin, DebugSettings settings) {
-        ConfigFileWrapper config = EldoUtilities.getConfiguration();
-        MessageSender messageSender = MessageSender.getPluginMessageSender(plugin);
+        var config = EldoUtilities.getConfiguration();
+        var messageSender = MessageSender.getPluginMessageSender(plugin);
         if (!config.get().getBoolean("debugConsens", false)) {
-            String message = "By using this command you agree that we will send data belonging to you to §lour server§r.\n"
-                    + "We will only send data when someone executes this command.\n"
-                    + "The data will be handled confidential from our side and will be only available by a hashed key.\n"
-                    + "Unless you share this key no one can access it. §cEveryone who receives this key will have access to your data.§r\n"
-                    + "You can delete your data at every time with the deletion key. §cIf you lose or didnt save your key we can not help you.§r\n"
-                    + "Your data will be deleted after §l§c14 days§r.\n"
-                    + "This data includes but is §l§cnot§r limited to:\n"
-                    + "  - Installed Plugins and their meta data\n"
-                    + "  - Latest log\n"
-                    + "  - Server Informations like Worldnames and Playercount\n"
-                    + "  - The configuration file or files of the debugged plugin\n"
-                    + "  - Additional Data provided by our own plugins.\n"
-                    + "We will filter sensitive data like IPs before sending.\n"
-                    + "However we §l§ccan not§r and §l§cwill not§r gurantee that we can remove all data which is considered confidential by you.\n"
-                    + "§2If you agree please execute this command once again.\n"
-                    + "§2This is a one time opt in.\n"
-                    + "You can opt out again in the EldoUtilities config file.";
+            var message = "By using this command you agree that we will send data belonging to you to §lour server§r.\n"
+                          + "We will only send data when someone executes this command.\n"
+                          + "The data will be handled confidential from our side and will be only available by a hashed key.\n"
+                          + "Unless you share this key no one can access it. §cEveryone who receives this key will have access to your data.§r\n"
+                          + "You can delete your data at every time with the deletion key. §cIf you lose or didnt save your key we can not help you.§r\n"
+                          + "Your data will be deleted after §l§c14 days§r.\n"
+                          + "This data includes but is §l§cnot§r limited to:\n"
+                          + "  - Installed Plugins and their meta data\n"
+                          + "  - Latest log\n"
+                          + "  - Server Informations like Worldnames and Playercount\n"
+                          + "  - The configuration file or files of the debugged plugin\n"
+                          + "  - Additional Data provided by our own plugins.\n"
+                          + "We will filter sensitive data like IPs before sending.\n"
+                          + "However we §l§ccan not§r and §l§cwill not§r gurantee that we can remove all data which is considered confidential by you.\n"
+                          + "§2If you agree please execute this command once again.\n"
+                          + "§2This is a one time opt in.\n"
+                          + "You can opt out again in the EldoUtilities config file.";
             messageSender.send(MessageChannel.CHAT, () -> "§6", sender, message);
             config.write(c -> c.set("debugConsens", true));
             return;
         }
 
-        EldoUtilities.getAsyncSyncingCallbackExecutor().schedule(
-                () -> sendDebug(plugin, DebugPayload.create(plugin, settings), settings),
-                debugResponse -> {
-                    if (debugResponse.isPresent()) {
-                        messageSender.send(MessageChannel.CHAT, MessageType.NORMAL, sender,
-                                "Your data is available here:\n"
-                                        + "§6" + settings.getHost() + "/debug/v1/read/" + debugResponse.get().getHash()
-                                        + "§r\nYou can delete it via this link:\n"
-                                        + "§c" + settings.getHost() + "/debug/v1/delete/" + debugResponse.get().getDeletionHash());
-                    } else {
-                        messageSender.send(MessageChannel.CHAT, MessageType.ERROR, sender, "Could not send data. Please try again later");
-                    }
-                });
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            var debugResponse = sendDebug(plugin, DebugPayload.create(plugin, settings), settings);
+            if (debugResponse.isPresent()) {
+                messageSender.send(MessageChannel.CHAT, MessageType.NORMAL, sender,
+                        "Your data is available here:\n"
+                        + "§6" + settings.getHost() + "/debug/v1/read/" + debugResponse.get().getHash()
+                        + "§r\nYou can delete it via this link:\n"
+                        + "§c" + settings.getHost() + "/debug/v1/delete/" + debugResponse.get().getDeletionHash());
+            } else {
+                messageSender.send(MessageChannel.CHAT, MessageType.ERROR, sender, "Could not send data. Please try again later");
+            }
+        });
     }
 
     /**
@@ -109,14 +109,14 @@ public final class DebugUtil {
             providers.add((DebugDataProvider) plugin);
             debuged.add((DebugDataProvider) plugin);
             while (!providers.isEmpty()) {
-                DebugDataProvider provider = providers.poll();
-                for (DebugDataProvider nextProvider : provider.getDebugProviders()) {
+                var provider = providers.poll();
+                for (var nextProvider : provider.getDebugProviders()) {
                     if (debuged.contains(nextProvider)) {
                         plugin.getLogger()
                                 .warning("Loop in debug data detected. Instance of class "
-                                        + nextProvider.getClass().getSimpleName()
-                                        + " returns a reference to already debugged instance of "
-                                        + provider.getClass().getSimpleName());
+                                         + nextProvider.getClass().getSimpleName()
+                                         + " returns a reference to already debugged instance of "
+                                         + provider.getClass().getSimpleName());
                         continue;
                     }
                     providers.add(nextProvider);
@@ -133,7 +133,7 @@ public final class DebugUtil {
         // Open connection to Butler.
         HttpURLConnection con;
         try {
-            URL url = new URL(settings.getHost() + "/debug/v1/submit");
+            var url = new URL(settings.getHost() + "/debug/v1/submit");
             con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("POST");
         } catch (IOException e) {
@@ -147,8 +147,8 @@ public final class DebugUtil {
         con.setDoOutput(true);
 
         // Lets write our data.
-        try (OutputStream outputStream = con.getOutputStream()) {
-            byte[] input = GSON.toJson(payload).getBytes(StandardCharsets.UTF_8);
+        try (var outputStream = con.getOutputStream()) {
+            var input = GSON.toJson(payload).getBytes(StandardCharsets.UTF_8);
             outputStream.write(input, 0, input.length);
         } catch (IOException e) {
             plugin.getLogger().info("Could not write to connection.");
@@ -166,9 +166,9 @@ public final class DebugUtil {
         }
 
         // Lets read the response.
-        try (BufferedReader br = new BufferedReader(
+        try (var br = new BufferedReader(
                 new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-            StringBuilder builder = new StringBuilder();
+            var builder = new StringBuilder();
             String responseLine;
             while ((responseLine = br.readLine()) != null) {
                 builder.append(responseLine.trim());

@@ -18,8 +18,8 @@ public final class TextUtil {
      * @return the number of occurences of the char in the string.
      */
     public static int countChars(String string, char count) {
-        int i = 0;
-        for (char c : string.toCharArray()) {
+        var i = 0;
+        for (var c : string.toCharArray()) {
             if (c == count) i++;
         }
         return i;
@@ -40,15 +40,15 @@ public final class TextUtil {
             return string;
         }
         if (!keepWords) {
-            String substring = string.substring(0, Math.max(0, maxChars - endSequence.length()));
+            var substring = string.substring(0, Math.max(0, maxChars - endSequence.length()));
             return (substring + endSequence).trim();
         }
 
-        String[] split = string.split("\\s");
+        var split = string.split("\\s");
 
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
 
-        for (String s : split) {
+        for (var s : split) {
             if (builder.length() + s.length() + 1 + endSequence.length() > maxChars) {
                 return builder.toString().trim() + endSequence;
             }

@@ -63,7 +63,7 @@ public final class EnumUtil {
      * @return enum value or null if no mathing value was found.
      */
     public static <T extends Enum<T>> Optional<T> parse(String mat, Class<T> values, boolean stripStrings) {
-        for (T value : values.getEnumConstants()) {
+        for (var value : values.getEnumConstants()) {
             if (mat.equalsIgnoreCase(stripStrings ? value.name().replace("_", "") : value.name())) {
                 return Optional.of(value);
             }

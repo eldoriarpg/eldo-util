@@ -52,7 +52,7 @@ public class CommandMeta {
     public String createCommandCall() {
         List<String> calls = new ArrayList<>();
         calls.add(name);
-        AdvancedCommand curr = parent();
+        var curr = parent();
         while (curr != null) {
             calls.add(curr.meta().name());
             curr = curr.meta().parent();
@@ -127,7 +127,7 @@ public class CommandMeta {
 
     public boolean isCommand(String value) {
         if (value.equalsIgnoreCase(name())) return true;
-        for (String alias : aliases) {
+        for (var alias : aliases) {
             if (alias.equalsIgnoreCase(value)) return true;
         }
         return false;

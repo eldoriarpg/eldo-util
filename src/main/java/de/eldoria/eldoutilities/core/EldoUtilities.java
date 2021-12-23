@@ -18,14 +18,15 @@ import org.bukkit.boss.KeyedBossBar;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -35,57 +36,22 @@ import java.util.logging.Logger;
  * If your plugins extends {@link EldoPlugin} this will be done automatically.
  */
 public final class EldoUtilities {
-    private static DelayedActions delayedActions;
-    private static InventoryActionHandler inventoryActionHandler;
-    private static AsyncSyncingCallbackExecutor asyncSyncingCallbackExecutor;
-    private static ConversationRequester conversationRequester;
+    private static Plugin mainOwner;
+    private static Map<Class<? extends Plugin>, Plugin> instanceOwners = new LinkedHashMap<>();
     private static ConfigFileWrapper configuration;
-    private static Plugin instanceOwner;
 
     private EldoUtilities() {
     }
 
-    public static DelayedActions getDelayedActions() {
-        if (delayedActions == null) {
-            delayedActions = DelayedActions.start(instanceOwner);
-            logger().config("DelayedActions ignited.");
-        }
-        return delayedActions;
-    }
-
-    public static ConversationRequester getConversationRequester() {
-        if (conversationRequester == null) {
-            conversationRequester = ConversationRequester.start(instanceOwner);
-            logger().config("ConversationRequester ignited.");
-        }
-        return conversationRequester;
-    }
-
-    public static InventoryActionHandler getInventoryActions() {
-        if (inventoryActionHandler == null) {
-            inventoryActionHandler = InventoryActionHandler.create(instanceOwner);
-            logger().config("InventoryActionHandler ignited.");
-        }
-        return inventoryActionHandler;
-    }
-
-    public static AsyncSyncingCallbackExecutor getAsyncSyncingCallbackExecutor() {
-        if (asyncSyncingCallbackExecutor == null) {
-            asyncSyncingCallbackExecutor = AsyncSyncingCallbackExecutor.create(instanceOwner);
-            logger().config("AsyncSyncingCallbackExecutor ignited.");
-        }
-        return asyncSyncingCallbackExecutor;
-    }
-
     public static Logger logger() {
-        return instanceOwner.getLogger();
+        return Bukkit.getLogger();
     }
 
     public static void preWarm(Plugin eldoPlugin) {
-        instanceOwner = eldoPlugin;
-        for (Class<? extends ConfigurationSerializable> clazz : getConfigSerialization()) {
+        instanceOwners.put(eldoPlugin.getClass(), eldoPlugin);
+        for (var clazz : getConfigSerialization()) {
             if (clazz.isAnnotationPresent(PluginSerializationName.class)) {
-                PluginSerializationName annotation = clazz.getAnnotation(PluginSerializationName.class);
+                var annotation = clazz.getAnnotation(PluginSerializationName.class);
                 ConfigurationSerialization.registerClass(clazz,
                         annotation.value().replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
             } else {
@@ -94,23 +60,23 @@ public final class EldoUtilities {
         }
     }
 
-    public static void ignite(Plugin eldoPlugin) {
+    public static void ignite(Plugin plugin) {
         VersionFunctionBuilder.functionBuilder(null, null)
                 .addVersionFunctionBetween(ServerVersion.MC_1_13, ServerVersion.MC_1_17,
                         a -> {
-                            Bukkit.getScheduler().runTaskLater(eldoPlugin, EldoUtilities::performLateCleanUp, 5);
+                            Bukkit.getScheduler().runTaskLater(plugin, () -> performLateCleanUp(plugin), 5);
                             return null;
                         });
-        Path path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
-        configuration = ConfigFileWrapper.forFile(eldoPlugin, path);
+        var path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        configuration = ConfigFileWrapper.forFile(plugin, path);
     }
 
-    private static void performLateCleanUp() {
-        Iterator<KeyedBossBar> bossBars = Bukkit.getBossBars();
+    private static void performLateCleanUp(Plugin plugin) {
+        var bossBars = Bukkit.getBossBars();
         while (bossBars.hasNext()) {
-            KeyedBossBar bar = bossBars.next();
-            NamespacedKey key = bar.getKey();
-            if (!key.getNamespace().equalsIgnoreCase(instanceOwner.getName())) continue;
+            var bar = bossBars.next();
+            var key = bar.getKey();
+            if (!key.getNamespace().equalsIgnoreCase(plugin.getName())) continue;
             if (key.getKey().startsWith(MessageChannel.KEY_PREFIX)) {
                 logger().config("Removed boss bar with key" + key);
                 bar.removeAll();
@@ -120,20 +86,6 @@ public final class EldoUtilities {
     }
 
     public static void shutdown() {
-        if (delayedActions != null) {
-            delayedActions.shutdown();
-            delayedActions = null;
-        }
-        if (asyncSyncingCallbackExecutor != null) {
-            asyncSyncingCallbackExecutor.shutdown();
-            asyncSyncingCallbackExecutor = null;
-        }
-        if (inventoryActionHandler != null) {
-            inventoryActionHandler = null;
-        }
-        if (conversationRequester != null) {
-            conversationRequester = null;
-        }
     }
 
     public static List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
@@ -144,13 +96,32 @@ public final class EldoUtilities {
 
     public static ConfigFileWrapper getConfiguration() {
         if (configuration == null) {
-            Path config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+            var config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
             configuration = ConfigFileWrapper.forFile(config);
         }
         return configuration;
     }
 
+    public static Plugin getInstanceOwner(Class<? extends Plugin> plugin) {
+        return instanceOwners.get(plugin);
+    }
+
+    public static void forceInstanceOwner(Plugin plugin) {
+        if (mainOwner != null) {
+            throw new IllegalStateException("A instance owner is already set");
+        }
+        mainOwner = plugin;
+    }
+
     public static Plugin getInstanceOwner() {
-        return instanceOwner;
+        if (mainOwner != null) {
+            return mainOwner;
+        }
+
+        for (var entry : instanceOwners.entrySet()) {
+            return entry.getValue();
+        }
+
+        throw new IllegalStateException("No instance owner is set but requested");
     }
 }

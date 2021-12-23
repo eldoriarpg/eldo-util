@@ -1,5 +1,7 @@
 package de.eldoria.eldoutilities.container;
 
+import java.util.Objects;
+
 /**
  * Contains a immutable triple of three values.
  *
@@ -39,5 +41,34 @@ public class Triple<A, B, C> {
      */
     public static <X, Y, Z> Triple<X, Y, Z> of(X x, Y y, Z z) {
         return new Triple<>(x, y, z);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Triple)) return false;
+
+        var triple = (Triple<?, ?, ?>) o;
+
+        if (!Objects.equals(first, triple.first)) return false;
+        if (!Objects.equals(second, triple.second)) return false;
+        return Objects.equals(third, triple.third);
+    }
+
+    @Override
+    public int hashCode() {
+        var result = first != null ? first.hashCode() : 0;
+        result = 31 * result + (second != null ? second.hashCode() : 0);
+        result = 31 * result + (third != null ? third.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Triple{" +
+               "first=" + first +
+               ", second=" + second +
+               ", third=" + third +
+               '}';
     }
 }

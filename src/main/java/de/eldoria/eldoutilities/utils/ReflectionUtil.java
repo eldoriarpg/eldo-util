@@ -27,8 +27,8 @@ public final class ReflectionUtil {
      * @return array of fields
      */
     public static Field[] getAllFields(Class<?> clazz) {
-        Field[] fields = new Field[0];
-        Class<?> currClazz = clazz;
+        var fields = new Field[0];
+        var currClazz = clazz;
         while (currClazz != null) {
             fields = ObjectArrays.concat(fields, currClazz.getDeclaredFields(), Field.class);
             currClazz = currClazz.getSuperclass();

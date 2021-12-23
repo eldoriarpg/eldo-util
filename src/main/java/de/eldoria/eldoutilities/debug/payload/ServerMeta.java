@@ -15,11 +15,11 @@ public final class ServerMeta extends ServerMetaData {
     }
 
     public static ServerMetaData create() {
-        Server server = Bukkit.getServer();
-        String version = server.getVersion();
-        int currentPlayers = server.getOnlinePlayers().size();
-        String[] loadedWorlds = server.getWorlds().stream().map(World::getName).toArray(String[]::new);
-        PluginMeta[] plugins = Arrays.stream(server.getPluginManager().getPlugins())
+        var server = Bukkit.getServer();
+        var version = server.getVersion();
+        var currentPlayers = server.getOnlinePlayers().size();
+        var loadedWorlds = server.getWorlds().stream().map(World::getName).toArray(String[]::new);
+        var plugins = Arrays.stream(server.getPluginManager().getPlugins())
                 .map(PluginMeta::create)
                 .toArray(PluginMeta[]::new);
 

@@ -43,8 +43,8 @@ public class LogMeta extends LogData {
 
 
     private static Pattern getPluginLog(Plugin plugin) {
-        String prefix = plugin.getDescription().getPrefix();
-        String name = prefix != null ? prefix : plugin.getDescription().getName();
+        var prefix = plugin.getDescription().getPrefix();
+        var name = prefix != null ? prefix : plugin.getDescription().getName();
         return Pattern.compile(PLUGIN_LOG.replace("name", name), Pattern.DOTALL + Pattern.MULTILINE);
     }
 
@@ -56,23 +56,23 @@ public class LogMeta extends LogData {
      * @return Log as string.
      */
     public static LogData create(Plugin plugin, DebugSettings settings) {
-        Path root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
-        Path logPath = Paths.get(root.toString(), "logs", "latest.log");
-        File logFile = logPath.toFile();
+        var root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
+        var logPath = Paths.get(root.toString(), "logs", "latest.log");
+        var logFile = logPath.toFile();
 
-        String fullLog = "";
-        String latestLog = "Could not read latest log.";
+        var fullLog = "";
+        var latestLog = "Could not read latest log.";
         Set<String> pluginLog = new LinkedHashSet<>();
 
-        ExceptionPair exceptionPair = new ExceptionPair();
+        var exceptionPair = new ExceptionPair();
 
         if (logFile.exists()) {
             if (logFile.length() / (1024 * 1024) > MAX_LOG_MB) {
                 List<String> start = new LinkedList<>();
-                FixedStack<String> end = new FixedStack<>(MAX_LOG_PART_SIZE);
+                var end = new FixedStack<String>(MAX_LOG_PART_SIZE);
                 // The log seems to be large we will read it partially.
-                int linesReadSinceScan = 0;
-                try (InputStream stream = new FileInputStream(logFile); Scanner reader = new Scanner(stream)) {
+                var linesReadSinceScan = 0;
+                try (InputStream stream = new FileInputStream(logFile); var reader = new Scanner(stream)) {
                     while (reader.hasNext()) {
                         // first we grab the start
                         if (start.size() < MAX_LOG_PART_SIZE) {
@@ -97,20 +97,20 @@ public class LogMeta extends LogData {
                 } catch (IOException e) {
                     plugin.getLogger().log(Level.WARNING, "Could not read log.", e);
                 }
-                String startLog = String.join("\n", start);
-                String endLog = String.join("\n", end.linkedList);
+                var startLog = String.join("\n", start);
+                var endLog = String.join("\n", end.linkedList);
                 latestLog = startLog + "\n\n[...]\n\n" + endLog;
             } else {
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8))) {
-                    List<String> logLines = reader.lines().collect(Collectors.toList());
+                try (var reader = new BufferedReader(new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8))) {
+                    var logLines = reader.lines().collect(Collectors.toList());
                     if (logLines.size() <= MAX_LOG_PART_SIZE * 2) {
                         // We have a small log. We will send it in one part.
                         latestLog = logLines.stream()
                                 .collect(Collectors.joining(System.lineSeparator()));
                     } else {
                         // We have a small log, we will only send start and end
-                        String start = String.join("\n", logLines.subList(0, MAX_LOG_PART_SIZE));
-                        String end = String.join("\n", logLines.subList(logLines.size() - MAX_LOG_PART_SIZE, logLines.size()));
+                        var start = String.join("\n", logLines.subList(0, MAX_LOG_PART_SIZE));
+                        var end = String.join("\n", logLines.subList(logLines.size() - MAX_LOG_PART_SIZE, logLines.size()));
                         latestLog = start + "\n\n[...]\n\n" + end;
                     }
                     exceptionPair.combine(extractExceptions(logLines, plugin));
@@ -121,7 +121,7 @@ public class LogMeta extends LogData {
             }
         }
         latestLog = settings.applyFilter(latestLog);
-        String pluginlogs = settings.applyFilter(String.join("", pluginLog));
+        var pluginlogs = settings.applyFilter(String.join("", pluginLog));
         exceptionPair.applyFilter(settings);
 
         return new LogMeta(latestLog, pluginlogs, exceptionPair.getInternalArray(), exceptionPair.getExternalArray());
@@ -133,24 +133,24 @@ public class LogMeta extends LogData {
 
     private static Set<String> extractPluginLog(String log, Plugin plugin) {
         Set<String> pluginLog = new LinkedHashSet<>();
-        Pattern pluginLogPattern = getPluginLog(plugin);
-        Matcher matcher = pluginLogPattern.matcher(log);
+        var pluginLogPattern = getPluginLog(plugin);
+        var matcher = pluginLogPattern.matcher(log);
         while (matcher.find()) {
-            String match = matcher.group(1);
+            var match = matcher.group(1);
             pluginLog.add("[" + match);
         }
         return pluginLog;
     }
 
     private static ExceptionPair extractExceptions(String log, Plugin plugin) {
-        String[] packages = plugin.getDescription().getMain().split("\\.");
-        String project = String.join(".", Arrays.copyOfRange(packages, 0, Math.min(packages.length, 3)));
+        var packages = plugin.getDescription().getMain().split("\\.");
+        var project = String.join(".", Arrays.copyOfRange(packages, 0, Math.min(packages.length, 3)));
 
         Set<String> external = new LinkedHashSet<>();
         Set<String> internal = new LinkedHashSet<>();
-        Matcher matcher = EXCEPTION.matcher(log);
+        var matcher = EXCEPTION.matcher(log);
         while (matcher.find()) {
-            String match = matcher.group(1);
+            var match = matcher.group(1);
             if (match.contains(project)) {
                 internal.add(match);
             } else {

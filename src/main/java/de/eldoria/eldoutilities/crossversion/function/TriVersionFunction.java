@@ -31,7 +31,7 @@ public class TriVersionFunction<A, B, C, R> {
      * @throws UnsupportedVersionException when no function is defined for the server version.
      */
     public R apply(A a, B b, C c) {
-        TriFunction<A, B, C, R> function = functions.get(ServerVersion.CURRENT_VERSION);
+        var function = functions.get(ServerVersion.CURRENT_VERSION);
         if (function == null) {
             throw new UnsupportedVersionException();
         }

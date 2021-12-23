@@ -22,7 +22,7 @@ public class DefaultAbout extends EldoCommand {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        PluginDescriptionFile descr = getPlugin().getDescription();
+        var descr = getPlugin().getDescription();
         messageSender().sendLocalizedMessage(sender, "about",
                 Replacement.create("PLUGIN_NAME", descr.getName(), 'b'),
                 Replacement.create("AUTHORS", String.join(", ", descr.getAuthors()), 'b'),

@@ -22,7 +22,7 @@ public class DownloadedNotifier extends UpdateNotifier {
     @Override
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        PluginDescriptionFile description = plugin.getDescription();
+        var description = plugin.getDescription();
         // send to operator.
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission(permission)) {
             if (updated) {

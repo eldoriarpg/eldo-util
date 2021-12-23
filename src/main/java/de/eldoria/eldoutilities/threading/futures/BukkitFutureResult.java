@@ -35,7 +35,7 @@ public class BukkitFutureResult<T> implements FutureResult<T> {
 
     @Override
     public void whenComplete(@NotNull Plugin plugin, @NotNull Consumer<? super T> callback, Consumer<Throwable> throwableConsumer) {
-        Executor executor = r -> plugin.getServer().getScheduler().runTask(plugin, r);
+        var executor = (Executor) r -> plugin.getServer().getScheduler().runTask(plugin, r);
         this.future.thenAcceptAsync(callback, executor).exceptionally(throwable -> {
             throwableConsumer.accept(throwable);
             return null;
@@ -44,9 +44,8 @@ public class BukkitFutureResult<T> implements FutureResult<T> {
 
     @Override
     public void whenComplete(@NotNull Plugin plugin, @NotNull Consumer<? super T> callback) {
-        whenComplete(plugin, callback, throwable -> {
-            EldoUtilities.getInstanceOwner().getLogger().log(Level.SEVERE, "Exception in Future Result", throwable);
-        });
+        whenComplete(plugin, callback, throwable ->
+                EldoUtilities.getInstanceOwner().getLogger().log(Level.SEVERE, "Exception in Future Result", throwable));
     }
 
     @Override

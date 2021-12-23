@@ -26,8 +26,8 @@ public final class ArrayUtil {
      * @return matcher instance wich matches the string
      */
     public static Matcher findInArray(String[] strings, Pattern contains) {
-        for (String string : strings) {
-            Matcher matcher = contains.matcher(string);
+        for (var string : strings) {
+            var matcher = contains.matcher(string);
             if (matcher.find()) return matcher;
         }
         return null;
@@ -41,8 +41,8 @@ public final class ArrayUtil {
      * @return true if a match was found
      */
     public static boolean arrayContains(String[] strings, String... values) {
-        for (String string : strings) {
-            for (String contain : values) {
+        for (var string : strings) {
+            for (var contain : values) {
                 if (string.equalsIgnoreCase(contain)) return true;
             }
         }
@@ -57,8 +57,8 @@ public final class ArrayUtil {
      * @return true if a match was found
      */
     public static boolean arrayContains(char[] chars, char... values) {
-        for (char character : chars) {
-            for (char contain : values) {
+        for (var character : chars) {
+            for (var contain : values) {
                 if (character == contain) return true;
             }
         }
@@ -73,8 +73,8 @@ public final class ArrayUtil {
      * @return one array
      */
     public static String[] combineArrays(String[] array, String[]... arrays) {
-        String[] result = array;
-        for (String[] arr : arrays) {
+        var result = array;
+        for (var arr : arrays) {
             result = ObjectArrays.concat(arr, result, String.class);
         }
         return result;
@@ -89,9 +89,10 @@ public final class ArrayUtil {
      * @param <T>    type of array
      * @return one array
      */
+    @SafeVarargs
     public static <T> T[] combineArrays(Class<T> clazz, T[] array, T[]... arrays) {
-        T[] result = array;
-        for (T[] arr : arrays) {
+        var result = array;
+        for (var arr : arrays) {
             result = ObjectArrays.concat(arr, result, clazz);
         }
         return result;

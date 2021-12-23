@@ -389,7 +389,7 @@ public final class MessageSender {
      * @since 1.3.0
      */
     public <T extends ChannelData> void send(MessageChannel<T> channel, MessageType type, CommandSender target, String message, @Nullable T data) {
-        String coloredMessage = type.forceColor(message);
+        var coloredMessage = type.forceColor(message);
         coloredMessage = channel.addPrefix(coloredMessage, prefix);
         if (data != null) {
             data.formatText(type, channel, prefix);

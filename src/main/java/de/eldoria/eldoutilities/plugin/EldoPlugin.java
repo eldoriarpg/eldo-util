@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -42,10 +44,8 @@ import java.util.logging.Logger;
  *
  * @since 1.1.0
  */
-public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
+public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     private static EldoPlugin instance;
-    private PluginManager pluginManager;
-    private BukkitScheduler scheduler;
     private DebugLogger debugLogger;
     private FailsaveCommand failcmd;
     private ReloadListener reloadListener;
@@ -61,7 +61,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     private static void registerSelf(EldoPlugin eldoPlugin) {
         instance = eldoPlugin;
-        for (Class<? extends ConfigurationSerializable> clazz : eldoPlugin.getConfigSerialization()) {
+        for (var clazz : eldoPlugin.getConfigSerialization()) {
             ConfigurationSerialization.registerClass(clazz);
         }
         EldoUtilities.preWarm(instance);
@@ -77,6 +77,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     }
 
     @Override
+    @NotNull
     public Logger getLogger() {
         if (debugLogger == null) {
             debugLogger = new DebugLogger(this, super.getLogger());
@@ -85,8 +86,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         return debugLogger;
     }
 
-    protected void setLoggerLevel() {
-        getLogger().setLevel(EldoConfig.getLogLevel());
+    protected final void setLoggerLevel() {
+        getLogger().setLevel(EldoConfig.getLogLevel(this));
     }
 
     /**
@@ -97,13 +98,24 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param command     name of command
      * @param tabExecutor command executor
      */
-    public void registerCommand(String command, TabExecutor tabExecutor) {
-        PluginCommand cmd = getCommand(command);
+    public final void registerCommand(String command, TabExecutor tabExecutor) {
+        var cmd = getCommand(command);
         if (cmd != null) {
             cmd.setExecutor(tabExecutor);
             return;
         }
         getLogger().warning("Command " + command + " not found!");
+    }
+
+    /**
+     * Register a advanced command.
+     * <p>
+     * This will register a command exector for the toplevel command.
+     *
+     * @param command command
+     */
+    public final void registerCommand(AdvancedCommand command) {
+        registerCommand(command.meta().name(), command);
     }
 
     /**
@@ -114,7 +126,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param command  name of command
      * @param executor command executor
      */
-    public void registerCommand(String command, AdvancedCommand executor) {
+    public final void registerCommand(String command, AdvancedCommand executor) {
         registerCommand(command, AdvancedCommandAdapter.wrap(this, executor));
     }
 
@@ -123,8 +135,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @param listener listener to register
      */
-    public void registerListener(Listener... listener) {
-        for (Listener l : listener) {
+    public final void registerListener(Listener... listener) {
+        for (var l : listener) {
             getPluginManager().registerEvents(l, this);
         }
     }
@@ -138,7 +150,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param period Period in server ticks of the task
      * @return Task id number (-1 if scheduling failed)
      */
-    public int scheduleRepeatingTask(Runnable task, int period) {
+    public final int scheduleRepeatingTask(Runnable task, int period) {
         return scheduleRepeatingTask(task, 100, period);
     }
 
@@ -152,7 +164,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      * @param period Period in server ticks of the task
      * @return Task id number (-1 if scheduling failed)
      */
-    public int scheduleRepeatingTask(Runnable task, int delay, int period) {
+    public final int scheduleRepeatingTask(Runnable task, int delay, int period) {
         return getScheduler().scheduleSyncRepeatingTask(this, task, delay, period);
     }
 
@@ -161,11 +173,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @return plugin manager
      */
-    public PluginManager getPluginManager() {
-        if (pluginManager == null) {
-            pluginManager = getServer().getPluginManager();
-        }
-        return pluginManager;
+    public final PluginManager getPluginManager() {
+        return getServer().getPluginManager();
     }
 
     /**
@@ -173,11 +182,8 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
      *
      * @return scheduler instance
      */
-    public BukkitScheduler getScheduler() {
-        if (scheduler == null) {
-            scheduler = getServer().getScheduler();
-        }
-        return scheduler;
+    public final BukkitScheduler getScheduler() {
+        return getServer().getScheduler();
     }
 
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
@@ -200,50 +206,64 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
 
     @Override
     public final void onEnable() {
-        boolean reload = isLocked();
+        var start = Instant.now();
+        var reload = isLocked();
         if (reload) {
             try {
                 logger().config("Detected plugin reload.");
                 onReload();
             } catch (Throwable e) {
                 initFailsave("Plugin failed to reload.", e);
+                return;
             }
         }
         reloadListener = new ReloadListener();
         registerListener(reloadListener);
         EldoUtilities.ignite(instance);
         try {
-            logger().config("Detected initial plugin enable.");
+            if (!reload) {
+                logger().config("Detected initial plugin enable.");
+            }
             onPluginEnable(reload);
+            onPluginEnable();
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
-            for (String cmd : getDescription().getCommands().keySet()) {
+            for (var cmd : getDescription().getCommands().keySet()) {
                 try {
                     registerCommand(cmd, failcmd);
                 } catch (Throwable ex) {
                     logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
                 }
             }
+            return;
         }
         logger().config("Scheduling post startup");
         new BukkitRunnable() {
             @Override
             public void run() {
+                var start = Instant.now();
                 try {
                     onPostStart(reload);
+                    onPostStart();
                 } catch (Throwable e) {
                     initFailsave("Plugin post start failed.", e);
+                    return;
                 }
+                var until = start.until(Instant.now(), ChronoUnit.MILLIS);
+                logger().info("Post startup done. Required " + until + " ms.");
+
             }
         }.runTaskLater(this, 1);
         removeLock();
+        var until = start.until(Instant.now(), ChronoUnit.MILLIS);
+        logger().info("Enabled. Required " + until + " ms.");
     }
 
     private void initFailsave(String message, Throwable e) {
         logger().log(Level.SEVERE, message, e);
         logger().log(Level.SEVERE, "Initializing failsave mode.");
-        FailsaveCommand failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
-        for (String cmd : getDescription().getCommands().keySet()) {
+        var failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        for (var cmd : getDescription().getCommands().keySet()) {
             try {
                 registerCommand(cmd, failcmd);
             } catch (Throwable ex) {
@@ -252,17 +272,13 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
         }
     }
 
-    private void onReload() {
-        try {
-            logger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
-            logger().severe("Detected server reload.");
-            logger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
-            logger().severe("Please do not report any bugs caused by reloading the server.");
-            logger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
-            onPluginReload();
-        } catch (Throwable e) {
-            initFailsave("Plugin failed to reload.", e);
-        }
+    private void onReload() throws Throwable {
+        logger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
+        logger().severe("Detected server reload.");
+        logger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
+        logger().severe("Please do not report any bugs caused by reloading the server.");
+        logger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
+        onPluginReload();
     }
 
     public void onPluginReload() throws Throwable {
@@ -271,17 +287,29 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     /**
      * Called when the server has started completely.
      *
-     * @param reload
+     * @param reload indicated that the call was caused by a server reload
      */
     public void onPostStart(boolean reload) throws Throwable {
     }
 
     /**
+     * Called when the server has started completely.
+     */
+    public void onPostStart() throws Throwable {
+    }
+
+    /**
      * Called when this plugin is enabled
      *
-     * @param reload
+     * @param reload indicated that the call was caused by a server reload
      */
     public void onPluginEnable(boolean reload) throws Throwable {
+    }
+
+    /**
+     * Called when this plugin is enabled
+     */
+    public void onPluginEnable() throws Throwable {
     }
 
     @Override
@@ -334,7 +362,7 @@ public class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return failcmd.onCommand(sender, command, label, args);
     }
 

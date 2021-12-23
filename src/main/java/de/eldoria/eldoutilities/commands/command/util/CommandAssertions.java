@@ -10,6 +10,8 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
@@ -55,10 +57,27 @@ public final class CommandAssertions {
      * @throws CommandException when the arguments are not sufficient.
      */
     public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args) throws CommandException {
-        long required = Arrays.stream(args).filter(Argument::isRequired).count();
-        String argumentString = Arrays.stream(args).map(arg -> String.format(arg.isRequired() ? "<%s>" : "[%s]", arg.name())).collect(Collectors.joining(" "));
+        var required = Arrays.stream(args).filter(Argument::isRequired).count();
+        var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString).addFormatting('6'));
+    }
+
+    /**
+     * Checks that the arguments have the required length.
+     * 
+     * This method will not create a command call chain.
+     *
+     * @param args      arguments
+     * @param arguments arguments which are required and optional in correct order
+     * @throws CommandException when the arguments are not sufficient.
+     * @see CommandAssertions#invalidArguments(CommandMeta, String[]) 
+     */
+    public static void invalidArguments(Arguments arguments, Argument... args) throws CommandException {
+        var required = Arrays.stream(args).filter(Argument::isRequired).count();
+        var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
+        isFalse(arguments.size() < required, "error.invalidArguments",
+                Replacement.create("SYNTAX", argumentString).addFormatting('6'));
     }
 
     /**
@@ -89,7 +108,7 @@ public final class CommandAssertions {
      * @throws CommandException when the sender is not listed
      */
     public static void sender(CommandSender sender, CommandMeta meta) throws CommandException {
-        for (Class<? extends CommandSender> clazz : meta.allowedSender()) {
+        for (var clazz : meta.allowedSender()) {
             if (sender.getClass().isInstance(clazz)) return;
         }
         throw CommandException.message("Invalid sender");
@@ -104,14 +123,26 @@ public final class CommandAssertions {
      * @throws CommandException when the user has none of the required permissions
      */
     public static void permission(CommandSender sender, CommandMeta meta, boolean silent) throws CommandException {
-        if (meta.permissions().isEmpty()) return;
-        for (String permission : meta.permissions()) {
+        permission(sender, silent, meta.permissions().toArray(new String[0]));
+    }
+
+    /**
+     * Checks if the user has at least one of the permissions in {@link CommandMeta#permissions()}.
+     *
+     * @param sender      sender
+     * @param silent      true if the permission error should not be reported
+     * @param permissions permissions to check
+     * @throws CommandException when the user has none of the required permissions
+     */
+    public static void permission(CommandSender sender, boolean silent, String... permissions) throws CommandException {
+        if (permissions.length == 0) return;
+        for (var permission : permissions) {
             if (sender.hasPermission(permission)) return;
         }
         if (silent) {
             throw CommandException.silent();
         }
-        throw CommandException.message("error.permission", Replacement.create("permission", meta.permissions()));
+        throw CommandException.message("error.permission", Replacement.create("permission", String.join(", ", permissions)));
     }
 
     /**
@@ -227,6 +258,10 @@ public final class CommandAssertions {
 
     public static void missingArgument(String[] args, int index) throws CommandException {
         isTrue(args.length > index, "error.missingArgument", Replacement.create("index", index));
+    }
+
+    public static void missingArgument(Collection<?> args, int index) throws CommandException {
+        isTrue(args.size()> index, "error.missingArgument", Replacement.create("index", index));
     }
 
     /**

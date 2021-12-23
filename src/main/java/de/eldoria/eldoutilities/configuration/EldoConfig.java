@@ -12,19 +12,19 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  * @since 1.1.0
  */
 public abstract class EldoConfig {
-    private static final Map<Class<? extends Plugin>, EldoConfig> PLUGIN_MAIN_CONFIGS = new HashMap<>();
+    private static final Map<Plugin, EldoConfig> INSTANCE_CONFIG = new HashMap<>();
     protected final Plugin plugin;
     private final Path pluginData;
     private final Map<String, FileConfiguration> configs = new HashMap<>();
@@ -44,8 +44,9 @@ public abstract class EldoConfig {
 
     public EldoConfig(Plugin plugin) {
         this.plugin = plugin;
+        INSTANCE_CONFIG.putIfAbsent(plugin, this);
         pluginData = plugin.getDataFolder().toPath();
-        PLUGIN_MAIN_CONFIGS.putIfAbsent(plugin.getClass(), this);
+        config = plugin.getConfig();
         plugin.saveDefaultConfig();
         // TODO: This is just here for backwards compatibility reasons after a stupid choice
         ConfigurationSerialization.registerClass(MapEntry.class, "eldoUtilitiesMapEntry");
@@ -63,13 +64,13 @@ public abstract class EldoConfig {
      *
      * @return true if plugin is in debug state.
      */
-    public static Level getLogLevel() {
-        return ObjUtil.nonNull(EldoUtilities.getInstanceOwner(), instance -> {
+    public static Level getLogLevel(Plugin plugin) {
+        return ObjUtil.nonNull(EldoUtilities.getInstanceOwner(plugin.getClass()), instance -> {
             // we probably want to load the config before the plugin is enabled.
             // Since we use the configuration serializable we cant load the config directly if the plugin is not enabled.
             String debug;
             if (!instance.isEnabled()) {
-                File dataFolder = instance.getDataFolder();
+                var dataFolder = instance.getDataFolder();
                 String config;
                 try {
                     config = Files.readAllLines(Paths.get(dataFolder.getAbsolutePath(), "config.yml")).stream().collect(Collectors.joining("\n"));
@@ -80,8 +81,8 @@ public abstract class EldoConfig {
                     Bukkit.getLogger().log(Level.INFO, "[EldoUtilities] Could not load config file. Using default log level.");
                     return Level.INFO;
                 }
-                Pattern compile = Pattern.compile("^debug:.?([a-zA-Z].*?)$", Pattern.MULTILINE);
-                Matcher matcher = compile.matcher(config);
+                var compile = Pattern.compile("^debug:.?([a-zA-Z].*?)$", Pattern.MULTILINE);
+                var matcher = compile.matcher(config);
                 if (matcher.find()) {
                     debug = matcher.group(1);
                 } else {
@@ -91,7 +92,7 @@ public abstract class EldoConfig {
                 debug = instance.getConfig().getString("debug", "INFO");
                 instance.saveConfig();
             }
-            Optional<Boolean> aBoolean = Parser.parseBoolean(debug);
+            var aBoolean = Parser.parseBoolean(debug);
             if (aBoolean.isPresent()) {
                 debug = aBoolean.get() ? "DEBUG" : "INFO";
                 if (instance.isEnabled()) {
@@ -139,18 +140,6 @@ public abstract class EldoConfig {
     }
 
     /**
-     * Get the main config.
-     * <p>
-     * Also refered as the config.yml
-     *
-     * @param clazz class of plugin to retrieve the main config
-     * @return file configuration for the main config.
-     */
-    public static EldoConfig getMainConfig(Class<? extends Plugin> clazz) {
-        return PLUGIN_MAIN_CONFIGS.get(clazz);
-    }
-
-    /**
      * Saves the config to disk.
      */
     public final void save() {
@@ -192,11 +181,42 @@ public abstract class EldoConfig {
     }
 
     private void readConfigs() {
-        plugin.reloadConfig();
-        config = plugin.getConfig();
+        try {
+            plugin.saveDefaultConfig();
+            plugin.reloadConfig();
+            config = plugin.getConfig();
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load config.yml.", e);
+            backupAndRemoveCorruptedFile(plugin.getDataFolder().toPath().resolve("config.yml"));
+            readConfigs();
+        }
         setIfAbsent("debug", "INFO");
-        for (Map.Entry<String, FileConfiguration> entry : configs.entrySet()) {
+        for (var entry : configs.entrySet()) {
             loadConfig(Paths.get(entry.getKey()), null, true);
+        }
+    }
+
+    private void backupAndRemoveCorruptedFile(Path path) {
+        var time = DateTimeFormatter.ofPattern("yyMMddHHmmss").format(LocalDateTime.now());
+        var matcher = Pattern.compile("(?<name>.*)\\.(?<type>.+?)$").matcher(path.getFileName().toString());
+        String name;
+        if (matcher.find()) {
+            name = String.format("%s-%s.%s", matcher.group("name"), time, matcher.group("type"));
+        } else {
+            plugin.getLogger().severe("Could not determine file type.");
+            name = path.getFileName() + time + ".backup";
+        }
+        var newLoc = path.getParent().resolve(name);
+        plugin.getLogger().warning("Attempting to backup " + path + " to " + newLoc);
+        try {
+            Files.copy(path, newLoc, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not create backup.", e);
+        }
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not remove old file.");
         }
     }
 
@@ -244,7 +264,7 @@ public abstract class EldoConfig {
      * @throws ExternalConfigException When load config is invoked on a eldo config which is not the main config.
      */
     protected final FileConfiguration loadConfig(String path, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
-        Path configPath = Paths.get(pluginData.toString(), path + ".yml");
+        var configPath = Paths.get(pluginData.toString(), path + ".yml");
         return loadConfig(configPath, defaultCreator, reload);
     }
 
@@ -257,8 +277,18 @@ public abstract class EldoConfig {
      * @throws ExternalConfigException When load config is invoked on a eldo config which is not the main config.
      */
     protected final FileConfiguration loadConfig(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
+        try {
+            return loadConfigWrapped(Paths.get(configPath.toString()), null, true);
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Failed to load " + configPath, e);
+            backupAndRemoveCorruptedFile(configPath);
+            return loadConfig(configPath, defaultCreator, reload);
+        }
+    }
+
+    private FileConfiguration loadConfigWrapped(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
         validateMainConfigEntry();
-        File configFile = configPath.toFile();
+        var configFile = configPath.toFile();
 
         try {
             Files.createDirectories(configPath.getParent());
@@ -275,7 +305,7 @@ public abstract class EldoConfig {
                 return null;
             }
 
-            YamlConfiguration config = YamlConfiguration.loadConfiguration(configFile);
+            var config = YamlConfiguration.loadConfiguration(configFile);
 
             ObjUtil.nonNull(defaultCreator, d -> {
                 d.accept(config);
@@ -298,8 +328,8 @@ public abstract class EldoConfig {
 
     private void writeConfigs() {
         plugin.saveConfig();
-        for (Map.Entry<String, FileConfiguration> entry : configs.entrySet()) {
-            File file = Paths.get(entry.getKey()).toFile();
+        for (var entry : configs.entrySet()) {
+            var file = Paths.get(entry.getKey()).toFile();
             if (!file.exists()) {
                 try {
                     Files.createFile(file.toPath());
@@ -328,8 +358,8 @@ public abstract class EldoConfig {
      *
      * @return file configuration for the main config.
      */
-    public final EldoConfig getMainConfig() {
-        return PLUGIN_MAIN_CONFIGS.get(plugin.getClass());
+    public static EldoConfig getMainConfig(Plugin plugin) {
+        return INSTANCE_CONFIG.get(plugin);
     }
 
     /**
@@ -365,7 +395,7 @@ public abstract class EldoConfig {
 
     public Map<String, FileConfiguration> getConfigs() {
         Map<String, FileConfiguration> configs = new LinkedHashMap<>();
-        configs.put(Paths.get(plugin.getDataFolder().toPath().toString(), "config.yml").toString(), getMainConfig().getConfig());
+        configs.put(Paths.get(plugin.getDataFolder().toPath().toString(), "config.yml").toString(), getMainConfig(plugin).getConfig());
         configs.putAll(this.configs);
         return configs;
     }
@@ -379,7 +409,7 @@ public abstract class EldoConfig {
     }
 
     public boolean isMainConfig() {
-        return PLUGIN_MAIN_CONFIGS.get(plugin.getClass()) == this;
+        return INSTANCE_CONFIG.get(plugin) == this;
     }
 
     private void validateMainConfigEntry() {

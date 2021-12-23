@@ -83,9 +83,9 @@ public final class SerializationUtil {
      * @since 1.1.0
      */
     public static Map<String, Object> objectToMap(Object obj) {
-        Builder builder = newBuilder();
-        Field[] declaredFields = ReflectionUtil.getAllFields(obj);
-        for (Field declaredField : declaredFields) {
+        var builder = newBuilder();
+        var declaredFields = ReflectionUtil.getAllFields(obj);
+        for (var declaredField : declaredFields) {
             declaredField.setAccessible(true);
             if (!Modifier.isTransient(declaredField.getModifiers())) {
                 try {
@@ -111,8 +111,8 @@ public final class SerializationUtil {
      * @since 1.1.0
      */
     public static <T> void mapOnObject(Map<String, Object> objectMap, T obj) {
-        Field[] declaredFields = ReflectionUtil.getAllFields(obj);
-        for (Field declaredField : declaredFields) {
+        var declaredFields = ReflectionUtil.getAllFields(obj);
+        for (var declaredField : declaredFields) {
             declaredField.setAccessible(true);
             if (!Modifier.isTransient(declaredField.getModifiers())) {
                 if (!objectMap.containsKey(declaredField.getName())) continue;

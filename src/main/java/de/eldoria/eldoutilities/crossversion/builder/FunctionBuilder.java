@@ -27,7 +27,7 @@ public class FunctionBuilder<A, R> {
      * @return builder instance with function applied for versions
      */
     public FunctionBuilder<A, R> addVersionFunction(Function<A, R> function, ServerVersion... version) {
-        for (ServerVersion serverVersion : version) {
+        for (var serverVersion : version) {
             functions.put(serverVersion, function);
         }
         return this;

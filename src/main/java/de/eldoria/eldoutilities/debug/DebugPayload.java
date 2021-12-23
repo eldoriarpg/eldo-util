@@ -36,11 +36,11 @@ public final class DebugPayload extends DebugPayloadData {
      * @return debug payload data
      */
     public static DebugPayloadData create(Plugin plugin, DebugSettings settings) {
-        PluginMetaData pluginMeta = PluginMeta.create(plugin);
-        ServerMetaData serverMeta = ServerMeta.create();
-        EntryData[] additionalPluginMeta = DebugUtil.getAdditionalPluginMeta(plugin);
-        LogData latestLog = LogMeta.create(plugin, settings);
-        EntryData[] configDumps = ConfigDump.create(plugin, settings);
+        var pluginMeta = PluginMeta.create(plugin);
+        var serverMeta = ServerMeta.create();
+        var additionalPluginMeta = DebugUtil.getAdditionalPluginMeta(plugin);
+        var latestLog = LogMeta.create(plugin, settings);
+        var configDumps = ConfigDump.create(plugin, settings);
         return new DebugPayload(pluginMeta, serverMeta, additionalPluginMeta, latestLog, configDumps);
     }
 }

@@ -32,7 +32,7 @@ public final class ArgumentUtils {
      * @return string at index or default value if the index does not exists.
      */
     public static String getOrDefault(String[] arguments, int index, String defaultValue) {
-        String arg = get(arguments, index);
+        var arg = get(arguments, index);
         return arg == null ? defaultValue : arg;
     }
 
@@ -47,7 +47,7 @@ public final class ArgumentUtils {
      * @return string at index or default value if the index does not exists.
      */
     public static <T> T getOrDefault(String[] arguments, int index, Function<String, T> parse, T defaultValue) {
-        String s = get(arguments, index);
+        var s = get(arguments, index);
 
         if (s == null) {
             return defaultValue;
@@ -95,7 +95,7 @@ public final class ArgumentUtils {
      * @return parsed string value at index or default value if the index does not exists
      */
     public static <T> T getOptionalParameter(String[] arguments, int index, T defaultValue, Function<String, T> parse) {
-        String arg = get(arguments, index);
+        var arg = get(arguments, index);
         if (arg == null) return defaultValue;
         return parse.apply(arg);
     }
@@ -124,11 +124,11 @@ public final class ArgumentUtils {
      * @return range as string
      */
     public static String getRangeAsString(String delimiter, String[] source, int from, int to) {
-        int finalTo = to;
+        var finalTo = to;
         if (to < 1) {
             finalTo = source.length + to;
         }
-        int finalFrom = from;
+        var finalFrom = from;
         if (from < 0) {
             finalFrom = source.length + from;
         }
@@ -196,8 +196,8 @@ public final class ArgumentUtils {
     public static String[] parseQuotedArgs(String[] args) {
         List<String> currArgs = new ArrayList<>();
         List<String> currArg = new ArrayList<>();
-        boolean open = false;
-        for (String arg : args) {
+        var open = false;
+        for (var arg : args) {
             if (arg.startsWith("\"") && arg.endsWith("\"")) {
                 currArgs.add(arg.replace("\"", ""));
                 continue;
@@ -234,6 +234,17 @@ public final class ArgumentUtils {
     public static String getMessage(String[] strings, int from) {
         return getMessage(strings, from, 0);
     }
+    /**
+     * Get a message from string array from 'from' to array.length().
+     *
+     * @param strings array of strings.
+     * @param from    start index (included). Use negative counts to count from the last index.
+     *
+     * @return array sequence as string
+     */
+    public static String getMessage(List<String> strings, int from) {
+        return getMessage(strings.toArray(new String[0]), from, 0);
+    }
 
     /**
      * Get a message from string array from 'from' to 'to'.
@@ -246,6 +257,19 @@ public final class ArgumentUtils {
      */
     public static String getMessage(String[] strings, int from, int to) {
         return TextFormatting.getRangeAsString(" ", strings, from, to);
+    }
+
+    /**
+     * Get a message from string array from 'from' to 'to'.
+     *
+     * @param strings array of strings.
+     * @param from    start index (included). Use negative counts to count from the last index.
+     * @param to      end index (excluded). Use negative counts to count from the last index.
+     *
+     * @return array sequence as string
+     */
+    public static String getMessage(List<String> strings, int from, int to) {
+        return TextFormatting.getRangeAsString(" ", strings.toArray(new String[0]), from, to);
     }
 
     /**
@@ -299,11 +323,11 @@ public final class ArgumentUtils {
      * @return sublist.
      */
     public static <T> List<T> getRangeAsList(List<T> objects, int from, int to) {
-        int finalTo = to;
+        var finalTo = to;
         if (to < 1) {
             finalTo = objects.size() + to;
         }
-        int finalFrom = from;
+        var finalFrom = from;
         if (from < 0) {
             finalFrom = objects.size() + from;
         }

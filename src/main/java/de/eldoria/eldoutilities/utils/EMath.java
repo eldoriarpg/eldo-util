@@ -71,7 +71,7 @@ public final class EMath {
      */
     public static float diff(float a, float b) {
         if (a <= 0 && b <= 0 || a > 0 && b > 0) {
-            Pair<Float, Float> values = compareValues(abs(a), abs(b));
+            var values = compareValues(abs(a), abs(b));
 
             return values.second - values.first;
         }
@@ -88,7 +88,7 @@ public final class EMath {
      */
     public static double diff(double a, double b) {
         if (a <= 0 && b <= 0 || a > 0 && b > 0) {
-            Pair<Double, Double> values = compareValues(abs(a), abs(b));
+            var values = compareValues(abs(a), abs(b));
 
             return values.second - values.first;
         }
@@ -106,7 +106,7 @@ public final class EMath {
      */
     public static int diff(int a, int b) {
         if ((a <= 0) == (b <= 0)) {
-            Pair<Integer, Integer> values = compareValues(abs(a), abs(b));
+            var values = compareValues(abs(a), abs(b));
 
             return values.second - values.first;
         }
@@ -232,12 +232,12 @@ public final class EMath {
      * @return Returns a float which contains the value of the curve at the point x
      */
     public static double smoothCurveValue(Pair<Double, Double> start, Pair<Double, Double> end, double x) {
-        double length = diff(start.first, end.first);
-        double height = diff(start.second, end.second);
-        double lengthHalf = start.first + length / 2;
+        var length = diff(start.first, end.first);
+        var height = diff(start.second, end.second);
+        var lengthHalf = start.first + length / 2;
         double heightHalf;
 
-        CurveType type = start.second < end.second ? CurveType.ASCENDING : CurveType.DESCENDING;
+        var type = start.second < end.second ? CurveType.ASCENDING : CurveType.DESCENDING;
 
         switch (type) {
             case ASCENDING:

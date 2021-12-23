@@ -21,7 +21,7 @@ public class SampleImplementation {
         // Constructor to map the map on your object
         // This constructor is called by bukkit to deserialize your object.
         public SerializableClass(Map<String, Object> objectMap) {
-            TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+            var map = SerializationUtil.mapOf(objectMap);
             // We use the default value from above as a default value.
             // This way we dont have to care about missing keys.
             someInt = map.getValueOrDefault("someInt", someInt);
@@ -42,12 +42,12 @@ public class SampleImplementation {
     }
 
     @SerializableAs("NestedClass")
-    public class NestedClass implements ConfigurationSerializable {
+    public static class NestedClass implements ConfigurationSerializable {
         private String someString = "Amazing";
         private String someOtherString = "Much default";
 
         public NestedClass(Map<String, Object> objectMap) {
-            TypeResolvingMap map = SerializationUtil.mapOf(objectMap);
+            var map = SerializationUtil.mapOf(objectMap);
             someString = map.getValueOrDefault("someInt", someString);
             someOtherString = map.getValueOrDefault("someInt", someOtherString);
         }

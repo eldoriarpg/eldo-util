@@ -23,13 +23,13 @@ public class DebugLogger extends Logger {
         // we still want to use our debugger. so we dont really care about what we are doing here.
         super(plugin.getName(), null);
         this.logger = logger;
-        setLevel(EldoConfig.getLogLevel());
+        setLevel(EldoConfig.getLogLevel(plugin));
         log(getLevel(), "Debug logger initialized. Log Level: " + getLevel().getName());
     }
 
     @Override
     public void log(LogRecord record) {
-        int level = record.getLevel().intValue();
+        var level = record.getLevel().intValue();
         // check if the level is lover than info.
         // if thats the case we need to change it.
         if (level < 800) {

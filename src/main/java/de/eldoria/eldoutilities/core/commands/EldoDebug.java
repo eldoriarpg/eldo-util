@@ -41,7 +41,7 @@ public class EldoDebug extends EldoCommand {
 
         @NotNull Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
         Plugin plugin = null;
-        for (Plugin pl : plugins) {
+        for (var pl : plugins) {
             if (pl.getName().equalsIgnoreCase(args[0])) {
                 plugin = pl;
                 break;

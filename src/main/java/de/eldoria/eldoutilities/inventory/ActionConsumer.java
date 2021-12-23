@@ -28,7 +28,7 @@ public final class ActionConsumer {
      */
     public static Consumer<InventoryClickEvent> getIntRange(NamespacedKey key, int min, int max) {
         return clickEvent -> {
-            int amount = 0;
+            var amount = 0;
             switch (clickEvent.getClick()) {
                 case LEFT:
                     amount = 1;
@@ -55,7 +55,7 @@ public final class ActionConsumer {
                     return;
             }
 
-            int finalAmount = amount;
+            var finalAmount = amount;
             int curr = DataContainerUtil.compute(clickEvent.getCurrentItem(), key, PersistentDataType.INTEGER,
                     integer -> EMath.clamp(min, max, integer + finalAmount));
             ItemStackBuilder.of(clickEvent.getCurrentItem(), false).withLore(String.valueOf(curr));
@@ -99,7 +99,7 @@ public final class ActionConsumer {
                     return;
             }
 
-            double finalAmount = amount;
+            var finalAmount = amount;
             double curr = DataContainerUtil.compute(clickEvent.getCurrentItem(), key, PersistentDataType.DOUBLE,
                     integer -> EMath.clamp(min, max, integer + finalAmount));
             ItemStackBuilder.of(clickEvent.getCurrentItem(), false).withLore(String.format("%.2f", curr));
@@ -133,14 +133,13 @@ public final class ActionConsumer {
                     return;
             }
 
-            Byte curr = DataContainerUtil.compute(
+            var curr = DataContainerUtil.compute(
                     clickEvent.getCurrentItem(),
                     key,
                     PersistentDataType.BYTE,
                     aByte -> DataContainerUtil.booleanToByte(!DataContainerUtil.byteToBoolean(aByte)));
-            boolean b = DataContainerUtil.byteToBoolean(curr);
+            var b = DataContainerUtil.byteToBoolean(curr);
             ItemStackBuilder.of(clickEvent.getCurrentItem(), false).withLore(b ? "§2true" : "§cfalse");
         };
     }
 }
-

@@ -87,7 +87,7 @@ public final class ItemStackBuilder {
      * @return builder instance
      */
     public ItemStackBuilder withMetaValue(Consumer<@NotNull ItemMeta> itemMetaConsumer) {
-        ItemMeta meta = itemStack.getItemMeta();
+        var meta = itemStack.getItemMeta();
         ObjUtil.nonNull(meta, itemMetaConsumer);
         itemStack.setItemMeta(meta);
         return this;
@@ -344,7 +344,7 @@ public final class ItemStackBuilder {
      */
     @SuppressWarnings("unchecked")
     public <T extends ItemMeta> ItemStackBuilder withMetaValue(Class<T> clazz, Consumer<@NotNull T> consumer) {
-        ItemMeta itemMeta = itemStack.getItemMeta();
+        var itemMeta = itemStack.getItemMeta();
         ObjUtil.nonNull(itemMeta, m -> {
             if (clazz.isAssignableFrom(m.getClass())) {
                 consumer.accept((T) m);

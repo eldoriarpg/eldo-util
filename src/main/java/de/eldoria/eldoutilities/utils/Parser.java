@@ -78,16 +78,16 @@ public final class Parser {
      * @return time as ticks or null if value could not be parsed.
      */
     public static OptionalInt parseTimeToTicks(String s) {
-        String[] split = s.split(":");
+        var split = s.split(":");
         if (split.length != 2) return OptionalInt.empty();
-        Optional<Integer> hour = parseInt(split[0]);
-        Optional<Integer> min = parseInt(split[1]);
+        var hour = parseInt(split[0]);
+        var min = parseInt(split[1]);
 
         if (!hour.isPresent() || !min.isPresent()) return OptionalInt.empty();
 
-        int hourTicks = (hour.get() - 6) * 1000 % 24000;
+        var hourTicks = (hour.get() - 6) * 1000 % 24000;
         if (hourTicks < 0) hourTicks = 24000 + hourTicks;
-        int minTicks = (int) Math.floor(1000 / 60d * min.get());
+        var minTicks = (int) Math.floor(1000 / 60d * min.get());
 
         return OptionalInt.of(hourTicks + minTicks);
     }
@@ -99,9 +99,9 @@ public final class Parser {
      * @return ticks as time
      */
     public static String parseTicksToTime(long ticks) {
-        long time = ticks % 24000;
-        int hours = ((int) Math.floor(time / 1000d) + 6) % 24;
-        int min = (int) Math.floor(((time % 1000) + 1) / (1000 / 60d));
+        var time = ticks % 24000;
+        var hours = ((int) Math.floor(time / 1000d) + 6) % 24;
+        var min = (int) Math.floor(((time % 1000) + 1) / (1000 / 60d));
         if (min < 10) return hours + ":0" + min;
         return hours + ":" + min;
     }
