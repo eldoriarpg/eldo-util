@@ -8,8 +8,8 @@ plugins {
 }
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
-version = "1.12.10"
-val shadebade = group as String? + "." + mainPackage + "."
+val shadebase = group as String? + "." + mainPackage + "."
+version = "1.13.0"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains{
