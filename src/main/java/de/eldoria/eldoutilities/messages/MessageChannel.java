@@ -1,21 +1,25 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ */
+
 package de.eldoria.eldoutilities.messages;
 
-import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.messages.channeldata.BossBarData;
 import de.eldoria.eldoutilities.messages.channeldata.ChannelData;
 import de.eldoria.eldoutilities.messages.channeldata.TitleData;
-import de.eldoria.eldoutilities.utils.ObjUtil;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public interface MessageChannel<T extends ChannelData> {
@@ -25,6 +29,11 @@ public interface MessageChannel<T extends ChannelData> {
      * Default implementation for a chat message
      */
     MessageChannel<? extends ChannelData> CHAT = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "CHAT";
+        }
+
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             target.sendMessage(message);
@@ -39,61 +48,99 @@ public interface MessageChannel<T extends ChannelData> {
     /**
      * Default implementation for a title message
      */
-    MessageChannel<TitleData> TITLE = (message, sender, target, data) -> {
-        var titleData = data;
-        if (titleData == null) titleData = TitleData.DEFAULT;
-        if (target instanceof Player) {
-            ((Player) target).sendTitle(message, titleData.getOtherLine(), titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
-        } else {
-            sender.send(CHAT, MessageType.NORMAL, target, message);
+    MessageChannel<TitleData> TITLE = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "TITLE";
+        }
+
+        @Override
+        public void sendMessage(String message, MessageSender sender, CommandSender target, TitleData data) {
+            var titleData = data;
+            if (titleData == null) titleData = TitleData.DEFAULT;
+            if (target instanceof Player) {
+                ((Player) target).sendTitle(message, titleData.getOtherLine(), titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
+            } else {
+                sender.send(CHAT, MessageType.NORMAL, target, message);
+            }
         }
     };
 
     /**
      * Default implementation for a subtitle message
      */
-    MessageChannel<TitleData> SUBTITLE = (message, sender, target, data) -> {
-        var titleData = data;
-        if (titleData == null) titleData = TitleData.DEFAULT;
-        if (target instanceof Player) {
-            ((Player) target).sendTitle(titleData.getOtherLine(), message, titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
-        } else {
-            sender.send(CHAT, MessageType.NORMAL, target, message);
+    MessageChannel<TitleData> SUBTITLE = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "SUBTITLE";
+        }
+
+        @Override
+        public void sendMessage(String message, MessageSender sender, CommandSender target, TitleData data) {
+            var titleData = data;
+            if (titleData == null) titleData = TitleData.DEFAULT;
+            if (target instanceof Player) {
+                ((Player) target).sendTitle(titleData.getOtherLine(), message, titleData.getFadeIn(), titleData.getStay(), titleData.getFadeOut());
+            } else {
+                sender.send(CHAT, MessageType.NORMAL, target, message);
+            }
+
         }
     };
 
     /**
      * Default implementation for a action bar message
      */
-    MessageChannel<? extends ChannelData> ACTION_BAR = (message, sender, target, data) -> {
-        if (target instanceof Player) {
-            ((Player) target).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
-        } else {
-            sender.send(CHAT, MessageType.NORMAL, target, message);
+    MessageChannel<? extends ChannelData> ACTION_BAR = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "ACTION_BAR";
+        }
+
+        @Override
+        public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
+            if (target instanceof Player) {
+                ((Player) target).spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+            } else {
+                sender.send(CHAT, MessageType.NORMAL, target, message);
+            }
         }
     };
 
-    MessageChannel<BossBarData> BOSS_BAR = (message, sender, target, data) -> {
-        var bossBarData = data;
-        if (bossBarData == null) {
-            bossBarData = BossBarData.DEFAULT;
+    MessageChannel<BossBarData> BOSS_BAR = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "BOSS_BAR";
         }
-        if (target instanceof Player) {
-            var key = KEY_PREFIX + target.getName() + ThreadLocalRandom.current().nextInt(10000, 99999);
-            var barKey = new NamespacedKey(EldoUtilities.getInstanceOwner(), key);
-            var bossBar = bossBarData.create(barKey, message);
-            bossBar.setProgress(1);
-            bossBar.addPlayer((Player) target);
-            Bukkit.getScheduler().runTaskLater(EldoUtilities.getInstanceOwner(), () ->{
-                bossBar.removeAll();
-                Bukkit.removeBossBar(barKey);
-            }, bossBarData.getDuration());
-        } else {
-            target.sendMessage(message);
+
+        @Override
+        public void sendMessage(String message, MessageSender sender, CommandSender target, BossBarData data) {
+            var bossBarData = data;
+            if (bossBarData == null) {
+                bossBarData = BossBarData.DEFAULT;
+            }
+            if (target instanceof Player) {
+                var key = KEY_PREFIX + target.getName() + ThreadLocalRandom.current().nextInt(10000, 99999);
+                var barKey = new NamespacedKey(EldoUtilities.getInstanceOwner(), key);
+                var bossBar = bossBarData.create(barKey, message);
+                bossBar.setProgress(1);
+                bossBar.addPlayer((Player) target);
+                Bukkit.getScheduler().runTaskLater(EldoUtilities.getInstanceOwner(), () -> {
+                    bossBar.removeAll();
+                    Bukkit.removeBossBar(barKey);
+                }, bossBarData.getDuration());
+            } else {
+                target.sendMessage(message);
+            }
         }
     };
 
-    MessageChannel<? extends ChannelData> BROADCAST = (new MessageChannel<>() {
+    MessageChannel<? extends ChannelData> BROADCAST = new MessageChannel<>() {
+        @Override
+        public String name() {
+            return "BROADCAST";
+        }
+
         @Override
         public void sendMessage(String message, MessageSender sender, CommandSender target, ChannelData data) {
             Bukkit.broadcastMessage(message);
@@ -103,7 +150,7 @@ public interface MessageChannel<T extends ChannelData> {
         public String addPrefix(String message, String prefix) {
             return prefix + message;
         }
-    });
+    };
 
     /**
      * Get a default channel by name.
@@ -112,7 +159,7 @@ public interface MessageChannel<T extends ChannelData> {
      * @return channel or {@link #CHAT} if channel is not found or name is null
      */
     static @NotNull MessageChannel<? extends ChannelData> getChannelByNameOrDefault(@Nullable String name) {
-        return ObjUtil.nonNull(getChannelByName(name), CHAT);
+        return getChannelByName(name).orElse(CHAT);
     }
 
     /**
@@ -121,31 +168,21 @@ public interface MessageChannel<T extends ChannelData> {
      * @param name name of channel not case sensitive
      * @return channel or null if name is null or no matching channel is found
      */
-    static @Nullable MessageChannel<? extends ChannelData> getChannelByName(@Nullable String name) {
-        if ("CHAT".equalsIgnoreCase(name)) {
-            return CHAT;
+    static Optional<MessageChannel<? extends ChannelData>> getChannelByName(@Nullable String name) {
+        for (var value : values()) {
+            if (value.name().equalsIgnoreCase(name)) {
+                return Optional.of(value);
+            }
         }
-
-        if ("TITLE".equalsIgnoreCase(name)) {
-            return TITLE;
-        }
-
-        if ("SUBTITLE".equalsIgnoreCase(name)) {
-            return SUBTITLE;
-        }
-
-        if ("ACTION_BAR".equalsIgnoreCase(name)) {
-            return ACTION_BAR;
-        }
-        if ("BOSS_BAR".equalsIgnoreCase(name)) {
-            return BOSS_BAR;
-        }
-        if ("BROADCAST".equalsIgnoreCase(name)) {
-            return BROADCAST;
-        }
-
-        return null;
+        return Optional.empty();
     }
+
+    /**
+     * Get the name of the channel
+     *
+     * @return name of channel
+     */
+    String name();
 
     /**
      * Send a message via this channel to a target with the delivered message sender instance.
@@ -170,5 +207,9 @@ public interface MessageChannel<T extends ChannelData> {
 
     default String addPrefix(String message, String prefix) {
         return message;
+    }
+
+    static MessageChannel<?>[] values() {
+        return new MessageChannel[]{CHAT, TITLE, SUBTITLE, ACTION_BAR, BOSS_BAR, BROADCAST};
     }
 }
