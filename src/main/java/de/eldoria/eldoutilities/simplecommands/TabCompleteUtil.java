@@ -315,7 +315,7 @@ public final class TabCompleteUtil {
         var d = Parser.parseDouble(value);
         List<String> result = new ArrayList<>();
         CommandAssertions.range(d.get(), min, max);
-        return singleEntryList(min + "-" + max);
+        return singleEntryList(min + " » " + max);
     }
 
     /**
@@ -331,7 +331,7 @@ public final class TabCompleteUtil {
         CommandAssertions.isInteger(value);
         var d = Parser.parseInt(value);
         CommandAssertions.range(d.get(), min, max);
-        return singleEntryList(min + "-" + max);
+        return singleEntryList(min + " » " + max);
     }
 
     /**
