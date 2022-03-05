@@ -101,6 +101,7 @@ public class Localizer implements ILocalizer {
         Map<String, String> locales = new HashMap<>();
         locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
         locales.put("error.invalidCommand", "Invalid Command");
+        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n%COMMANDS%");
         locales.put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
         locales.put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
         locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");

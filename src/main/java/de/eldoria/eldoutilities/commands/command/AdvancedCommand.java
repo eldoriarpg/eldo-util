@@ -78,11 +78,9 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
 
         if (args.isEmpty()) {
-            if (meta.defaultCommand() != null) {
-                meta.defaultCommand().commandRoute(sender, label, args);
-                return;
-            }
-            throw CommandException.message("error.invalidCommand");
+            CommandAssertions.unexpectedRouteEnd(meta, args);
+            meta.defaultCommand().commandRoute(sender, label, args);
+            return;
         }
 
         if (meta.subCommands().isEmpty()) {
@@ -91,11 +89,8 @@ public abstract class AdvancedCommand implements CommandRoute {
         final var newArgs = args.subArguments();
 
         var command = getCommand(args.asString(0));
-        if (command.isPresent()) {
-            command.get().commandRoute(sender, args.asString(0), newArgs);
-            return;
-        }
-        throw CommandException.message("error.invalidCommand");
+        CommandAssertions.unexpectedRouteEnd(meta, command);
+        command.get().commandRoute(sender, args.asString(0), newArgs);
     }
 
     @Override
@@ -134,7 +129,7 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
 
         var command = getCommand(args.asString(0));
-        if(!command.isPresent()){
+        if (!command.isPresent()) {
             return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
         }
         // forward
