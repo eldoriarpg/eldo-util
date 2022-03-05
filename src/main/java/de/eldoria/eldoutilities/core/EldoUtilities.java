@@ -1,3 +1,9 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ */
+
 package de.eldoria.eldoutilities.core;
 
 import de.eldoria.eldoutilities.configuration.ConfigFileWrapper;

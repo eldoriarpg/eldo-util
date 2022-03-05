@@ -1,3 +1,9 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ */
+
 package de.eldoria.eldoutilities.builder;
 
 import de.eldoria.eldoutilities.utils.ObjUtil;
@@ -94,12 +100,12 @@ public final class ItemStackBuilder {
     }
 
     /**
-     * Get the item stack
+     * Clone the underlying itemstack and return a cloned instance.
      *
-     * @return new item stack instance.
+     * @return new item stack instance
      */
     public ItemStack build() {
-        return itemStack;
+        return itemStack.clone();
     }
 
     /**

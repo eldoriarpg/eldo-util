@@ -1,5 +1,12 @@
+/*
+ *     SPDX-License-Identifier: AGPL-3.0-only
+ *
+ *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ */
+
 package de.eldoria.eldoutilities.commands.command.util;
 
+import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.localization.Replacement;
@@ -11,7 +18,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +29,21 @@ public final class CommandAssertions {
 
     private CommandAssertions() {
         throw new UnsupportedOperationException("This is a utility class.");
+    }
+
+    public static void unexpectedRouteEnd(CommandMeta meta, Arguments arguments) throws CommandException {
+        if (arguments.isEmpty() && meta.defaultCommand() == null) {
+            var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
+            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands).addFormatting('6'));
+        }
+    }
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public static void unexpectedRouteEnd(CommandMeta meta, Optional<AdvancedCommand> command) throws CommandException {
+        if (command.isEmpty()) {
+            var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
+            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands).addFormatting('6'));
+        }
     }
 
     /**
@@ -65,13 +87,13 @@ public final class CommandAssertions {
 
     /**
      * Checks that the arguments have the required length.
-     * 
+     * <p>
      * This method will not create a command call chain.
      *
      * @param args      arguments
      * @param arguments arguments which are required and optional in correct order
      * @throws CommandException when the arguments are not sufficient.
-     * @see CommandAssertions#invalidArguments(CommandMeta, String[]) 
+     * @see CommandAssertions#invalidArguments(CommandMeta, String[])
      */
     public static void invalidArguments(Arguments arguments, Argument... args) throws CommandException {
         var required = Arrays.stream(args).filter(Argument::isRequired).count();
@@ -261,7 +283,7 @@ public final class CommandAssertions {
     }
 
     public static void missingArgument(Collection<?> args, int index) throws CommandException {
-        isTrue(args.size()> index, "error.missingArgument", Replacement.create("index", index));
+        isTrue(args.size() > index, "error.missingArgument", Replacement.create("index", index));
     }
 
     /**
