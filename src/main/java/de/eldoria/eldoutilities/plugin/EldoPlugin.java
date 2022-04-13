@@ -16,7 +16,6 @@ import de.eldoria.eldoutilities.logging.DebugLogger;
 import de.eldoria.eldoutilities.simplecommands.commands.FailsaveCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -66,7 +65,9 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     }
 
     private static void registerSelf(EldoPlugin eldoPlugin) {
-        instance = eldoPlugin;
+        if (instance != null) {
+            instance = eldoPlugin;
+        }
         for (var clazz : eldoPlugin.getConfigSerialization()) {
             ConfigurationSerialization.registerClass(clazz);
         }
@@ -198,7 +199,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     @Override
     public final void onLoad() {
-        logger().config("Loading plugin.");
+        getLogger().config("Loading plugin.");
         try {
             onPluginLoad();
         } catch (Throwable e) {
@@ -216,7 +217,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         var reload = isLocked();
         if (reload) {
             try {
-                logger().config("Detected plugin reload.");
+                getLogger().config("Detected plugin reload.");
                 onReload();
             } catch (Throwable e) {
                 initFailsave("Plugin failed to reload.", e);
@@ -228,7 +229,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         EldoUtilities.ignite(instance);
         try {
             if (!reload) {
-                logger().config("Detected initial plugin enable.");
+                getLogger().config("Detected initial plugin enable.");
             }
             onPluginEnable(reload);
             onPluginEnable();
@@ -238,12 +239,12 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                 try {
                     registerCommand(cmd, failcmd);
                 } catch (Throwable ex) {
-                    logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
+                    getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
                 }
             }
             return;
         }
-        logger().config("Scheduling post startup");
+        getLogger().config("Scheduling post startup");
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -256,34 +257,34 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                     return;
                 }
                 var until = start.until(Instant.now(), ChronoUnit.MILLIS);
-                logger().info("Post startup done. Required " + until + " ms.");
+                getLogger().info("Post startup done. Required " + until + " ms.");
 
             }
         }.runTaskLater(this, 1);
         removeLock();
         var until = start.until(Instant.now(), ChronoUnit.MILLIS);
-        logger().info("Enabled. Required " + until + " ms.");
+        getLogger().info("Enabled. Required " + until + " ms.");
     }
 
     private void initFailsave(String message, Throwable e) {
-        logger().log(Level.SEVERE, message, e);
-        logger().log(Level.SEVERE, "Initializing failsave mode.");
+        getLogger().log(Level.SEVERE, message, e);
+        getLogger().log(Level.SEVERE, "Initializing failsave mode.");
         var failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
         for (var cmd : getDescription().getCommands().keySet()) {
             try {
                 registerCommand(cmd, failcmd);
             } catch (Throwable ex) {
-                logger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
+                getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
             }
         }
     }
 
     private void onReload() throws Throwable {
-        logger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
-        logger().severe("Detected server reload.");
-        logger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
-        logger().severe("Please do not report any bugs caused by reloading the server.");
-        logger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
+        getLogger().severe("⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱ ⟱");
+        getLogger().severe("Detected server reload.");
+        getLogger().severe("Reloading the server is highly discouraged and can lead to unexpected behaviour.");
+        getLogger().severe("Please do not report any bugs caused by reloading the server.");
+        getLogger().severe("⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰ ⟰");
         onPluginReload();
     }
 
@@ -321,14 +322,14 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     @Override
     public final void onDisable() {
         if (reloadListener.isReload()) {
-            logger().severe("Plugin is disabled by server reload.");
+            getLogger().severe("Plugin is disabled by server reload.");
             createLock();
         }
         EldoUtilities.shutdown();
         try {
             onPluginDisable();
         } catch (Throwable e) {
-            logger().log(Level.SEVERE, "Plugin failed to shutdown correctly.", e);
+            getLogger().log(Level.SEVERE, "Plugin failed to shutdown correctly.", e);
         }
     }
 
@@ -340,7 +341,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         try {
             Files.createFile(getLockFile());
         } catch (IOException e) {
-            logger().config("Could not create lock file");
+            getLogger().config("Could not create lock file");
         }
     }
 
@@ -352,7 +353,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         try {
             Files.deleteIfExists(getLockFile());
         } catch (IOException e) {
-            logger().config("Could not resolve lock");
+            getLogger().config("Could not resolve lock");
         }
     }
 
