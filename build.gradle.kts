@@ -26,9 +26,9 @@ repositories {
 dependencies {
     implementation("org.bstats", "bstats-bukkit", "2.2.1")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains", "annotations", "19.0.0")
+    compileOnly("org.jetbrains", "annotations", "23.0.0")
 
-    testImplementation("org.jetbrains", "annotations", "19.0.0")
+    testImplementation("org.jetbrains", "annotations", "23.0.0")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.8.2")
