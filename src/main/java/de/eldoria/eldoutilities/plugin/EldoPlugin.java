@@ -71,8 +71,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         for (var clazz : eldoPlugin.getConfigSerialization()) {
             ConfigurationSerialization.registerClass(clazz);
         }
-        EldoUtilities.preWarm(instance);
-        instance.failcmd = new FailsaveCommand(instance, instance.getDescription().getFullName().toLowerCase());
+        EldoUtilities.preWarm(eldoPlugin);
+        eldoPlugin.failcmd = new FailsaveCommand(eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase());
     }
 
     public static EldoPlugin getInstance() {

@@ -71,7 +71,7 @@ public abstract class EldoConfig {
      * @return true if plugin is in debug state.
      */
     public static Level getLogLevel(Plugin plugin) {
-        return ObjUtil.nonNull(EldoUtilities.getInstanceOwner(plugin.getClass()), instance -> {
+        Level level = ObjUtil.nonNull(EldoUtilities.getInstanceOwner(plugin.getClass()), instance -> {
             // we probably want to load the config before the plugin is enabled.
             // Since we use the configuration serializable we cant load the config directly if the plugin is not enabled.
             String debug;
@@ -109,6 +109,11 @@ public abstract class EldoConfig {
 
             return parseLevel(debug);
         });
+        if (level == null) {
+            parseLevel("INFO");
+            Bukkit.getLogger().log(Level.INFO, "[EldoUtilities] No instance owner set for " + plugin.getClass());
+        }
+        return level;
     }
 
     private static Level parseLevel(String level) {
