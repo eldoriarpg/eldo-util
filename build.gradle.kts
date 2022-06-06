@@ -9,7 +9,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.13.5"
+version = "1.13.6"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains{
@@ -77,9 +77,14 @@ tasks {
         options.encoding = "UTF-8"
     }
 
+    javadoc{
+        options.encoding = "UTF-8"
+    }
+
     compileTestJava {
         options.encoding = "UTF-8"
     }
+
     test {
         useJUnitPlatform()
         testLogging {

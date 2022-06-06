@@ -134,7 +134,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      * @param executor command executor
      */
     public final void registerCommand(String command, AdvancedCommand executor) {
-        registerCommand(command, AdvancedCommandAdapter.wrap(this, executor));
+        registerCommand(command, (TabExecutor) AdvancedCommandAdapter.wrap(this, executor));
     }
 
     /**

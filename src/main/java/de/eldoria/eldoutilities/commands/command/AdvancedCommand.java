@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 
 public abstract class AdvancedCommand implements CommandRoute {
     private final Plugin plugin;
@@ -192,5 +193,10 @@ public abstract class AdvancedCommand implements CommandRoute {
         if (this.meta != null) throw new IllegalStateException("Meta is already assigned");
         this.meta = meta;
         linkMeta();
+    }
+
+    public void handleCommandError(CommandSender sender, CommandException e){
+        messageSender().sendLocalizedError(sender, e.getMessage(), e.replacements());
+        plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
     }
 }
