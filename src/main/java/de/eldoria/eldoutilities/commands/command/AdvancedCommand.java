@@ -195,7 +195,7 @@ public abstract class AdvancedCommand implements CommandRoute {
         linkMeta();
     }
 
-    public void handleCommandError(CommandSender sender, Exception e) {
+    public void handleCommandError(CommandSender sender, Throwable e) {
         if (e instanceof CommandException) {
             messageSender().sendLocalizedError(sender, e.getMessage(), ((CommandException) e).replacements());
             plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
