@@ -130,7 +130,7 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
 
         var command = getCommand(args.asString(0));
-        if (!command.isPresent()) {
+        if (command.isEmpty()) {
             return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
         }
         // forward
@@ -195,8 +195,12 @@ public abstract class AdvancedCommand implements CommandRoute {
         linkMeta();
     }
 
-    public void handleCommandError(CommandSender sender, CommandException e){
-        messageSender().sendLocalizedError(sender, e.getMessage(), e.replacements());
-        plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
+    public void handleCommandError(CommandSender sender, Throwable e) {
+        if (e instanceof CommandException) {
+            messageSender().sendLocalizedError(sender, e.getMessage(), ((CommandException) e).replacements());
+            plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
+            return;
+        }
+        plugin().getLogger().log(Level.SEVERE, "Unhandled exception occured", e);
     }
 }
