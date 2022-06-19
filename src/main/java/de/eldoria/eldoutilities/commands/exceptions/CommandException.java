@@ -9,7 +9,7 @@ package de.eldoria.eldoutilities.commands.exceptions;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.localization.Replacement;
 
-public class CommandException extends Exception {
+public class CommandException extends RuntimeException {
     private Replacement[] replacements;
     private boolean silent;
 

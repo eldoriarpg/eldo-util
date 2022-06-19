@@ -1,5 +1,5 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "7.1.2"
     java
     `maven-publish`
     `java-library`
@@ -9,7 +9,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.13.5"
+version = "1.13.8"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains{
@@ -24,15 +24,15 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "2.2.1")
+    implementation("org.bstats", "bstats-bukkit", "3.0.0")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains", "annotations", "19.0.0")
+    compileOnly("org.jetbrains", "annotations", "23.0.0")
 
-    testImplementation("org.jetbrains", "annotations", "19.0.0")
+    testImplementation("org.jetbrains", "annotations", "23.0.0")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.7.1")
-    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.7.1")
-    testImplementation("org.mockito", "mockito-core", "3.5.13")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
+    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.8.2")
+    testImplementation("org.mockito", "mockito-core", "4.6.0")
 }
 
 java {
@@ -77,9 +77,14 @@ tasks {
         options.encoding = "UTF-8"
     }
 
+    javadoc{
+        options.encoding = "UTF-8"
+    }
+
     compileTestJava {
         options.encoding = "UTF-8"
     }
+
     test {
         useJUnitPlatform()
         testLogging {

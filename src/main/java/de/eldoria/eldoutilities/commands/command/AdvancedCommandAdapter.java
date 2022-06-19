@@ -25,19 +25,17 @@ import java.util.logging.Level;
 /**
  * Wraps a {@link AdvancedCommand} into a {@link TabExecutor}
  */
-public class AdvancedCommandAdapter implements TabExecutor {
-    private final Plugin plugin;
+public class AdvancedCommandAdapter extends AdvancedCommand implements TabExecutor {
     private final AdvancedCommand advancedCommand;
-    private ILocalizer localizer;
-    private MessageSender messageSender;
 
     public static AdvancedCommandAdapter wrap(Plugin plugin, AdvancedCommand advancedCommand) {
         return new AdvancedCommandAdapter(plugin, advancedCommand);
     }
 
     private AdvancedCommandAdapter(Plugin plugin, AdvancedCommand advancedCommand) {
-        this.plugin = plugin;
+        super(plugin);
         this.advancedCommand = advancedCommand;
+        advancedCommand.meta().parent(this);
     }
 
     @Override
@@ -45,53 +43,27 @@ public class AdvancedCommandAdapter implements TabExecutor {
         try {
             executeCommand(sender, label, args);
         } catch (CommandException e) {
-            messageSender().sendLocalizedError(sender, e.getMessage(), e.replacements());
-            plugin.getLogger().log(Level.CONFIG, "Command exception occured.", e);
+            handleCommandError(sender, e);
         }
         return true;
     }
 
     private void executeCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) throws CommandException {
-        var arguments = Arguments.create(plugin, sender, args);
+        var arguments = Arguments.create(plugin(), sender, args);
         advancedCommand.commandRoute(sender, label, arguments);
     }
 
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        var arguments = Arguments.create(plugin, sender, args);
+        var arguments = Arguments.create(plugin(), sender, args);
         List<String> strings;
         try {
             strings = advancedCommand.tabCompleteRoute(sender, label, arguments);
         } catch (CommandException e) {
             strings = Collections.singletonList(localizer().localize(e.getMessage(), e.replacements()));
-            plugin.getLogger().log(Level.CONFIG, "Command exception occured.", e);
+            plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
         }
         return strings;
     }
-
-    /**
-     * Get a instance of the localizer.
-     *
-     * @return localizer instance
-     */
-    protected final ILocalizer localizer() {
-        if (localizer == null || localizer instanceof DummyLocalizer) {
-            localizer = ILocalizer.getPluginLocalizer(plugin);
-        }
-        return localizer;
-    }
-
-    /**
-     * Get a instance of the message sender.
-     *
-     * @return message sender instance
-     */
-    protected final MessageSender messageSender() {
-        if (messageSender == null || messageSender.isDefault()) {
-            messageSender = MessageSender.getPluginMessageSender(plugin);
-        }
-        return messageSender;
-    }
-
 }
