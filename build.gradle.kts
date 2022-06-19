@@ -9,7 +9,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.13.8"
+version = "1.13.9"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains{
@@ -20,7 +20,7 @@ javaToolchains{
 
 repositories {
     mavenCentral()
-    maven ("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
 }
 
 dependencies {

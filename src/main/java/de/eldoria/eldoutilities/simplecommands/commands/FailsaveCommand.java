@@ -11,6 +11,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @deprecated Use {@link de.eldoria.eldoutilities.commands.defaultcommands.FailsaveCommand} instead
+ */
+@Deprecated(forRemoval = true)
 public class FailsaveCommand extends DefaultDebug {
     public FailsaveCommand(Plugin plugin, String permission) {
         super(plugin, permission);

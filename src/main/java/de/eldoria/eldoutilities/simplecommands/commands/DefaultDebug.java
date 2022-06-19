@@ -14,6 +14,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * @deprecated Use {@link de.eldoria.eldoutilities.commands.defaultcommands.DefaultDebug} instead.
+ */
+@Deprecated(forRemoval = true)
 public class DefaultDebug extends EldoCommand {
 
     private final String permission;

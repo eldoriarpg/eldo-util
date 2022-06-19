@@ -8,12 +8,12 @@ package de.eldoria.eldoutilities.plugin;
 
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommandAdapter;
+import de.eldoria.eldoutilities.commands.defaultcommands.FailsaveCommand;
 import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.logging.DebugLogger;
-import de.eldoria.eldoutilities.simplecommands.commands.FailsaveCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -49,10 +49,11 @@ import java.util.logging.Logger;
  *
  * @since 1.1.0
  */
+@SuppressWarnings({"RedundantThrows", "unused"})
 public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider {
     private static EldoPlugin instance;
     private DebugLogger debugLogger;
-    private FailsaveCommand failcmd;
+    private AdvancedCommandAdapter failcmd;
     private ReloadListener reloadListener;
 
     public EldoPlugin() {
@@ -72,7 +73,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             ConfigurationSerialization.registerClass(clazz);
         }
         EldoUtilities.preWarm(eldoPlugin);
-        eldoPlugin.failcmd = new FailsaveCommand(eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase());
+        eldoPlugin.failcmd = AdvancedCommandAdapter.wrap(eldoPlugin, new FailsaveCommand(eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase()));
     }
 
     public static EldoPlugin getInstance() {
@@ -237,7 +238,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             initFailsave("Plugin failed to enable.", e);
             for (var cmd : getDescription().getCommands().keySet()) {
                 try {
-                    registerCommand(cmd, failcmd);
+                    registerCommand(cmd, (TabExecutor) failcmd);
                 } catch (Throwable ex) {
                     getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
                 }
@@ -370,7 +371,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     @Override
     public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return failcmd.onCommand(sender, command, label, args);
+        return AdvancedCommandAdapter.wrap(this, failcmd).onCommand(sender, command, label, args);
     }
 
     private static class ReloadListener implements Listener {
