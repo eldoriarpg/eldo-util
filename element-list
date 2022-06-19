@@ -3,6 +3,7 @@ de.eldoria.eldoutilities.bstats
 de.eldoria.eldoutilities.builder
 de.eldoria.eldoutilities.commands.command
 de.eldoria.eldoutilities.commands.command.util
+de.eldoria.eldoutilities.commands.defaultcommands
 de.eldoria.eldoutilities.commands.exceptions
 de.eldoria.eldoutilities.commands.executor
 de.eldoria.eldoutilities.configuration
