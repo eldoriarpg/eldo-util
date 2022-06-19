@@ -11,9 +11,13 @@ import de.eldoria.eldoutilities.simplecommands.EldoCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
 
+
+/**
+ * @deprecated Use {@link de.eldoria.eldoutilities.commands.defaultcommands.DefaultAbout} instead.
+ */
+@Deprecated(forRemoval = true)
 public class DefaultAbout extends EldoCommand {
     private String discord = "rfRuUge";
 
