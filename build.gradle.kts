@@ -3,7 +3,7 @@ plugins {
     java
     `maven-publish`
     `java-library`
-    id("de.chojo.publishdata") version "1.0.4"
+    id("de.chojo.publishdata") version "1.0.5"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 group = "de.eldoria"
