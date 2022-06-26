@@ -201,6 +201,12 @@ public abstract class AdvancedCommand implements CommandRoute {
             plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
             return;
         }
+        if (e.getCause() != null) {
+            if (e.getCause() instanceof CommandException) {
+                handleCommandError(sender, e.getCause());
+                return;
+            }
+        }
         plugin().getLogger().log(Level.SEVERE, "Unhandled exception occured", e);
     }
 }
