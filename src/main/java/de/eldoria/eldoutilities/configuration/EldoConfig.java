@@ -275,7 +275,7 @@ public abstract class EldoConfig {
      * @throws ExternalConfigException When load config is invoked on a eldo config which is not the main config.
      */
     protected final FileConfiguration loadConfig(String path, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
-        var configPath = Paths.get(pluginData.toString(), path + ".yml");
+        var configPath = pluginData.resolve(path + ".yml");
         return loadConfig(configPath, defaultCreator, reload);
     }
 
@@ -289,7 +289,7 @@ public abstract class EldoConfig {
      */
     protected final FileConfiguration loadConfig(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
         try {
-            return loadConfigWrapped(Paths.get(configPath.toString()), null, true);
+            return loadConfigWrapped(configPath, defaultCreator, reload);
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Failed to load " + configPath, e);
             backupAndRemoveCorruptedFile(configPath);

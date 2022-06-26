@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -201,6 +202,7 @@ public abstract class AdvancedCommand implements CommandRoute {
             plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
             return;
         }
+
         if (e.getCause() != null) {
             if (e.getCause() instanceof CommandException) {
                 handleCommandError(sender, e.getCause());
