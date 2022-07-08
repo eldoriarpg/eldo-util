@@ -210,7 +210,7 @@ public abstract class EldoConfig {
     }
 
     private void backupAndRemoveCorruptedFile(Path path) {
-        var time = DateTimeFormatter.ofPattern("yyMMddHHmmss").format(LocalDateTime.now());
+        var time = DateTimeFormatter.ofPattern("yy-MM-dd_HH.mm.ss").format(LocalDateTime.now());
         var matcher = Pattern.compile("(?<name>.*)\\.(?<type>.+?)$").matcher(path.getFileName().toString());
         String name;
         if (matcher.find()) {
@@ -226,11 +226,13 @@ public abstract class EldoConfig {
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not create backup.", e);
         }
+        plugin.getLogger().warning("Created backup at " + newLoc);
         try {
             Files.deleteIfExists(path);
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not remove old file.");
         }
+        plugin.getLogger().warning("Removed corrupted file");
     }
 
     /**
