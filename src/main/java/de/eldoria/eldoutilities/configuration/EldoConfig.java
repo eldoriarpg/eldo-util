@@ -12,12 +12,14 @@ import de.eldoria.eldoutilities.utils.ObjUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -297,7 +299,7 @@ public abstract class EldoConfig {
         }
     }
 
-    private FileConfiguration loadConfigWrapped(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) {
+    private FileConfiguration loadConfigWrapped(Path configPath, @Nullable Consumer<FileConfiguration> defaultCreator, boolean reload) throws IOException, InvalidConfigurationException {
         validateMainConfigEntry();
         var configFile = configPath.toFile();
 
@@ -316,7 +318,8 @@ public abstract class EldoConfig {
                 return null;
             }
 
-            var config = YamlConfiguration.loadConfiguration(configFile);
+            var config = new YamlConfiguration();
+            config.load(configFile);
 
             ObjUtil.nonNull(defaultCreator, d -> {
                 d.accept(config);
@@ -331,10 +334,21 @@ public abstract class EldoConfig {
         }
 
         if (reload) {
-            return configs.compute(configPath.toString(), (k, v) -> YamlConfiguration.loadConfiguration(configFile));
+            var load = load(configFile);
+            return configs.compute(configPath.toString(), (k, v) -> load);
         }
 
-        return configs.computeIfAbsent(configPath.toString(), p -> YamlConfiguration.loadConfiguration(configFile));
+        if(configs.containsKey(configPath.toString())){
+            return configs.get(configPath.toString());
+        }
+        var load = load(configFile);
+        return configs.computeIfAbsent(configPath.toString(), p -> load);
+    }
+
+    private YamlConfiguration load(File file) throws IOException, InvalidConfigurationException {
+        YamlConfiguration yamlConfiguration = new YamlConfiguration();
+        yamlConfiguration.load(file);
+        return yamlConfiguration;
     }
 
     private void writeConfigs() {
