@@ -6,6 +6,8 @@
 
 package de.eldoria.eldoutilities.localization;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 
 /**
@@ -36,7 +38,17 @@ public class DummyLocalizer implements ILocalizer {
     }
 
     @Override
+    public @Nullable String getValue(String key) {
+        return null;
+    }
+
+    @Override
     public String localize(String message, Replacement... replacements) {
         return message;
+    }
+
+    @Override
+    public void registerChild(ILocalizer localizer) {
+
     }
 }

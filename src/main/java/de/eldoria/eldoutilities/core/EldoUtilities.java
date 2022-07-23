@@ -73,7 +73,7 @@ public final class EldoUtilities {
                             Bukkit.getScheduler().runTaskLater(plugin, () -> performLateCleanUp(plugin), 5);
                             return null;
                         });
-        var path = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        var path = plugin.getDataFolder().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
         configuration = ConfigFileWrapper.forFile(plugin, path);
     }
 

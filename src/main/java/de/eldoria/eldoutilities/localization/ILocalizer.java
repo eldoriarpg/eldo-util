@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.localization;
 
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.PropertyKey;
 
 import java.util.HashMap;
@@ -119,6 +120,9 @@ public interface ILocalizer {
      */
     void addLocaleCodes(Map<String, String> runtimeLocaleCodes);
 
+    @Nullable
+    String getValue(String key);
+
     /**
      * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
      * right order.
@@ -129,4 +133,6 @@ public interface ILocalizer {
      * @since 1.2.3
      */
     String localize(String message, Replacement... replacements);
+
+    void registerChild(ILocalizer localizer);
 }

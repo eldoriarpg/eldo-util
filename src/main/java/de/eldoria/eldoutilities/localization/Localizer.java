@@ -7,38 +7,31 @@
 package de.eldoria.eldoutilities.localization;
 
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Compact localizer class.
@@ -59,14 +52,15 @@ public class Localizer implements ILocalizer {
     private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z0-9_.]+?)\\$");
     private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_.]+?)");
 
-    private final ResourceBundle fallbackLocaleFile;
+    private final ResourceBundle fallbackBundle;
     private final Plugin plugin;
     private final String localesPath;
     private final String localesPrefix;
     private final String[] includedLocales;
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
     private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
-    private ResourceBundle localeFile;
+    private ResourceBundle bundle;
+    List<ILocalizer> childs = new ArrayList<>();
     private boolean checked;
 
     /**
@@ -92,7 +86,13 @@ public class Localizer implements ILocalizer {
         this.localesPath = localesPath;
         this.localesPrefix = localesPrefix;
         this.includedLocales = includedLocales;
-        fallbackLocaleFile = ResourceBundle.getBundle(localesPrefix, fallbackLocale, plugin.getClass().getClassLoader());
+        ResourceBundle fallbackBundle = new DummyResourceBundle();
+        try {
+            fallbackBundle = getBundle(getLocaleFileName(fallbackLocale.toString()));
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not read fallback file", e);
+        }
+        this.fallbackBundle = fallbackBundle;
         LOCALIZER.put(plugin.getClass(), this);
         createDefaults();
     }
@@ -143,37 +143,24 @@ public class Localizer implements ILocalizer {
             checked = true;
         }
 
-        var localeFile = localesPrefix + "_" + language + ".properties";
-
-        try (var stream = Files.newInputStream(Paths.get(plugin.getDataFolder().toString(), localesPath, localeFile))) {
-            this.localeFile = new PropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        try {
+            this.bundle = getBundle(getLocaleFile(language));
         } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load locale file " + Paths.get(localesPath, localeFile), e);
-            this.localeFile = fallbackLocaleFile;
+            plugin.getLogger().log(Level.WARNING, "Could not load locale file " + getLocaleFile(language), e);
+            this.bundle = fallbackBundle;
         }
     }
 
     /**
-     * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
-     * right order.
+     * Translates a String with Placeholders. Can handle multiple messages with replacements.
      *
      * @param key          Key of message
-     * @param replacements Replacements in the right order.
+     * @param replacements Replacements
      * @return Replaced Messages
      */
     @Override
     public String getMessage(String key, Replacement... replacements) {
-        String result = null;
-        if (localeFile.containsKey(key)) {
-            result = localeFile.getString(key);
-            if (result.isEmpty()) {
-                if (fallbackLocaleFile.containsKey(key)) {
-                    result = fallbackLocaleFile.getString(key);
-                }
-            }
-        } else if (fallbackLocaleFile.containsKey(key)) {
-            result = fallbackLocaleFile.getString(key);
-        }
+        var result = getValue(key);
 
         if (result == null) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
@@ -183,172 +170,214 @@ public class Localizer implements ILocalizer {
         return invokeReplacements(result, replacements);
     }
 
-    private void createOrUpdateLocaleFiles() {
-        var messages = Paths.get(plugin.getDataFolder().toString(), localesPath);
-
-        try {
-            Files.createDirectories(messages);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Could not create message directory.", e);
+    @Override
+    @Nullable
+    public String getValue(String key) {
+        String result = null;
+        if (bundle.containsKey(key)) {
+            try {
+                result = bundle.getString(key);
+            } catch (MissingResourceException e) {
+                // ignore
+            }
+        }
+        if (result == null && fallbackBundle.containsKey(key)) {
+            try {
+                result = fallbackBundle.getString(key);
+            } catch (MissingResourceException e) {
+                // ignore
+            }
         }
 
-        // Create the property files if they do not exists.
-        for (var includedLocale : includedLocales) {
-            var filename = localesPrefix + "_" + includedLocale + ".properties";
+        if (result == null) {
+            for (var child : childs) {
+                result = child.getValue(key);
+                if (result != null) break;
+            }
+        }
+        return result;
+    }
 
-            var localeFile = Paths.get(messages.toString(), filename).toFile();
+    private Path getLocalePath() {
+        return plugin.getDataFolder().toPath().resolve(localesPath);
+    }
+
+    private Path getLocaleFile(String locale) {
+        return getLocalePath().resolve(getLocaleFileName(locale));
+    }
+
+    private String getLocaleFileName(String locale) {
+        return String.format("%s_%s.properties", localesPrefix, locale);
+    }
+
+    private void createDefaultFiles() {
+        // Create the property files if they do not exists.
+        for (var locale : includedLocales) {
+            var localeFile = getLocaleFile(locale).toFile();
             if (localeFile.exists()) {
                 continue;
             }
 
-            var builder = new StringBuilder();
-            try (var bufferedReader = new BufferedReader(new InputStreamReader(
-                    plugin.getResource(filename), StandardCharsets.UTF_8))) {
-                var line = bufferedReader.readLine();
-                while (line != null) {
-                    builder.append(line).append("\n");
-                    line = bufferedReader.readLine();
-                }
+            try (var resource = plugin.getResource(getLocaleFileName(locale))) {
+                if (resource == null)
+                    throw new FileNotFoundException("No locale file for " + locale + "found in resources.");
+                Files.copy(resource, getLocaleFile(locale));
             } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Could not load resource " + filename + ".", e);
-            } catch (NullPointerException e) {
-                plugin.getLogger().log(Level.WARNING, "Locale " + includedLocale + " could not be loaded but should exists.", e);
+                plugin.getLogger().log(Level.SEVERE, "Could not create default message file for locale " + locale);
                 continue;
             }
 
-            try (var outputStream = new OutputStreamWriter(new FileOutputStream(localeFile), StandardCharsets.UTF_8)) {
-                outputStream.write(builder.toString());
+            plugin.getLogger().info("Created default locale " + getLocaleFileName(locale));
+        }
+    }
 
-            } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Failed to create default message file " + localeFile.getName() + ".", e);
-                continue;
+    private boolean isLocaleFile(Path path) {
+        if (path.toFile().isDirectory()) return false;
+        if (path.toFile().getName().matches(localesPrefix + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties")) return true;
+        plugin.getLogger().info(path + " is not a valid message file. Skipped.");
+        return false;
+    }
+
+    private ResourceBundle getDefaultBundle() throws IOException {
+        try (var input = plugin.getResource(localesPrefix + ".properties")) {
+            //TODO: Lazy getter
+            return new PropertyResourceBundle(input);
+        }
+    }
+
+    private ResourceBundle getBundle(String locale) throws IOException {
+        try (var input = plugin.getResource(getLocaleFileName(locale))) {
+            if (input == null) {
+                return getDefaultBundle();
             }
-            plugin.getLogger().info("Created default locale " + filename);
+            return new PropertyResourceBundle(input);
+        }
+    }
+
+    private ResourceBundle getBundle(Locale locale) throws IOException {
+        if (locale == null) {
+            return getDefaultBundle();
+        }
+        return getBundle(locale.toString());
+    }
+
+    private ResourceBundle getBundle(Path locale) throws IOException {
+        try (var input = Files.newInputStream(locale)) {
+            return new PropertyResourceBundle(input);
+        }
+    }
+
+    private Map<String, String> bundleMap(Path path) throws IOException {
+        var map = new TreeMap<String, String>(String::compareToIgnoreCase);
+        Files.readAllLines(path, StandardCharsets.UTF_8).stream()
+                .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
+                .forEach(line -> map.put(line[0], line[1]));
+        return map;
+    }
+
+    private Set<String> getDefaultKeys() throws IOException {
+        Set<String> defaultKeys = new HashSet<>(Collections.list(getDefaultBundle().getKeys()));
+        defaultKeys.addAll(runtimeLocaleCodes.keySet());
+        return defaultKeys;
+    }
+
+    private String timestamp() {
+        return DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now());
+    }
+
+    private void createOrUpdateLocaleFiles() {
+        try {
+            Files.createDirectories(getLocalePath());
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not create message directory.", e);
         }
 
-        List<File> localeFiles = new ArrayList<>();
+        createDefaultFiles();
+
+        List<Path> localeFiles = new ArrayList<>();
 
         // Load all property files
-        try (var message = Files.list(messages)) {
-            for (var path : message.collect(Collectors.toList())) {
-                // skip directories. why should they be there anyway?
-                if (path.toFile().isDirectory()) {
-                    continue;
-                }
-
-                // Lets be a bit nice with the formatting. not everyone knows the ISO.
-                if (path.toFile().getName().matches(localesPrefix + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties")) {
-                    localeFiles.add(path.toFile());
-                } else {
-                    // Notify the user that he did something weird in his messages directory.
-                    plugin.getLogger().info(path + " is not a valid message file. Skipped.");
-                }
-            }
+        try (var files = Files.list(getLocalePath())) {
+            files.filter(this::isLocaleFile).forEach(localeFiles::add);
         } catch (IOException e) {
             // we will try to continue with the successfull loaded files. If there are none thats not bad.
             plugin.getLogger().log(Level.WARNING, "Failed to load message files.");
         }
 
-        // get the default pack to have a set of all needed keys. Hopefully its correct.
-        ResourceBundle defaultBundle = null;
-        try {
-            defaultBundle = new PropertyResourceBundle(new InputStreamReader(plugin.getResource(localesPrefix + ".properties"), StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load reference file... This is really bad!", e);
-        }
-
-        if (defaultBundle == null) {
-            // How should we update without a reference?
-            plugin.getLogger().warning("No reference locale found. Please report this to the application owner");
-            return;
-        }
-
-        Set<String> defaultKeys = new HashSet<>(Collections.list(defaultBundle.getKeys()));
-        defaultKeys.addAll(runtimeLocaleCodes.keySet());
 
         // Update keys of existing files.
-        for (var file : localeFiles) {
+        for (var path : localeFiles) {
 
-            // try to search for a included updated version.
-            var currLocale = extractLocale(file.getName());
-            @Nullable ResourceBundle refBundle = null;
-
-            if (currLocale != null) {
-                try {
-                    refBundle = new PropertyResourceBundle(new InputStreamReader(
-                            plugin.getResource(localesPrefix + "_" + currLocale + ".properties"), StandardCharsets.UTF_8));
-                } catch (IOException | NullPointerException e) {
-                    plugin.getLogger().info("§eNo reference locale found for " + currLocale + ". Using default locale.");
-                }
-                if (refBundle == null) {
-                    refBundle = defaultBundle;
-                } else {
-                    plugin.getLogger().info("§2Found matching locale for " + currLocale);
-                }
-            } else {
-                plugin.getLogger().warning("Could not determine locale code of file " + file.getName());
-                refBundle = defaultBundle;
+            // get the default keys.
+            Set<String> updateKeys;
+            try {
+                updateKeys = getDefaultKeys();
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Could not load reference file... Aborting update!", e);
+                return;
             }
 
-            // TODO: Preserve commands for properties.
-            // load the external property file.
-            Map<String, String> treemap = new TreeMap<>(String::compareToIgnoreCase);
-            try (var bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {
-                var line = bufferedReader.readLine();
-                while (line != null) {
-                    var split = line.split("=", 2);
-                    if (split.length == 2) {
-                        treemap.put(split[0], split[1]);
-                    }
-                    line = bufferedReader.readLine();
-                }
+            // try to search for a included updated version.
+            ResourceBundle refBundle;
+            try {
+                refBundle = getBundle(extractLocale(path));
             } catch (IOException e) {
-                plugin.getLogger().log(Level.WARNING, "Could not update locale " + file.getName() + ".", e);
+                plugin.getLogger().log(Level.SEVERE, "Could not load any reference locale", e);
                 continue;
             }
 
-            var keys = treemap.keySet();
+            ResourceBundle bundle;
+            try {
+                bundle = getBundle(path);
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.SEVERE, "Could not load bundle " + path, e);
+                continue;
+            }
 
-            var updated = false;
+            // load the external property file.
+            Map<String, String> bundleMap;
+            try {
+                bundleMap = bundleMap(path);
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
+                continue;
+            }
+
+            updateKeys.removeAll(bundleMap.keySet());
+
+            if (updateKeys.isEmpty()) {
+                plugin.getLogger().info("§2Locale " + path + " is up to date.");
+                continue;
+            }
+            plugin.getLogger().info("§2Updating " + path + ".");
+
             // check if ref key is in locale
-            for (var currKey : defaultKeys) {
-                if (keys.contains(currKey)) continue;
-                var value = "";
-                if (refBundle != null) {
-                    value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
-                }
+            for (var currKey : updateKeys) {
+                var value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
                 // Add the property with the value if it exists in a internal file.
-                treemap.put(currKey, value);
-                if (!updated) {
-                    plugin.getLogger().info("§2Updating " + file.getName() + ".");
-
-                }
+                bundleMap.put(currKey, value);
                 plugin.getLogger().info("§2Added: §3" + currKey + "§6=§b" + value.replace("\n", "\\n"));
-                updated = true;
-
             }
 
-            // Write to file if updated.
-            if (updated) {
-                try (var outputStream = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
-                    outputStream.write("# File automatically updated at "
-                                       + DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss").format(LocalDateTime.now()) + "\n");
-                    for (var entry : treemap.entrySet()) {
-                        outputStream.write(entry.getKey() + "=" + entry.getValue().replace("\n", "\\n") + "\n");
-                    }
-                } catch (IOException e) {
-                    plugin.getLogger().log(Level.WARNING, "Could not update locale " + file.getName() + ".", e);
-                    continue;
-                }
-                plugin.getLogger().info("§2Updated locale " + file.getName() + ". Please check your translation.");
-            } else {
-                plugin.getLogger().info("§2Locale " + file.getName() + " is up to date.");
+            List<String> lines = new ArrayList<>();
+            lines.add("# File automatically updated at " + timestamp());
+
+            bundleMap.entrySet().stream()
+                    .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
+                    .forEach(lines::add);
+
+            try {
+                Files.write(path, lines, StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
+                continue;
             }
+            plugin.getLogger().info("§2Updated locale " + path + ". Please check your translation.");
         }
     }
 
-    private Locale extractLocale(String filename) {
-        var matcher = localePattern.matcher(filename);
+    private Locale extractLocale(Path filename) {
+        var matcher = localePattern.matcher(filename.toFile().getName());
         if (matcher.find()) {
             var group = matcher.group(1);
             var s = group.split("_");
@@ -422,5 +451,24 @@ public class Localizer implements ILocalizer {
     @Override
     public void addLocaleCodes(Map<String, String> runtimeLocaleCodes) {
         this.runtimeLocaleCodes.putAll(runtimeLocaleCodes);
+    }
+
+    @Override
+    public void registerChild(ILocalizer localizer) {
+        childs.add(localizer);
+    }
+
+    private class DummyResourceBundle extends ResourceBundle {
+
+        @Override
+        protected Object handleGetObject(@NotNull String key) {
+            return null;
+        }
+
+        @NotNull
+        @Override
+        public Enumeration<String> getKeys() {
+            return Collections.emptyEnumeration();
+        }
     }
 }
