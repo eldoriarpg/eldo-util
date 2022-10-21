@@ -9,11 +9,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-<<<<<<< HEAD
 version = "1.14.0"
-=======
-version = "1.13.10"
->>>>>>> c1f26fe (Rewrite update mechanism and add child localizers (#39))
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains {
