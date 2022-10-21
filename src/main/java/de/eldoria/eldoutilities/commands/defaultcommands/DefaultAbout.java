@@ -12,6 +12,7 @@ import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IConsoleTabExecutor;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.eldoutilities.commands.executor.ITabExecutor;
 import de.eldoria.eldoutilities.localization.Replacement;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -19,7 +20,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class DefaultAbout extends AdvancedCommand implements IPlayerTabExecutor, IConsoleTabExecutor {
+public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
     private final String discord;
 
     public DefaultAbout(Plugin plugin) {
@@ -31,6 +32,7 @@ public class DefaultAbout extends AdvancedCommand implements IPlayerTabExecutor,
         this.discord = discord;
     }
 
+    @Override
     public void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) {
         var descr = plugin().getDescription();
         messageSender().sendLocalizedMessage(sender, "about",
@@ -39,15 +41,5 @@ public class DefaultAbout extends AdvancedCommand implements IPlayerTabExecutor,
                 Replacement.create("VERSION", descr.getVersion(), 'b'),
                 Replacement.create("WEBSITE", descr.getWebsite(), 'b'),
                 Replacement.create("DISCORD", "https://discord.gg/" + discord, 'b'));
-    }
-
-    @Override
-    public void onCommand(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        onCommand((CommandSender) console, alias, args);
-    }
-
-    @Override
-    public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        onCommand((CommandSender) player, alias, args);
     }
 }

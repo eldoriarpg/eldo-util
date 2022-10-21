@@ -12,6 +12,7 @@ import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.commands.executor.IConsoleTabExecutor;
 import de.eldoria.eldoutilities.commands.executor.IPlayerTabExecutor;
+import de.eldoria.eldoutilities.commands.executor.ITabExecutor;
 import de.eldoria.eldoutilities.debug.DebugSettings;
 import de.eldoria.eldoutilities.debug.DebugUtil;
 import org.bukkit.command.CommandSender;
@@ -20,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class DefaultDebug extends AdvancedCommand implements IPlayerTabExecutor, IConsoleTabExecutor {
+public class DefaultDebug extends AdvancedCommand implements ITabExecutor {
 
     private final DebugSettings settings;
 
@@ -35,17 +36,8 @@ public class DefaultDebug extends AdvancedCommand implements IPlayerTabExecutor,
         this(plugin, permission, DebugSettings.DEFAULT);
     }
 
-    protected void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) {
+    @Override
+    public void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) {
         DebugUtil.dispatchDebug(sender, plugin(), settings);
-    }
-
-    @Override
-    public void onCommand(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        onCommand((CommandSender) console, alias, args);
-    }
-
-    @Override
-    public void onCommand(@NotNull Player player, @NotNull String alias, @NotNull Arguments args) throws CommandException {
-        onCommand((CommandSender) player, alias, args);
     }
 }
