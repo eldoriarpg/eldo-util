@@ -9,18 +9,24 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.13.9"
+version = "1.13.10"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
-javaToolchains{
-    java{
-        sourceCompatibility = JavaVersion.VERSION_11
+javaToolchains {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
+    testing{
+
     }
 }
 
 repositories {
     mavenCentral()
+    maven("https://eldonexus.de/repository/maven-proxies")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+    maven("https://repo.papermc.io/repository/maven-public/")
+
 }
 
 dependencies {
@@ -33,6 +39,7 @@ dependencies {
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.1")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.1")
     testImplementation("org.mockito", "mockito-core", "4.8.0")
+    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.82.1")
 }
 
 java {
@@ -40,7 +47,7 @@ java {
     withJavadocJar()
 }
 
-publishData{
+publishData {
     useEldoNexusRepos()
     publishTask("shadowJar")
     publishTask("sourcesJar")
@@ -77,7 +84,7 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    javadoc{
+    javadoc {
         options.encoding = "UTF-8"
     }
 
