@@ -38,7 +38,7 @@ dependencies {
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.1")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.1")
-    testImplementation("org.mockito", "mockito-core", "4.8.0")
+    testImplementation("org.mockito", "mockito-core", "4.8.1")
     testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.126.1")
 }
 
