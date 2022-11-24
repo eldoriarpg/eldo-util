@@ -35,7 +35,6 @@ public class AdvancedCommandAdapter extends AdvancedCommand implements TabExecut
     private AdvancedCommandAdapter(Plugin plugin, AdvancedCommand advancedCommand) {
         super(plugin);
         this.advancedCommand = advancedCommand;
-        advancedCommand.meta().parent(this);
     }
 
     @Override

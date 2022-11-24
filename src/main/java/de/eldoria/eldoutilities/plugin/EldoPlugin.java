@@ -23,6 +23,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.server.ServerCommandEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -177,7 +178,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     }
 
     /**
-     * Get the servers plugin manager
+     * Get the servers plugin manager.
      *
      * @return plugin manager
      */
@@ -186,7 +187,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     }
 
     /**
-     * Get the servers scheduler
+     * Get the servers scheduler.
      *
      * @return scheduler instance
      */
@@ -194,6 +195,14 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         return getServer().getScheduler();
     }
 
+
+    /**
+     * Get a list of classes which should be registered via {@link  ConfigurationSerialization#registerClass(Class)}.
+     * <p>
+     * These classes will be registered on load plugin initialization.
+     *
+     * @return list of serializable classes.
+     */
     public List<Class<? extends ConfigurationSerializable>> getConfigSerialization() {
         return Collections.emptyList();
     }
@@ -208,6 +217,13 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         }
     }
 
+    /**
+     * Executed on load of the plugin. Replacement for {@link Plugin#onLoad()}.
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
+     *
+     * @throws Throwable any throwable
+     */
     public void onPluginLoad() throws Throwable {
 
     }
@@ -289,33 +305,54 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         onPluginReload();
     }
 
+    /**
+     * Executed on when the plugin gets reloaded via server reload. This method will be executed before execution of {@link #onPluginEnable()}.
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
+     *
+     * @throws Throwable any throwable
+     */
     public void onPluginReload() throws Throwable {
     }
 
     /**
      * Called when the server has started completely.
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
      *
      * @param reload indicated that the call was caused by a server reload
+     * @throws Throwable any throwable
      */
     public void onPostStart(boolean reload) throws Throwable {
     }
 
     /**
      * Called when the server has started completely.
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
+     *
+     * @throws Throwable any throwable
      */
     public void onPostStart() throws Throwable {
     }
 
     /**
-     * Called when this plugin is enabled
+     * Called when this plugin is enabled. Replacement for {@link Plugin#onEnable()}
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
      *
      * @param reload indicated that the call was caused by a server reload
+     * @throws Throwable any throwable
      */
     public void onPluginEnable(boolean reload) throws Throwable {
     }
 
     /**
-     * Called when this plugin is enabled
+     * Called when this plugin is enabled. Replacement for {@link Plugin#onEnable()}
+     * <p>
+     * Any thrown exception will be catched and make the plugin initializing the failsave mode.
+     *
+     * @throws Throwable any throwable
      */
     public void onPluginEnable() throws Throwable {
     }
@@ -360,6 +397,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     /**
      * Called when this plugin is disabled.
+     *
+     * @throws Throwable any exception
      */
     public void onPluginDisable() throws Throwable {
     }

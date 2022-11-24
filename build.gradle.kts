@@ -3,24 +3,30 @@ plugins {
     java
     `maven-publish`
     `java-library`
-    id("de.chojo.publishdata") version "1.0.4"
+    id("de.chojo.publishdata") version "1.0.9"
     id("org.cadixdev.licenser") version "0.6.1"
 }
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.13.9"
+version = "1.14.0"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
-javaToolchains{
-    java{
-        sourceCompatibility = JavaVersion.VERSION_11
+javaToolchains {
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+    }
+    testing{
+
     }
 }
 
 repositories {
     mavenCentral()
+    maven("https://eldonexus.de/repository/maven-proxies")
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+    maven("https://repo.papermc.io/repository/maven-public/")
+
 }
 
 dependencies {
@@ -30,9 +36,10 @@ dependencies {
 
     testImplementation("org.jetbrains", "annotations", "23.0.0")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.8.2")
-    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.8.2")
-    testImplementation("org.mockito", "mockito-core", "4.6.0")
+    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.1")
+    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.1")
+    testImplementation("org.mockito", "mockito-core", "4.9.0")
+    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.133.1")
 }
 
 java {
@@ -40,7 +47,7 @@ java {
     withJavadocJar()
 }
 
-publishData{
+publishData {
     useEldoNexusRepos()
     publishTask("shadowJar")
     publishTask("sourcesJar")
@@ -77,7 +84,7 @@ tasks {
         options.encoding = "UTF-8"
     }
 
-    javadoc{
+    javadoc {
         options.encoding = "UTF-8"
     }
 
