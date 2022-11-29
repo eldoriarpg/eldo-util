@@ -88,7 +88,7 @@ public class Localizer implements ILocalizer {
         this.includedLocales = includedLocales;
         ResourceBundle fallbackBundle = new DummyResourceBundle();
         try {
-            fallbackBundle = getBundle(getLocaleFileName(fallbackLocale.toString()));
+            fallbackBundle = getBundle(fallbackLocale);
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not read fallback file", e);
         }
