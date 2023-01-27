@@ -8,12 +8,9 @@ package de.eldoria.eldoutilities.simplecommands;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.internal.LinkedHashTreeMap;
 import de.eldoria.eldoutilities.C;
 import de.eldoria.eldoutilities.commands.command.util.CommandAssertions;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
-import de.eldoria.eldoutilities.localization.ILocalizer;
-import de.eldoria.eldoutilities.localization.Replacement;
 import de.eldoria.eldoutilities.utils.ArrayUtil;
 import de.eldoria.eldoutilities.utils.Parser;
 import org.bukkit.Bukkit;
@@ -33,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -50,9 +48,9 @@ public final class TabCompleteUtil {
     private static final Set<String> ONLINE_NAMES = new HashSet<>();
     public static final long OFFLINE_PLAYER_CACHE_SIZE = 1000L;
     private static Instant lastPlayerRefresh = Instant.now();
-    private static final Set<String> smartMats;
-    private static final Map<String, List<String>> smartShortMats;
-    private static final Map<String, List<String>> smartPartMats;
+    private static final Set<String> SMART_MATS;
+    private static final Map<String, List<String>> SMART_SHORT_MATS;
+    private static final Map<String, List<String>> SMART_PART_MATS;
     private static final Pattern SHORT_NAME = Pattern.compile("(?:(?:^|_)(.))");
     private static final Cache<String, List<String>> SMART_MAT_RESULTS = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
 
@@ -61,17 +59,17 @@ public final class TabCompleteUtil {
     }
 
     static {
-        smartMats = new LinkedHashSet<>();
-        smartShortMats = new LinkedHashTreeMap<>();
-        smartPartMats = new LinkedHashTreeMap<>();
+        SMART_MATS = new LinkedHashSet<>();
+        SMART_SHORT_MATS = new TreeMap<>();
+        SMART_PART_MATS = new TreeMap<>();
 
         for (var material : Material.values()) {
             var name = material.name();
             if (name.startsWith("LEGACY")) continue;
-            smartShortMats.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
-            smartMats.add(name);
+            SMART_SHORT_MATS.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            SMART_MATS.add(name);
             for (var part : getParts(material)) {
-                smartPartMats.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+                SMART_PART_MATS.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
             }
         }
     }
@@ -100,23 +98,23 @@ public final class TabCompleteUtil {
         value = value.toLowerCase(Locale.ROOT);
         Set<String> results = new LinkedHashSet<>();
         // Smart matches on part have the highest priority
-        for (var entry : smartShortMats.entrySet()) {
+        for (var entry : SMART_SHORT_MATS.entrySet()) {
             if (!entry.getKey().startsWith(value)) continue;
             results.addAll(entry.getValue());
         }
 
         // Matches on the start of the value have second prio
-        results.addAll(complete(value, smartMats));
+        results.addAll(complete(value, SMART_MATS));
 
         // Part matches are nice, but have low priority
-        for (var entry : smartPartMats.entrySet()) {
+        for (var entry : SMART_PART_MATS.entrySet()) {
             if (!entry.getKey().startsWith(value)) continue;
             results.addAll(entry.getValue());
         }
 
         var finalValue = value.toUpperCase(Locale.ROOT);
 
-        results.addAll(smartMats.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
+        results.addAll(SMART_MATS.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
         return results.stream()
                 .map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name)
