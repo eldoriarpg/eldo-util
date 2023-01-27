@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -47,6 +46,7 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     private void linkMeta() {
+        if (this instanceof AdvancedCommandAdapter) return;
         for (var cmd : meta.subCommands().values()) {
             cmd.meta().parent(this);
         }
