@@ -118,7 +118,7 @@ public class MessageComposer {
     }
 
     public MessageComposer newLine() {
-        stringBuilder.append(String.format("%n"));
+        stringBuilder.append("\n");
         return this;
     }
 
