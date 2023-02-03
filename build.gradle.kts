@@ -9,7 +9,7 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.14.1"
+version = "1.14.2"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains {
