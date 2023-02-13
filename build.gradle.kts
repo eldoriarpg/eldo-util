@@ -30,7 +30,7 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "3.0.0")
+    implementation("org.bstats", "bstats-bukkit", "3.0.1")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains", "annotations", "24.0.0")
 
