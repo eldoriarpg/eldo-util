@@ -15,18 +15,7 @@ import org.bukkit.entity.HumanEntity;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.regex.Matcher;
@@ -54,8 +43,8 @@ public final class TabCompleteUtil {
 
     static {
         smartMats = new LinkedHashSet<>();
-        smartShortMats = new LinkedHashTreeMap<>();
-        smartPartMats = new LinkedHashTreeMap<>();
+        smartShortMats = new TreeMap<>();
+        smartPartMats = new TreeMap<>();
 
         for (Material material : Material.values()) {
             String name = material.name();
