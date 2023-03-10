@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
     `java-library`
     id("de.chojo.publishdata") version "1.2.1"
-    id("org.cadixdev.licenser") version "0.6.1"
+    id("com.diffplug.spotless") version "6.16.0"
 }
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
@@ -54,10 +54,12 @@ publishData {
     publishTask("javadocJar")
 }
 
-license {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
-}
+    spotless {
+        java {
+            licenseHeaderFile(rootProject.file("HEADER.txt"))
+            target("**/*.java")
+        }
+    }
 
 publishing {
     publications.create<MavenPublication>("maven") {
