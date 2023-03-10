@@ -1,8 +1,10 @@
 /*
  *     SPDX-License-Identifier: AGPL-3.0-only
  *
- *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ *     Copyright (C) EldoriaRPG Team and Contributor
  */
+
+package de.eldoria.eldoutilities;
 
 import de.eldoria.eldoutilities.localization.Replacement;
 import org.junit.jupiter.api.Assertions;

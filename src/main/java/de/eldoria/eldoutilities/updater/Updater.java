@@ -1,13 +1,15 @@
 /*
  *     SPDX-License-Identifier: AGPL-3.0-only
  *
- *     Copyright (C) 2021 EldoriaRPG Team and Contributor
+ *     Copyright (C) EldoriaRPG Team and Contributor
  */
 
 package de.eldoria.eldoutilities.updater;
 
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateChecker;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateData;
+import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
+import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
@@ -17,6 +19,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.net.http.HttpClient;
 import java.util.Optional;
 
 /**
@@ -29,6 +32,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     private final T data;
     private String latestVersion;
     private boolean notifyActive;
+    private HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
     private boolean updateAvailable;
     private boolean downloaded;
 
@@ -57,13 +61,23 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
         return new ButlerUpdateChecker(data);
     }
 
+    /**
+     * Create a new lyna update check
+     *
+     * @param data lyna plugin data
+     * @return Updater instance
+     */
+    public static Updater<?> lyna(LynaUpdateData data) {
+        return new LynaUpdateChecker(data);
+    }
+
     @Override
     public void run() {
         performCheck(true);
     }
 
     /**
-     * Performs a update check with the saved data. This can be repeatet in a scheduler.
+     * Performs an update check with the saved data. This can be repeatet in a scheduler.
      *
      * @return true when the check was successful and a new version is available
      */
@@ -75,10 +89,10 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
             plugin.getLogger().info("§2Checking for new Version...");
         }
 
-        var optLatest = getLatestVersion(data);
+        var optLatest = checkUpdate(data);
         if (optLatest.isPresent()) {
-            latestVersion = optLatest.get();
-            updateAvailable = evaluate(this.latestVersion);
+            latestVersion = optLatest.get().latestVersion();
+            updateAvailable = optLatest.get().isOutdated();
         } else {
             plugin.getLogger().info("Could not check latest version.");
             return false;
@@ -90,9 +104,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
                 if (!downloaded) {
                     downloaded = update();
                 }
-                registerListener(new DownloadedNotifier(plugin, data.notifyPermission(), latestVersion, downloaded));
+                registerListener(new DownloadedNotifier(plugin, data, latestVersion, downloaded));
             } else {
-                registerListener(new UpdateNotifier(plugin, data.notifyPermission(), latestVersion));
+                registerListener(new UpdateNotifier(plugin, data, latestVersion));
             }
         } else {
             if (!silent) {
@@ -114,17 +128,7 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
      * @param data data for plugin updates
      * @return empty optional if the version could not be checked or the latest version.
      */
-    protected abstract Optional<String> getLatestVersion(T data);
-
-    /**
-     * Evaluates the result from request.
-     *
-     * @param latestVersion optional with latest version
-     * @return true if a update is available.
-     */
-    private boolean evaluate(String latestVersion) {
-        return !plugin.getDescription().getVersion().equalsIgnoreCase(latestVersion);
-    }
+    protected abstract Optional<UpdateResponse> checkUpdate(T data);
 
     /**
      * This version should update the plugin. If not implemented set the {@link UpdateData#isAutoUpdate()} to false.
@@ -147,9 +151,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     }
 
     private void logUpdateMessage() {
-        plugin.getLogger().info("§2New version of §6" + plugin.getName() + "§2 available.");
-        plugin.getLogger().info("§2Newest version: §3" + latestVersion + "! Current version: §c" + plugin.getDescription().getVersion() + "§2!");
-        plugin.getLogger().info("§2Download new version here: §6" + plugin.getDescription().getWebsite());
+        data.updateMessage(latestVersion).lines().forEach(line -> {
+            plugin.getLogger().info(line);
+        });
     }
 
     private void registerListener(Listener listener) {
@@ -162,5 +166,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
 
     public T getData() {
         return data;
+    }
+
+    protected HttpClient client() {
+        return client;
     }
 }
