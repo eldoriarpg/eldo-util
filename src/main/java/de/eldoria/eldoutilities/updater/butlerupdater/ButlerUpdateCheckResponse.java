@@ -11,7 +11,7 @@ package de.eldoria.eldoutilities.updater.butlerupdater;
  *
  * @since 1.1.0
  */
-public class UpdateCheckResponse {
+public class ButlerUpdateCheckResponse {
     private final boolean newVersionAvailable;
     private final String latestVersion;
     private final String hash;
@@ -21,9 +21,9 @@ public class UpdateCheckResponse {
      *
      * @param newVersionAvailable whether a new version is available or not
      * @param latestVersion       latest available version
-     * @param hash                hash of latest version
+     * @param hash                hash of the latest version
      */
-    public UpdateCheckResponse(boolean newVersionAvailable, String latestVersion, String hash) {
+    public ButlerUpdateCheckResponse(boolean newVersionAvailable, String latestVersion, String hash) {
         this.newVersionAvailable = newVersionAvailable;
         this.latestVersion = latestVersion;
         this.hash = hash;

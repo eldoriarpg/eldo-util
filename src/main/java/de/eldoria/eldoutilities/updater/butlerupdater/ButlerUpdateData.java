@@ -19,7 +19,6 @@ public class ButlerUpdateData extends UpdateData {
      * Default adress to submit debug data and update checks
      */
     public static final String HOST = "https://plugins.eldoria.de";
-
     private final int butlerId;
     private final String host;
 
@@ -29,14 +28,18 @@ public class ButlerUpdateData extends UpdateData {
      * @param plugin           plugin instance
      * @param notifyPermission permission which will be required for update notification
      * @param notifyUpdate     true if users with permission should be notified
-     * @param autoUpdate       true if a auto update should be performed
+     * @param autoUpdate       true if an auto update should be performed
      * @param butlerId         id of buttler application
      * @param host             host of butler instance
      */
-    public ButlerUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, int butlerId, String host) {
-        super(plugin, notifyPermission, notifyUpdate, autoUpdate);
+    ButlerUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, int butlerId, String host, String updateUrl, String updateMessage) {
+        super(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage);
         this.butlerId = butlerId;
         this.host = host;
+    }
+
+    public static ButlerUpdateDataBuilder builder(Plugin plugin, int butlerId) {
+        return new ButlerUpdateDataBuilder(plugin, butlerId);
     }
 
     public int butlerId() {

@@ -8,20 +8,17 @@ package de.eldoria.eldoutilities.updater.butlerupdater;
 
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
+import de.eldoria.eldoutilities.updater.UpdateResponse;
 import de.eldoria.eldoutilities.updater.Updater;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
+import de.eldoria.eldoutilities.utils.Plugins;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Field;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -34,58 +31,40 @@ import java.util.logging.Level;
  * @since 1.1.0
  */
 public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
-    private UpdateCheckResponse response;
+    private ButlerUpdateCheckResponse response;
 
     public ButlerUpdateChecker(ButlerUpdateData data) {
         super(data);
     }
 
     @Override
-    protected Optional<String> getLatestVersion(ButlerUpdateData data) {
+    protected Optional<UpdateResponse> checkUpdate(ButlerUpdateData data) {
         var plugin = data.plugin();
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create("%s/api/v1/update/check?version%s&id=%s"
+                        .formatted(data.host(), plugin.getDescription().getVersion(), data.butlerId())))
+                .GET()
+                .header("Content-Type", "application/json; utf-8")
+                .header("Accept", "application/json")
+                .header("User-Agent", "EldoUtilities/ButlerUpdater")
+                .build();
 
-        HttpURLConnection con;
+        String body;
         try {
-            var url = new URL(data.host() + "/check?version=" + plugin.getDescription().getVersion() + "&id=" + data.butlerId() + "&devbuild=" + false);
-            con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.FINEST, "Could not open connection.", e);
-            return Optional.empty();
-        }
-
-        con.setRequestProperty("Content-Type", "application/json; utf-8");
-        con.setRequestProperty("Accept", "application/json");
-        con.setDoOutput(true);
-
-        try {
-            if (con.getResponseCode() != 200) {
+            var response = client().send(request, HttpResponse.BodyHandlers.ofString());
+            body = response.body();
+            if (response.statusCode() != 200) {
                 plugin.getLogger().log(Level.FINEST, "Received non 200 request.");
-
                 return Optional.empty();
             }
         } catch (IOException e) {
-            plugin.getLogger().log(Level.INFO, "Could not read response.", e);
-
+            return Optional.empty();
+        } catch (InterruptedException e) {
             return Optional.empty();
         }
+        response = new Gson().fromJson(body, ButlerUpdateCheckResponse.class);
 
-
-        try (var br = new BufferedReader(
-                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-            var builder = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                builder.append(responseLine.trim());
-            }
-            response = new Gson().fromJson(builder.toString(), UpdateCheckResponse.class);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.FINEST, "Could not read response.", e);
-
-            return Optional.empty();
-        }
-
-        return Optional.ofNullable(response.latestVersion());
+        return Optional.of(new UpdateResponse(response.isNewVersionAvailable(), response.latestVersion()));
     }
 
     @Override
@@ -118,25 +97,13 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
             }
         }
 
-        // Get File of plugin
-        Field fileField;
-        try {
-            fileField = JavaPlugin.class.getDeclaredField("file");
-        } catch (NoSuchFieldException e) {
-            plugin.getLogger().log(Level.WARNING, "§cCould not find field file in plugin.", e);
-            plugin.getLogger().warning("§cAborting Update.");
-            return false;
-        }
-        fileField.setAccessible(true);
-        File pluginFile;
-        try {
-            pluginFile = (File) fileField.get(plugin);
-        } catch (IllegalAccessException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not retrieve file of plugin.", e);
+        var pluginFile = Plugins.getPluginFile(plugin);
+        if (pluginFile.isEmpty()) {
+            plugin.getLogger().log(Level.WARNING, "§cCould not find plugin file");
             return false;
         }
 
-        var updateFile = Paths.get(updateDirectory.getAbsolutePath(), pluginFile.getName()).toFile();
+        var updateFile = Paths.get(updateDirectory.getAbsolutePath(), pluginFile.get().getName()).toFile();
         try (var input = url.openStream()) {
             Files.copy(input, updateFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
@@ -164,7 +131,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
         }
         plugin.getLogger().info("§2Checksums of update file is correct.");
 
-        plugin.getLogger().info("§2File " + pluginFile.getName() + " will be replaced with the new version on next startup.");
+        plugin.getLogger().info("§2File " + pluginFile.get().getName() + " will be replaced with the new version on next startup.");
 
         plugin.getLogger().info("§2>----------------------------------------------------<");
         plugin.getLogger().info("§2> Update downloaded. Please restart to apply update. <");

@@ -25,9 +25,13 @@ public class SpigotUpdateData extends UpdateData {
      * @param notifyUpdate     set to true to notify admins on login
      * @param spigotId         spigot id of the plugin
      */
-    public SpigotUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, int spigotId) {
-        super(plugin, notifyPermission, notifyUpdate, false);
+    SpigotUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, int spigotId, String updateUrl, String updateMessage) {
+        super(plugin, notifyPermission, notifyUpdate, false, updateUrl, updateMessage);
         this.spigotId = spigotId;
+    }
+
+    public static SpigotUpdateDataBuilder builder(Plugin plugin, int spigotId) {
+        return new SpigotUpdateDataBuilder(plugin, spigotId);
     }
 
     public int getSpigotId() {

@@ -8,7 +8,6 @@ package de.eldoria.eldoutilities.debug;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import de.eldoria.eldoutilities.configuration.ConfigFileWrapper;
 import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.debug.data.DebugPayloadData;
 import de.eldoria.eldoutilities.debug.data.DebugResponse;
@@ -25,7 +24,6 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -108,6 +106,10 @@ public final class DebugUtil {
      */
     public static @NotNull EntryData[] getAdditionalPluginMeta(Plugin plugin) {
         List<EntryData> meta = new LinkedList<>();
+
+        UserData userData = UserData.get(plugin);
+
+        meta.add(new EntryData("User Data", userData.asString()));
 
         if (plugin instanceof DebugDataProvider) {
             Set<DebugDataProvider> debuged = new HashSet<>();
