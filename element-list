@@ -37,6 +37,7 @@ de.eldoria.eldoutilities.threading
 de.eldoria.eldoutilities.threading.futures
 de.eldoria.eldoutilities.updater
 de.eldoria.eldoutilities.updater.butlerupdater
+de.eldoria.eldoutilities.updater.lynaupdater
 de.eldoria.eldoutilities.updater.notifier
 de.eldoria.eldoutilities.updater.spigotupdater
 de.eldoria.eldoutilities.utils
