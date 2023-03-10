@@ -39,7 +39,7 @@ public class LynaUpdateChecker extends Updater<LynaUpdateData> {
     protected Optional<UpdateResponse> checkUpdate(LynaUpdateData data) {
         var plugin = data.plugin();
         var request = HttpRequest.newBuilder()
-                .uri(URI.create("%s/api/v1/update/check?version%s&id=%s"
+                .uri(URI.create("%s/api/v1/update/check?version=%s&id=%s"
                         .formatted(data.host(), data.userData().property(DefaultProperties.ARTIFACT_VERSION), data.productId())))
                 .GET()
                 .header("Content-Type", "application/json; utf-8")

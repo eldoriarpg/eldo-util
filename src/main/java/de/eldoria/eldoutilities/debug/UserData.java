@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,7 +36,7 @@ public final class UserData {
     }
 
     public static UserData get(Plugin plugin) {
-        Map<String, String> buildProperties = new HashMap<>();
+        Map<String, String> buildProperties = new LinkedHashMap<>();
         try (var in = plugin.getResource("build.data")) {
             if (in != null) {
                 buildProperties = Arrays.stream(new String(in.readAllBytes(), StandardCharsets.UTF_8).split("\n"))

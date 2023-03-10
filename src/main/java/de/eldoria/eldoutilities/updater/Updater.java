@@ -151,9 +151,9 @@ public abstract class Updater<T extends UpdateData> extends BukkitRunnable imple
     }
 
     private void logUpdateMessage() {
-        plugin.getLogger().info("§2New version of §6" + plugin.getName() + "§2 available.");
-        plugin.getLogger().info("§2Newest version: §3" + latestVersion + "! Current version: §c" + plugin.getDescription().getVersion() + "§2!");
-        plugin.getLogger().info("§2Download new version here: §6" + plugin.getDescription().getWebsite());
+        data.updateMessage(latestVersion).lines().forEach(line -> {
+            plugin.getLogger().info(line);
+        });
     }
 
     private void registerListener(Listener listener) {
