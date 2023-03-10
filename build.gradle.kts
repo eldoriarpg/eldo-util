@@ -1,15 +1,15 @@
 plugins {
-    id("com.github.johnrengelman.shadow") version "7.1.2"
+    id("com.github.johnrengelman.shadow") version "8.1.0"
     java
     `maven-publish`
     `java-library`
-    id("de.chojo.publishdata") version "1.0.9"
-    id("org.cadixdev.licenser") version "0.6.1"
+    id("de.chojo.publishdata") version "1.2.3"
+    id("com.diffplug.spotless") version "6.16.0"
 }
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.14.2"
+version = "1.14.3"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains {
@@ -30,16 +30,16 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "3.0.0")
+    implementation("org.bstats", "bstats-bukkit", "3.0.1")
     compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains", "annotations", "24.0.0")
+    compileOnly("org.jetbrains", "annotations", "24.0.1")
 
-    testImplementation("org.jetbrains", "annotations", "24.0.0")
+    testImplementation("org.jetbrains", "annotations", "24.0.1")
     testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
-    testImplementation("org.mockito", "mockito-core", "5.1.1")
-    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.144.5")
+    testImplementation("org.mockito", "mockito-core", "5.2.0")
+    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
 }
 
 java {
@@ -48,16 +48,18 @@ java {
 }
 
 publishData {
-    useEldoNexusRepos(true)
+    useEldoNexusRepos()
     publishTask("shadowJar")
     publishTask("sourcesJar")
     publishTask("javadocJar")
 }
 
-license {
-    header(rootProject.file("HEADER.txt"))
-    include("**/*.java")
-}
+    spotless {
+        java {
+            licenseHeaderFile(rootProject.file("HEADER.txt"))
+            target("**/*.java")
+        }
+    }
 
 publishing {
     publications.create<MavenPublication>("maven") {
