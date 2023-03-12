@@ -7,21 +7,20 @@
 package de.eldoria.eldoutilities.updater.notifier;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
-import de.eldoria.eldoutilities.updater.Notifier;
 import de.eldoria.eldoutilities.updater.UpdateData;
+import de.eldoria.eldoutilities.updater.UpdateResponse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginDescriptionFile;
 
 /**
  * Notifier implementation for updater with update check function.
  *
  * @since 1.1.0
  */
-public class UpdateNotifier extends Notifier {
+public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
 
-    public UpdateNotifier(Plugin plugin, UpdateData data, String latest) {
+    public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest) {
         super(plugin, data, latest);
     }
 

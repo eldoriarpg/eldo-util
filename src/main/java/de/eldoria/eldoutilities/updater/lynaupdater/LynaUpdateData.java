@@ -10,12 +10,14 @@ import de.eldoria.eldoutilities.debug.UserData;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Map;
+
 /**
  * Update Data implementation for butler application.
  *
  * @since 1.1.0
  */
-public class LynaUpdateData extends UpdateData {
+public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
     /**
      * Default adress to submit debug data and update checks
      */
@@ -43,6 +45,14 @@ public class LynaUpdateData extends UpdateData {
 
     public static LynaUpdateDataBuilder builder(Plugin plugin, int productId) {
         return new LynaUpdateDataBuilder(plugin, productId);
+    }
+
+
+    @Override
+    protected Map<String, Object> replacements(LynaUpdateResponse updateResponse) {
+        var replacements = super.replacements(updateResponse);
+        replacements.put("age", updateResponse);
+        return replacements;
     }
 
     public int productId() {

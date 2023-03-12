@@ -8,12 +8,15 @@ package de.eldoria.eldoutilities.updater;
 
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Update data base implementation.
  *
  * @since 1.0.0
  */
-public abstract class UpdateData {
+public abstract class UpdateData<T extends UpdateResponse> {
     private final String notifyPermission;
     private final boolean notifyUpdate;
     private final Plugin plugin;
@@ -56,11 +59,20 @@ public abstract class UpdateData {
         return autoUpdate;
     }
 
-    public String updateMessage(String newVersion) {
-        return updateMessage
-                .replace("{plugin_name}", plugin.getName())
-                .replace("{new_version}", newVersion)
-                .replace("{current_version}", plugin.getDescription().getVersion())
-                .replace("{website}", updateUrl);
+    protected Map<String, Object> replacements(T updateResponse) {
+        var replacements = new HashMap<String, Object>();
+        replacements.put("plugin_name", plugin.getName());
+        replacements.put("new_version", updateResponse.latestVersion());
+        replacements.put("current_version", plugin.getDescription().getVersion());
+        replacements.put("website", updateUrl);
+        return replacements;
+    }
+
+    public String updateMessage(T updateResponse) {
+        var message = updateMessage;
+        for (var entry : replacements(updateResponse).entrySet()) {
+            message = message.replace("{%s}".formatted(entry.getKey()), String.valueOf(entry.getValue()));
+        }
+        return message;
     }
 }

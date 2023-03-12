@@ -8,7 +8,7 @@ package de.eldoria.eldoutilities.updater;
 
 import org.bukkit.plugin.Plugin;
 
-public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?,?>, V extends UpdateData> {
+public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
     protected String notifyPermission = "eldoutilitites.admin";
     protected boolean notifyUpdate;

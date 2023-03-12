@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.updater.spigotupdater;
 
+import de.eldoria.eldoutilities.updater.DefaultUpdateResponse;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import org.bukkit.plugin.Plugin;
 
@@ -14,7 +15,7 @@ import org.bukkit.plugin.Plugin;
  *
  * @since 1.0.0
  */
-public class SpigotUpdateData extends UpdateData {
+public class SpigotUpdateData extends UpdateData<DefaultUpdateResponse> {
     private final int spigotId;
 
     /**
