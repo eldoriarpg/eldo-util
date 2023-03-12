@@ -19,7 +19,8 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
         this.productId = productId;
         updateMessage = """
                 New version of §b{plugin_name}§r available.
-                §a{new_version}§r was published §a{new_time} ({new_date_time})§r ago! Current version: §c{current_version} ({current_date_time})§r!
+                New Version: §a{new_version}§r. Published §a{new_time}§r ago! {new_date_time}
+                Current version: §c{current_version}§r Published §c{current_time}§r ago! {current_date_time}
                 Download the new version via Discord: §b{website}""".stripIndent();
     }
 
