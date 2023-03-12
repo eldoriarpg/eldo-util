@@ -8,7 +8,7 @@ package de.eldoria.eldoutilities.updater.butlerupdater;
 
 import com.google.common.hash.Hashing;
 import com.google.gson.Gson;
-import de.eldoria.eldoutilities.updater.UpdateResponse;
+import de.eldoria.eldoutilities.updater.DefaultUpdateResponse;
 import de.eldoria.eldoutilities.updater.Updater;
 import de.eldoria.eldoutilities.utils.Plugins;
 
@@ -30,7 +30,7 @@ import java.util.logging.Level;
  *
  * @since 1.1.0
  */
-public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
+public class ButlerUpdateChecker extends Updater<DefaultUpdateResponse, ButlerUpdateData> {
     private ButlerUpdateCheckResponse response;
 
     public ButlerUpdateChecker(ButlerUpdateData data) {
@@ -38,7 +38,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
     }
 
     @Override
-    protected Optional<UpdateResponse> checkUpdate(ButlerUpdateData data) {
+    protected Optional<DefaultUpdateResponse> checkUpdate(ButlerUpdateData data) {
         var plugin = data.plugin();
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/api/v1/update/check?version%s&id=%s"
@@ -64,7 +64,7 @@ public class ButlerUpdateChecker extends Updater<ButlerUpdateData> {
         }
         response = new Gson().fromJson(body, ButlerUpdateCheckResponse.class);
 
-        return Optional.of(new UpdateResponse(response.isNewVersionAvailable(), response.latestVersion()));
+        return Optional.of(new DefaultUpdateResponse(response.isNewVersionAvailable(), response.latestVersion()));
     }
 
     @Override

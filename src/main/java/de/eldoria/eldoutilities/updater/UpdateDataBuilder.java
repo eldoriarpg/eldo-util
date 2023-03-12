@@ -8,15 +8,15 @@ package de.eldoria.eldoutilities.updater;
 
 import org.bukkit.plugin.Plugin;
 
-public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?,?>, V extends UpdateData> {
+public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
     protected String notifyPermission = "eldoutilitites.admin";
     protected boolean notifyUpdate;
     protected boolean autoUpdate;
     protected String updateUrl;
     protected String updateMessage = """
-            New version of §b {plugin_name} §r available.
-            Newest version: §a" + {new_version} + "§r! Current version: §c{current_version}§r!
+            New version of §b{plugin_name}§r available.
+            Newest version: §a{new_version}§r! Current version: §c{current_version}§r!
             Download new version here: §b{website}
             """.stripIndent();
 
@@ -45,6 +45,27 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?,?>, V exte
         return (T) this;
     }
 
+    /**
+     * Set the update notification message. Provides some placeholders to modify the message with runtime information
+     * <table border="1">
+     *   <caption><b>Available placeholder</b></caption>
+     *   <tr>
+     *     <td>plugin_name</td> <td>The name of the plugin</td>
+     *   </tr>
+     *   <tr>
+     *     <td>new_version</td> <td>The new version string</td>
+     *   </tr>
+     *   <tr>
+     *     <td>current_version</td> <td>The current version string</td>
+     *   </tr>
+     *   <tr>
+     *     <td>website</td> <td>The website set in the plugin.yml or provided by {@link #updateUrl(String)}</td>
+     *   </tr>
+     * </table>
+     *
+     * @param updateMessage the update message to be sent
+     * @return builder instance
+     */
     public T updateMessage(String updateMessage) {
         this.updateMessage = updateMessage;
         return (T) this;

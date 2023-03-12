@@ -10,7 +10,7 @@ import de.eldoria.eldoutilities.updater.UpdateDataBuilder;
 import org.bukkit.plugin.Plugin;
 
 public class SpigotUpdateDataBuilder extends UpdateDataBuilder<SpigotUpdateDataBuilder, SpigotUpdateData> {
-    private int spigotId;
+    private final int spigotId;
 
     public SpigotUpdateDataBuilder(Plugin plugin, int spigotId) {
         super(plugin);
