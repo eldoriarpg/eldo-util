@@ -65,7 +65,6 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
                 .map(instant -> Duration.between(instant, Instant.now()))
                 .map(Durations::simpleDurationFormat)
                 .ifPresent(time -> replacements.put("current_time", time));
-        replacements.put("current_time", updateResponse.publishedDuration());
         userData.property(DefaultProperties.UNIX)
                 .map(Long::parseLong)
                 .map(Instant::ofEpochSecond)
