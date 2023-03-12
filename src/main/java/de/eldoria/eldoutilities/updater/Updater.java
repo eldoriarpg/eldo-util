@@ -162,7 +162,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
     private void logUpdateMessage() {
         data.updateMessage(lastCheck).lines().forEach(line -> {
-            plugin.getLogger().info(line);
+            plugin.getLogger().info(line.replaceAll("§.", ""));
         });
     }
 

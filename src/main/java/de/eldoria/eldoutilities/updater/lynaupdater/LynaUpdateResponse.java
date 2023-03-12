@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import de.eldoria.eldoutilities.updater.UpdateResponse;
+import de.eldoria.eldoutilities.utils.Durations;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -53,22 +54,6 @@ public class LynaUpdateResponse implements UpdateResponse {
     }
 
     public String published() {
-        var duration = Duration.ofSeconds(Instant.ofEpochSecond(published).until(Instant.now(), ChronoUnit.SECONDS));
-
-        if (duration.toDays() > 0) {
-            if (duration.toDays() == 1) {
-                return "1 day";
-            }
-            return "%d days".formatted(duration.toDays());
-        }
-
-        if (duration.toHours() > 0) {
-            if (duration.toHours() == 1) {
-                return "1 hour";
-            }
-            return "%d hours".formatted(duration.toHours());
-        }
-
-        return "%d minutes".formatted(duration.toMinutes());
+        return Durations.simpleDurationFormat(Duration.between(Instant.ofEpochSecond(published), Instant.now()));
     }
 }
