@@ -8,6 +8,10 @@ package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import de.eldoria.eldoutilities.updater.UpdateResponse;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 /**
  * Web Response for butler application.
  *
@@ -46,5 +50,25 @@ public class LynaUpdateResponse implements UpdateResponse {
     @Override
     public String latestVersion() {
         return latest;
+    }
+
+    public String published() {
+        var duration = Duration.ofSeconds(Instant.ofEpochSecond(published).until(Instant.now(), ChronoUnit.SECONDS));
+
+        if (duration.toDays() > 0) {
+            if (duration.toDays() == 1) {
+                return "1 day";
+            }
+            return "%d days".formatted(duration.toDays());
+        }
+
+        if (duration.toHours() > 0) {
+            if (duration.toHours() == 1) {
+                return "1 hour";
+            }
+            return "%d hours".formatted(duration.toHours());
+        }
+
+        return "%d minutes".formatted(duration.toMinutes());
     }
 }

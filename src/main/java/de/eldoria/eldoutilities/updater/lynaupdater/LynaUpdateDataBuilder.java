@@ -17,6 +17,10 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
     public LynaUpdateDataBuilder(Plugin plugin, int productId) {
         super(plugin);
         this.productId = productId;
+        updateMessage = """
+                New version of §b{plugin_name}§r available.
+                §a{new_version}§r was published §a{time}§r ago! Current version: §c{current_version}§r!
+                Download the new version via Discord: §b{website}""".stripIndent();
     }
 
     public LynaUpdateDataBuilder host(String host) {

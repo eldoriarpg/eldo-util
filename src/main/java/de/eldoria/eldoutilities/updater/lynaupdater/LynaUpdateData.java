@@ -51,7 +51,7 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
     @Override
     protected Map<String, Object> replacements(LynaUpdateResponse updateResponse) {
         var replacements = super.replacements(updateResponse);
-        replacements.put("age", updateResponse);
+        replacements.put("time", updateResponse.published());
         return replacements;
     }
 
