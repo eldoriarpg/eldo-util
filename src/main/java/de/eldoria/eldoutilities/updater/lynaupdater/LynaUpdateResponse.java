@@ -11,7 +11,6 @@ import de.eldoria.eldoutilities.utils.Durations;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Web Response for butler application.
@@ -53,7 +52,11 @@ public class LynaUpdateResponse implements UpdateResponse {
         return latest;
     }
 
-    public String published() {
+    public long published() {
+        return published;
+    }
+
+    public String publishedDuration() {
         return Durations.simpleDurationFormat(Duration.between(Instant.ofEpochSecond(published), Instant.now()));
     }
 }

@@ -58,20 +58,20 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
     @Override
     protected Map<String, Object> replacements(LynaUpdateResponse updateResponse) {
         var replacements = super.replacements(updateResponse);
-        replacements.put("new_time", updateResponse.published());
+        replacements.put("new_time", updateResponse.publishedDuration());
         userData.property(DefaultProperties.UNIX)
                 .map(Long::parseLong)
                 .map(Instant::ofEpochSecond)
                 .map(instant -> Duration.between(instant, Instant.now()))
                 .map(Durations::simpleDurationFormat)
                 .ifPresent(time -> replacements.put("current_time", time));
-        replacements.put("current_time", updateResponse.published());
+        replacements.put("current_time", updateResponse.publishedDuration());
         userData.property(DefaultProperties.UNIX)
                 .map(Long::parseLong)
                 .map(Instant::ofEpochSecond)
                 .map(format::format)
                 .ifPresent(time -> replacements.put("current_date_time", time));
-        replacements.put("new_date_time", format.format(Instant.ofEpochSecond(Long.parseLong(updateResponse.published()))));
+        replacements.put("new_date_time", format.format(Instant.ofEpochSecond(updateResponse.published())));
         return replacements;
     }
 
