@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * Updater implementation for butler application.
@@ -50,7 +51,7 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/api/v1/update/check?%s"
                         .formatted(data.host(),
-                                queryParams.entrySet().stream().map(e -> "%s=%s".formatted(e.getKey(), e.getValue())))))
+                                queryParams.entrySet().stream().map(e -> "%s=%s".formatted(e.getKey(), e.getValue())).collect(Collectors.joining("&")))))
                 .GET()
                 .header("Content-Type", "application/json; utf-8")
                 .header("Accept", "application/json")
