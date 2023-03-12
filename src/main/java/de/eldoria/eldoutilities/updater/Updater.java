@@ -15,6 +15,7 @@ import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
+import org.bukkit.Color;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -162,7 +163,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
     private void logUpdateMessage() {
         data.updateMessage(lastCheck).lines().forEach(line -> {
-            plugin.getLogger().info(line.replaceAll("§.", ""));
+            plugin.getLogger().info(line.replaceAll("§[0-9a-fklmnor]", ""));
         });
     }
 
