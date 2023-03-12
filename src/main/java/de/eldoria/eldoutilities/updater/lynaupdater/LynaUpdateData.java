@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -27,7 +28,7 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
      * Default adress to submit debug data and update checks
      */
     public static final String HOST = "https://lyna.eldoria.de";
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm");
+    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").withZone(ZoneId.of("Z"));
 
     private final int productId;
     private final String host;

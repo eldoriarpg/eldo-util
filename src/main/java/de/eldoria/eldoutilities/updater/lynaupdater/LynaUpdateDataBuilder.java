@@ -30,9 +30,8 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
 
     /**
      * {@inheritDoc}
-     * <b>Available Lyna placeholder</b>
      * <table border="1">
-     *   <caption>Placeholder</caption>
+     *   <caption><b>Available Lyna placeholder</b></caption>
      *   <tr>
      *     <td>new_time</td> <td>Pretty formatted duration string showing the time since new version was published</td>
      *   </tr>

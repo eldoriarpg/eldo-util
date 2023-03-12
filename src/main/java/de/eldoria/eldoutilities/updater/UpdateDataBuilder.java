@@ -47,10 +47,8 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
 
     /**
      * Set the update notification message. Provides some placeholders to modify the message with runtime information
-     * <p>
-     * <b>Available placeholder</b>
      * <table border="1">
-     *   <caption>Placeholder</caption>
+     *   <caption><b>Available placeholder</b></caption>
      *   <tr>
      *     <td>plugin_name</td> <td>The name of the plugin</td>
      *   </tr>
