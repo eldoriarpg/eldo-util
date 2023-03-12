@@ -8,6 +8,7 @@ package de.eldoria.eldoutilities.updater.notifier;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.UpdateData;
+import de.eldoria.eldoutilities.updater.UpdateResponse;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
@@ -17,10 +18,10 @@ import org.bukkit.plugin.Plugin;
  *
  * @since 1.1.0
  */
-public class DownloadedNotifier extends UpdateNotifier {
+public class DownloadedNotifier<T extends UpdateResponse> extends UpdateNotifier<T> {
     private final boolean updated;
 
-    public DownloadedNotifier(Plugin plugin, UpdateData data, String latestVersion, boolean updated) {
+    public DownloadedNotifier(Plugin plugin, UpdateData<T> data, T latestVersion, boolean updated) {
         super(plugin, data, latestVersion);
         this.updated = updated;
     }

@@ -16,10 +16,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class UserData {
@@ -31,8 +31,8 @@ public final class UserData {
     public final String nonce = "%%__NONCE__%%";
 
     private UserData(Map<String, String> buildProperties) {
-        type = buildProperties.getOrDefault("type", "LOCAL");
         this.buildProperties = buildProperties;
+        type = buildProperties.getOrDefault("type", "LOCAL");
     }
 
     public static UserData get(Plugin plugin) {
@@ -61,11 +61,12 @@ public final class UserData {
         return new UserData(buildProperties);
     }
 
-    public String property(String property) {
-        return buildProperties.get(property);
+    public Optional<String> property(String property) {
+        return Optional.ofNullable(buildProperties.get(property));
     }
-    public String property(DefaultProperties property) {
-        return buildProperties.get(property.key());
+
+    public Optional<String> property(DefaultProperties property) {
+        return property(property.key());
     }
 
     public String resource() {
@@ -88,5 +89,4 @@ public final class UserData {
         buildProperties.entrySet().stream().map(e -> "%s: %s".formatted(e.getKey(), e.getValue())).forEach(properties::add);
         return String.join("\n", properties);
     }
-
 }

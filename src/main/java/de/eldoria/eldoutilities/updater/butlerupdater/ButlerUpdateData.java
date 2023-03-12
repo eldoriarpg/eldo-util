@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.updater.butlerupdater;
 
+import de.eldoria.eldoutilities.updater.DefaultUpdateResponse;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import org.bukkit.plugin.Plugin;
 
@@ -14,7 +15,7 @@ import org.bukkit.plugin.Plugin;
  *
  * @since 1.1.0
  */
-public class ButlerUpdateData extends UpdateData {
+public class ButlerUpdateData extends UpdateData<DefaultUpdateResponse> {
     /**
      * Default adress to submit debug data and update checks
      */
