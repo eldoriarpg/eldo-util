@@ -15,7 +15,6 @@ import de.eldoria.eldoutilities.messages.MessageType;
 import de.eldoria.eldoutilities.utils.ArrayUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

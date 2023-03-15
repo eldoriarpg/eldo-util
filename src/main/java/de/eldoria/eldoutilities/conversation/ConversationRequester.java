@@ -6,7 +6,6 @@
 
 package de.eldoria.eldoutilities.conversation;
 
-import de.eldoria.eldoutilities.core.EldoUtilities;
 import de.eldoria.eldoutilities.messages.MessageType;
 import org.bukkit.Bukkit;
 import org.bukkit.conversations.Conversation;

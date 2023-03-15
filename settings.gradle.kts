@@ -11,3 +11,11 @@ pluginManagement{
         }
     }
 }
+include("core")
+include("messaging")
+include("plugin")
+include("debugging")
+include("updater")
+include("serialization")
+include("commands")
+include("localization")

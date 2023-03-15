@@ -8,8 +8,6 @@ package de.eldoria.eldoutilities.commands.command;
 
 import de.eldoria.eldoutilities.commands.command.util.Arguments;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
-import de.eldoria.eldoutilities.localization.DummyLocalizer;
-import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;

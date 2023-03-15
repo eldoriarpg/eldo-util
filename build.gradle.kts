@@ -1,3 +1,6 @@
+import com.diffplug.gradle.spotless.SpotlessPlugin
+import de.chojo.PublishData
+
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     java
@@ -16,43 +19,66 @@ javaToolchains {
     java {
         sourceCompatibility = JavaVersion.VERSION_17
     }
-    testing{
+    testing {
 
     }
 }
 
-repositories {
-    mavenCentral()
-    maven("https://eldonexus.de/repository/maven-proxies")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
-    maven("https://repo.papermc.io/repository/maven-public/")
+subprojects {
 
 }
 
-dependencies {
-    implementation("org.bstats", "bstats-bukkit", "3.0.1")
-    compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("org.jetbrains", "annotations", "24.0.1")
+allprojects {
+    apply {
+        plugin<JavaLibraryPlugin>()
+        plugin<SpotlessPlugin>()
+        plugin<JavaPlugin>()
+        plugin<MavenPublishPlugin>()
+        plugin<PublishData>()
+    }
 
-    testImplementation("org.jetbrains", "annotations", "24.0.1")
-    testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
-    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
-    testImplementation("org.mockito", "mockito-core", "5.2.0")
-    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
-}
+    repositories {
+        mavenCentral()
+        maven("https://eldonexus.de/repository/maven-proxies")
+        maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
+        maven("https://repo.papermc.io/repository/maven-public/")
 
-java {
-    withSourcesJar()
-    withJavadocJar()
-}
+    }
+    dependencies {
+        compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
+        compileOnly("org.jetbrains", "annotations", "24.0.1")
 
-publishData {
-    useEldoNexusRepos()
-    publishTask("shadowJar")
-    publishTask("sourcesJar")
-    publishTask("javadocJar")
-}
+        testImplementation("org.jetbrains", "annotations", "24.0.1")
+        testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
+        testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
+        testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
+        testImplementation("org.mockito", "mockito-core", "5.2.0")
+        testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
+    }
+
+    java {
+        withSourcesJar()
+        withJavadocJar()
+    }
+    publishing {
+        publications.create<MavenPublication>("maven") {
+            publishData.configurePublication(this);
+        }
+
+        repositories {
+            maven {
+                authentication {
+                    credentials(PasswordCredentials::class) {
+                        username = System.getenv("NEXUS_USERNAME")
+                        password = System.getenv("NEXUS_PASSWORD")
+                    }
+                }
+
+                name = "EldoNexus"
+                setUrl(publishData.getRepository())
+            }
+        }
+    }
 
     spotless {
         java {
@@ -61,48 +87,35 @@ publishData {
         }
     }
 
-publishing {
-    publications.create<MavenPublication>("maven") {
-        publishData.configurePublication(this);
-    }
+    tasks {
+        compileJava {
+            options.encoding = "UTF-8"
+        }
 
-    repositories {
-        maven {
-            authentication {
-                credentials(PasswordCredentials::class) {
-                    username = System.getenv("NEXUS_USERNAME")
-                    password = System.getenv("NEXUS_PASSWORD")
-                }
+        javadoc {
+            options.encoding = "UTF-8"
+        }
+
+        compileTestJava {
+            options.encoding = "UTF-8"
+        }
+
+        test {
+            useJUnitPlatform()
+            testLogging {
+                events("passed", "skipped", "failed")
             }
-
-            name = "EldoNexus"
-            setUrl(publishData.getRepository())
         }
     }
 }
 
-tasks {
-    compileJava {
-        options.encoding = "UTF-8"
-    }
 
-    javadoc {
-        options.encoding = "UTF-8"
-    }
-
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
-
-    test {
-        useJUnitPlatform()
-        testLogging {
-            events("passed", "skipped", "failed")
-        }
-    }
-    shadowJar {
-        relocate("org.bstats", shadebase + "bstats")
-        mergeServiceFiles()
-        archiveClassifier.set("")
-    }
+publishData {
+    useEldoNexusRepos()
+    publishTask("shadowJar")
+    publishTask("sourcesJar")
+    publishTask("javadocJar")
 }
+
+
+
