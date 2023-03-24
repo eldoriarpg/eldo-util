@@ -10,8 +10,6 @@ import de.eldoria.eldoutilities.debug.DefaultProperties;
 import de.eldoria.eldoutilities.debug.UserData;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.utils.Durations;
-import de.eldoria.eldoutilities.updater.UpdateData;
-import de.eldoria.eldoutilities.debug.UserData;
 import org.bukkit.plugin.Plugin;
 
 import java.time.Duration;

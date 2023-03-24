@@ -1,10 +1,10 @@
 rootProject.name = "eldo-util"
 
-pluginManagement{
-    repositories{
+pluginManagement {
+    repositories {
         mavenLocal()
         gradlePluginPortal()
-        maven{
+        maven {
             name = "EldoNexus"
             url = uri("https://eldonexus.de/repository/maven-public/")
 
@@ -16,6 +16,13 @@ include("messaging")
 include("plugin")
 include("debugging")
 include("updater")
-include("serialization")
+include("legacy-serialization")
 include("commands")
 include("localization")
+include("threading")
+include("entities")
+include("inventory")
+include("crossversion")
+include("configuration")
+include("metrics")
+include("items")

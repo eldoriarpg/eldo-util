@@ -7,7 +7,6 @@
 package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import com.google.gson.Gson;
-import de.eldoria.eldoutilities.updater.UpdateResponse;
 import de.eldoria.eldoutilities.debug.DefaultProperties;
 import de.eldoria.eldoutilities.updater.Updater;
 

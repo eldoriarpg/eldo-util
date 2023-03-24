@@ -6,9 +6,9 @@
 
 package de.eldoria.eldoutilities.updater.notifier;
 
+import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.updater.UpdateResponse;
-import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;

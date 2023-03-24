@@ -10,13 +10,16 @@ import de.eldoria.eldoutilities.localization.ILocalizer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,12 +39,13 @@ import java.util.Set;
  */
 public final class MessageSender {
     private static final Map<Class<? extends Plugin>, MessageSender> PLUGIN_SENDER = new HashMap<>();
+    @Nullable
     private final Class<? extends Plugin> ownerPlugin;
+    private final BukkitAudiences audiences;
     private MiniMessage miniMessage;
     private TagResolver messageTagResolver;
     private TagResolver errorTagResolver;
     private Component prefix;
-    private final BukkitAudiences audiences;
 
     MessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         this.ownerPlugin = plugin.getClass();
@@ -59,6 +63,11 @@ public final class MessageSender {
                 (k, v) -> v == null
                         ? new MessageSender(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix)
                         : v.update(miniMessage, messageTagResolver, errorTagResolver, prefix));
+    }
+
+    static MessageSender anonymous() {
+        var resolver = TagResolver.builder().resolver(Replacement.create("default", "", Style.empty())).build();
+        return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }
 
     /**
@@ -210,5 +219,13 @@ public final class MessageSender {
 
     private Component applyPrefix(Component component) {
         return prefix.append(component);
+    }
+
+    public String translatePlain(String message, TagResolver... replacements) {
+        return PlainTextComponentSerializer.plainText().serialize(serialize(message, messageTagResolver, replacements));
+    }
+
+    public boolean isAnonymous() {
+        return ownerPlugin == null;
     }
 }

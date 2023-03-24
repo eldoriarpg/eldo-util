@@ -10,22 +10,13 @@ import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateChecker;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
-<<<<<<< HEAD:src/main/java/de/eldoria/eldoutilities/updater/Updater.java
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateResponse;
 import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
-import org.bukkit.Color;
-=======
-import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
-import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
-import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
-import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
->>>>>>> 247df7c (Start of v2 implementation):updater/src/main/java/de/eldoria/eldoutilities/updater/Updater.java
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.net.http.HttpClient;
 import java.util.Optional;
@@ -38,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @param <T> type of Updater
  */
-public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>> extends BukkitRunnable implements Listener {
+public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>> implements Listener, Runnable {
     private final Plugin plugin;
     private final T data;
     private final HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
@@ -162,7 +153,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     /**
      * Start the update check thread.
      * <p>
-     * This will check every 6 hours if a update is available.
+     * This will check every 6 hours if an update is available.
      */
     public void start() {
         executor.scheduleAtFixedRate(this, 0, 6, TimeUnit.HOURS);

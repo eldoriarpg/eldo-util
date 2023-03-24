@@ -59,8 +59,8 @@ public class Localizer implements ILocalizer {
     private final String[] includedLocales;
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
     private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
-    private ResourceBundle bundle;
     List<ILocalizer> childs = new ArrayList<>();
+    private ResourceBundle bundle;
     private boolean checked;
 
     /**
@@ -95,6 +95,53 @@ public class Localizer implements ILocalizer {
         this.fallbackBundle = fallbackBundle;
         LOCALIZER.put(plugin.getClass(), this);
         createDefaults();
+    }
+
+    /**
+     * Create a new localizer instance with default values.
+     * <p>
+     * The message path and prefix will be "messages" and the fallback language the "en_US" locale.
+     * <p>
+     * This instance will create locale files, which are provided in the resources directory.
+     * <p>
+     * After this it will updates all locale files inside the locales directory. For this the ref keys from the internal
+     * default locale file will be used.
+     * <p>
+     * After a update check and a update if needed it will load the provided language or the fallback language if the
+     * provided language does not exists.
+     *
+     * @param plugin          instance of plugin
+     * @param includedLocales internal provided locales
+     * @return the created localizer instance
+     */
+    static ILocalizer create(Plugin plugin,
+                             String... includedLocales) {
+        return create(plugin, "messages", "messages", Locale.US, includedLocales);
+    }
+
+    /**
+     * Create a new localizer instance.
+     * <p>
+     * This instance will create locale files, which are provided in the resources directory.
+     * <p>
+     * After this it will updates all locale files inside the locales directory. For this the ref keys from the internal
+     * default locale file will be used.
+     * <p>
+     * After a update check and a update if needed it will load the provided language or the fallback language if the
+     * provided language does not exists.
+     *
+     * @param plugin          instance of plugin
+     * @param localesPath     path of the locales directory
+     * @param localesPrefix   prefix of the locale files
+     * @param fallbackLocale  fallbackLocale
+     * @param includedLocales internal provided locales
+     * @return the created localizer instance
+     */
+    static ILocalizer create(Plugin plugin, String localesPath,
+                             String localesPrefix, Locale fallbackLocale, String... includedLocales) {
+        ILocalizer localizer = new Localizer(plugin, localesPath, localesPrefix, fallbackLocale, includedLocales);
+        LOCALIZER.put(plugin.getClass(), localizer);
+        return localizer;
     }
 
     private void createDefaults() {
@@ -154,7 +201,7 @@ public class Localizer implements ILocalizer {
     /**
      * Translates a String with Placeholders. Can handle multiple messages with replacements.
      *
-     * @param key          Key of message
+     * @param key Key of message
      * @return Replaced Messages
      */
     @Override
@@ -391,7 +438,7 @@ public class Localizer implements ILocalizer {
     /**
      * Translates a String with Placeholders. Can handle multiple messages with replacements.
      *
-     * @param message      Message to translate
+     * @param message Message to translate
      * @return Replaced Messages
      */
     @Override

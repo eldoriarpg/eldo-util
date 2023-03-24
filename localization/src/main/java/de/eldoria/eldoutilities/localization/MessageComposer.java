@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.localization;
 
 import de.eldoria.eldoutilities.utils.TextUtil;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,16 +23,20 @@ import java.util.stream.IntStream;
 @SuppressWarnings("unused")
 public class MessageComposer {
     private final StringBuilder stringBuilder = new StringBuilder();
-    private final List<Replacement> replacements = new ArrayList<>();
+    private final List<TagResolver> replacements = new ArrayList<>();
+
+    private MessageComposer() {
+    }
 
     public static MessageComposer create() {
         return new MessageComposer();
     }
 
-    private MessageComposer() {
+    public static String escape(String propertyKey) {
+        return String.format("$%s$", propertyKey);
     }
 
-    public MessageComposer localeCode(String propertyKey, Replacement... replacements) {
+    public MessageComposer localeCode(String propertyKey, TagResolver... replacements) {
         stringBuilder.append(escape(propertyKey));
         this.replacements.addAll(Arrays.asList(replacements));
         return this;
@@ -127,10 +132,6 @@ public class MessageComposer {
     }
 
     public String buildLocalized(ILocalizer localizer) {
-        return localizer.localize(stringBuilder.toString(), replacements.toArray(new Replacement[0]));
-    }
-
-    public static String escape(String propertyKey) {
-        return String.format("$%s$", propertyKey);
+        return localizer.localize(stringBuilder.toString());
     }
 }

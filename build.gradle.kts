@@ -9,24 +9,11 @@ plugins {
     id("de.chojo.publishdata") version "1.2.4"
     id("com.diffplug.spotless") version "6.17.0"
 }
-group = "de.eldoria"
+group = "de.eldoria.eldoutilities"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
 version = "1.14.4"
 description = "Utility Library for spigot plugins used by the eldoria team."
-
-javaToolchains {
-    java {
-        sourceCompatibility = JavaVersion.VERSION_17
-    }
-    testing {
-
-    }
-}
-
-subprojects {
-
-}
 
 allprojects {
     apply {
@@ -59,6 +46,9 @@ allprojects {
     java {
         withSourcesJar()
         withJavadocJar()
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
     }
     publishing {
         publications.create<MavenPublication>("maven") {

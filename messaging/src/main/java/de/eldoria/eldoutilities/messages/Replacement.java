@@ -24,13 +24,35 @@ public final class Replacement {
     /**
      * Creates a new replacement.
      *
-     * @param key     key of replacement
-     * @param value   value for replacement
+     * @param key   key of replacement
+     * @param value value for replacement
      * @param style format which should be applied on the replacement.
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, String value, Style style) {
         return Placeholder.component(key, Component.text(value).style(style));
+    }
+
+    /**
+     * Creates a new replacement.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
+    public static TagResolver create(String key, String value) {
+        return Placeholder.component(key, Component.text(value));
+    }
+
+    /**
+     * Creates a new replacement.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
+    public static TagResolver create(String key, Object value) {
+        return Placeholder.component(key, Component.text(String.valueOf(value)));
     }
 
     public static TagResolver create(String key, Double value, Style style) {
