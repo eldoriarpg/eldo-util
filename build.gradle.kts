@@ -2,17 +2,16 @@ import com.diffplug.gradle.spotless.SpotlessPlugin
 import de.chojo.PublishData
 
 plugins {
-    id("com.github.johnrengelman.shadow") version "8.1.1"
     java
     `maven-publish`
     `java-library`
     id("de.chojo.publishdata") version "1.2.4"
     id("com.diffplug.spotless") version "6.17.0"
 }
-group = "de.eldoria.eldoutilities"
+group = "de.eldoria.util"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.14.4"
+version = "2.0.0"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 allprojects {
@@ -29,8 +28,8 @@ allprojects {
         maven("https://eldonexus.de/repository/maven-proxies")
         maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
         maven("https://repo.papermc.io/repository/maven-public/")
-
     }
+
     dependencies {
         compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
         compileOnly("org.jetbrains", "annotations", "24.0.1")
@@ -50,6 +49,12 @@ allprojects {
             languageVersion.set(JavaLanguageVersion.of(17))
         }
     }
+
+    publishData{
+        useEldoNexusRepos()
+        publishComponent("java")
+    }
+
     publishing {
         publications.create<MavenPublication>("maven") {
             publishData.configurePublication(this);
@@ -98,14 +103,3 @@ allprojects {
         }
     }
 }
-
-
-publishData {
-    useEldoNexusRepos()
-    publishTask("shadowJar")
-    publishTask("sourcesJar")
-    publishTask("javadocJar")
-}
-
-
-
