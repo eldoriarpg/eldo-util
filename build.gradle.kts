@@ -110,7 +110,7 @@ dependencies{
     api(project(":core"))
     api(project(":crossversion"))
     api(project(":debugging"))
-    api(project(":entitied"))
+    api(project(":entities"))
     api(project(":inventory"))
     api(project(":items"))
     api(project(":legacy-serialization"))
