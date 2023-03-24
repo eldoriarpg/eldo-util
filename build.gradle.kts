@@ -103,3 +103,21 @@ allprojects {
         }
     }
 }
+
+dependencies{
+    api(project(":commands"))
+    api(project(":configuration"))
+    api(project(":core"))
+    api(project(":crossversion"))
+    api(project(":debugging"))
+    api(project(":entitied"))
+    api(project(":inventory"))
+    api(project(":items"))
+    api(project(":legacy-serialization"))
+    api(project(":localization"))
+    api(project(":messaging"))
+    api(project(":metrics"))
+    api(project(":plugin"))
+    api(project(":threading"))
+    api(project(":updater"))
+}
