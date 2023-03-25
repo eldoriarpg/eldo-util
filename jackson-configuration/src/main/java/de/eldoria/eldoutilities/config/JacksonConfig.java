@@ -14,24 +14,35 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import de.eldoria.eldoutilities.ConfigurationException;
 import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
-
+/**
+ * Class allowing to manage multiple configuration files
+ *
+ * @param <T> type of main configuration
+ */
 public abstract class JacksonConfig<T> {
     private final Plugin plugin;
     private final ConfigKey<T> mainKey;
     private final Map<ConfigKey<?>, Object> files = new HashMap<>();
     private ObjectMapper mapper;
+    private ObjectMapper writer;
+    private ObjectMapper reader;
 
     /**
      * Creates a new Jackson Configuration
@@ -68,6 +79,38 @@ public abstract class JacksonConfig<T> {
      */
     public <V> V secondary(ConfigKey<V> key) {
         return (V) files.computeIfAbsent(key, k -> createAndLoad(key));
+    }
+
+    /**
+     * Get the primary configuration wrapper.
+     * <p>
+     * This wrapper can be used to save the config using the closable.
+     * It is also safe to be stored since it does not store the file itself.
+     * <p>
+     * This will be the config.yml in most cases.
+     * <p>
+     * If the config was not yet created, it will be created.
+     *
+     * @return configuration
+     */
+    public Wrapper<T> mainWrapped() {
+        return Wrapper.of(mainKey, this);
+    }
+
+    /**
+     * Get a configuration file.
+     * <p>
+     * This wrapper can be used to save the config using the closable.
+     * It is also safe to be stored since it does not store the file itself.
+     * <p>
+     * If this file was not yet created, it will be created.
+     *
+     * @param key configuration key
+     * @param <V> type of configuration
+     * @return configuration file
+     */
+    public <V> Wrapper<V> secondaryWrapped(ConfigKey<V> key) {
+        return Wrapper.of(key, this);
     }
 
     /**
@@ -119,7 +162,16 @@ public abstract class JacksonConfig<T> {
      * @return instance of file
      */
     protected final <V> V load(ConfigKey<V> key) {
-        return read(resolvePath(key), key.configClazz());
+        if (!resolvePath(key).toFile().exists()) return null;
+        try {
+            return read(resolvePath(key), key.configClazz());
+        } catch (ConfigurationException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load configuration file.", e);
+            backup(key);
+            plugin.getLogger().log(Level.WARNING, "Recreating default config");
+            write(resolvePath(key), key.initValue());
+        }
+        return key.initValue();
     }
 
     /**
@@ -142,8 +194,11 @@ public abstract class JacksonConfig<T> {
      *
      * @return object mapper instance
      */
-    protected ObjectMapper reader() {
-        return mapper();
+    protected final ObjectMapper reader() {
+        if (reader != null) {
+            reader = createReadMapper();
+        }
+        return reader;
     }
 
     /**
@@ -151,8 +206,47 @@ public abstract class JacksonConfig<T> {
      *
      * @return object mapper instance
      */
-    protected ObjectMapper writer() {
+    protected final ObjectMapper writer() {
+        if (writer != null) {
+            writer = createWriteMapper();
+        }
+        return writer;
+    }
+
+    /**
+     * Create a mapper for writing files.
+     *
+     * @return mapper instance
+     */
+    protected ObjectMapper createWriteMapper() {
         return mapper();
+    }
+
+    /**
+     * Create a mapper for reading files.
+     *
+     * @return mapper instance
+     */
+    protected ObjectMapper createReadMapper() {
+        return mapper();
+    }
+
+    /**
+     * Create a general mapper for read and write.
+     * <p>
+     * You can define different wrapper for read and write operations by overwriting {@link #createReadMapper()} and {@link #createWriteMapper()}
+     *
+     * @return mapper instance
+     */
+    protected ObjectMapper createMapper() {
+        return YAMLMapper.builder()
+                .addModule(getPlatformModule())
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                .build()
+                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
     }
 
     /**
@@ -160,45 +254,68 @@ public abstract class JacksonConfig<T> {
      *
      * @return object mapper instance
      */
-    protected ObjectMapper mapper() {
+    protected final ObjectMapper mapper() {
         if (mapper == null) {
-            mapper = YAMLMapper.builder()
-                    .addModule(getPlatformModule())
-                    .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                    .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
-                    .build()
-                    .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                    .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
+            mapper = createMapper();
         }
         return mapper;
     }
 
-    protected Module getPlatformModule() {
+    /**
+     * Get the module for the current platform.
+     *
+     * @return module
+     */
+    protected final Module getPlatformModule() {
         if (plugin.getServer().getName().toLowerCase(Locale.ROOT).contains("spigot")) {
             return getBukkitModule();
         }
         return getPaperModule();
     }
 
+    /**
+     * Create the module used for paper server.
+     * <p>
+     * This should be a {@link JacksonPaper} module.
+     *
+     * @return paper module
+     */
     protected JacksonPaper getPaperModule() {
         return JacksonPaper.builder()
                 .colorAsHex()
                 .build();
     }
 
+    /**
+     * Create the module used for spigot/bukkit server.
+     * <p>
+     * This should be a {@link JacksonBukkit} module.
+     *
+     * @return spigot/bukkit module
+     */
     protected JacksonBukkit getBukkitModule() {
         return JacksonBukkit.builder()
                 .colorAsHex()
                 .build();
     }
 
+    private void backup(ConfigKey<?> key) {
+        var target = resolvePath(key);
+        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy.MM.dd_hh:mm").format(LocalDateTime.now()) + target.getFileName();
+        plugin.getLogger().log(Level.WARNING, "Backing up " + target + " to " + backupName);
+        try {
+            Files.move(target, target.getParent().resolve(backupName));
+            plugin.getLogger().log(Level.SEVERE, "Backup done.");
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not create backup.");
+        }
+    }
+
     private void write(Path path, Object object) {
         try {
             writer().writeValue(path.toFile(), object);
         } catch (IOException e) {
-            // TODO: handle c:
-            throw new RuntimeException(e);
+            throw new ConfigurationException("Could not write configuration file", e);
         }
     }
 
@@ -206,8 +323,7 @@ public abstract class JacksonConfig<T> {
         try {
             return reader().readValue(path.toFile(), clazz);
         } catch (IOException e) {
-            // TODO: Handle c:
-            throw new RuntimeException(e);
+            throw new ConfigurationException("Could not read configuration file", e);
         }
     }
 
