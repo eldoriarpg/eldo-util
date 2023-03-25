@@ -1,7 +1,6 @@
 package de.eldoria.eldoutilities.config;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * Class allowing to access a configuration file.
@@ -35,7 +34,7 @@ public class Wrapper<T> implements Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         config.save(key);
     }
 }
