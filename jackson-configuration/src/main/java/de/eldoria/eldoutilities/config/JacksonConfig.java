@@ -125,6 +125,17 @@ public abstract class JacksonConfig<T> {
     }
 
     /**
+     * Replace the configuration currently associated with this key with a new configuration.
+     *
+     * @param key      configuration key
+     * @param newValue new value of key
+     * @param <V>      type of key
+     */
+    public <V> void replace(ConfigKey<V> key, V newValue) {
+        files.put(key, newValue);
+    }
+
+    /**
      * Saves all files loaded via this instance.
      */
     public void save() {
