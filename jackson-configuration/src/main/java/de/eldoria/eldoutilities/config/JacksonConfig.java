@@ -150,7 +150,7 @@ public abstract class JacksonConfig<T> {
      * @param key configuration key
      */
     public void save(ConfigKey<?> key) {
-        write(key.path(), files.get(key));
+        write(resolvePath(key), files.get(key));
     }
 
     /**
@@ -207,7 +207,10 @@ public abstract class JacksonConfig<T> {
      */
     protected final <V> V createAndLoad(ConfigKey<V> key) {
         var path = resolvePath(key);
-        if (!path.toFile().exists()) write(key.path(), key.initValue().get());
+        if (!path.toFile().exists()) {
+            plugin.getLogger().info("Configuration file: " + path + " does not exist. Creating.");
+            write(path, key.initValue().get());
+        }
         return load(key);
     }
 
@@ -323,7 +326,7 @@ public abstract class JacksonConfig<T> {
 
     private void backup(ConfigKey<?> key) {
         var target = resolvePath(key);
-        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy.MM.dd_hh:mm").format(LocalDateTime.now()) + target.getFileName();
+        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy.MM.dd_hh:mm").format(LocalDateTime.now()) + "_" + target.getFileName();
         plugin.getLogger().log(Level.WARNING, "Backing up " + target + " to " + backupName);
         try {
             Files.move(target, target.getParent().resolve(backupName));
