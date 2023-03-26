@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import de.eldoria.eldoutilities.config.ConfigKey;
 import de.eldoria.eldoutilities.config.parsing.deserializer.LevelDeserializer;
 import de.eldoria.eldoutilities.config.parsing.serializer.LevelSerializer;
+import org.bukkit.plugin.Plugin;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -47,5 +48,20 @@ public final class PluginBaseConfiguration {
 
     public String lastInstalledVersion() {
         return lastInstalledVersion;
+    }
+
+    public void version(int version) {
+        this.version = version;
+    }
+
+    public void lastInstalledVersion(String lastInstalledVersion) {
+        this.lastInstalledVersion = lastInstalledVersion;
+    }
+    public void lastInstalledVersion(Plugin plugin) {
+        this.lastInstalledVersion = plugin.getDescription().getVersion();
+    }
+
+    public void logLevel(String logLevel) {
+        this.logLevel = logLevel;
     }
 }
