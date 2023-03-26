@@ -33,23 +33,10 @@ public record ConfigKey<T>(String name, Path path, Class<T> configClazz, Supplie
      * @param <V>         type of config class
      * @return config key for config.yml
      */
-    public static <V> ConfigKey<V> defaultConfig(Class<V> configClazz, V initValue) {
-        return new ConfigKey<>("config.yml", Path.of("config.yml"), configClazz, () -> initValue);
+    public static <V> ConfigKey<V> defaultConfig(Class<V> configClazz, Supplier<V> initValue) {
+        return new ConfigKey<>("config.yml", Path.of("config.yml"), configClazz, initValue);
     }
 
-    /**
-     * Create a key for the default config aka config.yml.
-     *
-     * @param name        name of file
-     * @param path        path of file with file ending. Path might be relative to {@link Plugin#getDataFolder()}
-     * @param configClazz class representing the config.yml
-     * @param initValue   the initial value when the config does not yet exist.
-     * @param <V>         type of config class
-     * @return config key for config.yml
-     */
-    public static <V> ConfigKey<V> of(String name, Path path, Class<V> configClazz, V initValue) {
-        return new ConfigKey<>(name, path, configClazz, () -> initValue);
-    }
     /**
      * Create a key for the default config aka config.yml.
      *

@@ -15,7 +15,6 @@ import de.eldoria.eldoutilities.config.parsing.serializer.LevelSerializer;
 import org.bukkit.plugin.Plugin;
 
 import java.nio.file.Path;
-import java.util.function.Supplier;
 import java.util.logging.Level;
 
 public final class PluginBaseConfiguration {
@@ -23,7 +22,7 @@ public final class PluginBaseConfiguration {
             "Base configuration",
             Path.of("base_configuration.yml"),
             PluginBaseConfiguration.class,
-            (Supplier<PluginBaseConfiguration>) PluginBaseConfiguration::new);
+            PluginBaseConfiguration::new);
     @JsonProperty
     private int version = 0;
     @JsonProperty
@@ -57,6 +56,7 @@ public final class PluginBaseConfiguration {
     public void lastInstalledVersion(String lastInstalledVersion) {
         this.lastInstalledVersion = lastInstalledVersion;
     }
+
     public void lastInstalledVersion(Plugin plugin) {
         this.lastInstalledVersion = plugin.getDescription().getVersion();
     }
