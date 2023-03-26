@@ -9,6 +9,7 @@ package de.eldoria.eldoutilities.config;
 import org.bukkit.plugin.Plugin;
 
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 /**
  * A key for a config file. A config key is considered unique based on the underlying path.
@@ -22,7 +23,7 @@ import java.nio.file.Path;
  * @param initValue   the initial value when the file does not yet exist.
  * @param <T>         type of file class
  */
-public record ConfigKey<T>(String name, Path path, Class<T> configClazz, T initValue) {
+public record ConfigKey<T>(String name, Path path, Class<T> configClazz, Supplier<T> initValue) {
 
     /**
      * Create a key for the default config aka config.yml.
@@ -33,7 +34,34 @@ public record ConfigKey<T>(String name, Path path, Class<T> configClazz, T initV
      * @return config key for config.yml
      */
     public static <V> ConfigKey<V> defaultConfig(Class<V> configClazz, V initValue) {
-        return new ConfigKey<>("config.yml", Path.of("config.yml"), configClazz, initValue);
+        return new ConfigKey<>("config.yml", Path.of("config.yml"), configClazz, () -> initValue);
+    }
+
+    /**
+     * Create a key for the default config aka config.yml.
+     *
+     * @param name        name of file
+     * @param path        path of file with file ending. Path might be relative to {@link Plugin#getDataFolder()}
+     * @param configClazz class representing the config.yml
+     * @param initValue   the initial value when the config does not yet exist.
+     * @param <V>         type of config class
+     * @return config key for config.yml
+     */
+    public static <V> ConfigKey<V> of(String name, Path path, Class<V> configClazz, V initValue) {
+        return new ConfigKey<>(name, path, configClazz, () -> initValue);
+    }
+    /**
+     * Create a key for the default config aka config.yml.
+     *
+     * @param name        name of file
+     * @param path        path of file with file ending. Path might be relative to {@link Plugin#getDataFolder()}
+     * @param configClazz class representing the config.yml
+     * @param initValue   the initial value when the config does not yet exist.
+     * @param <V>         type of config class
+     * @return config key for config.yml
+     */
+    public static <V> ConfigKey<V> of(String name, Path path, Class<V> configClazz, Supplier<V> initValue) {
+        return new ConfigKey<>(name, path, configClazz, initValue);
     }
 
     @Override

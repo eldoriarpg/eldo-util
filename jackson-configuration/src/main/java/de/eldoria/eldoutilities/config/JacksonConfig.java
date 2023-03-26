@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-import de.eldoria.eldoutilities.ConfigurationException;
+import de.eldoria.eldoutilities.config.exceptions.ConfigurationException;
+import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import org.bukkit.plugin.Plugin;
@@ -53,6 +54,16 @@ public abstract class JacksonConfig<T> {
     public JacksonConfig(@NotNull Plugin plugin, @NotNull ConfigKey<T> mainKey) {
         this.plugin = plugin;
         this.mainKey = mainKey;
+        secondary(PluginBaseConfiguration.KEY);
+    }
+
+    /**
+     * Plugin associated with this configuration
+     *
+     * @return plugin instance
+     */
+    public Plugin plugin() {
+        return plugin;
     }
 
     /**
@@ -169,9 +180,9 @@ public abstract class JacksonConfig<T> {
             plugin.getLogger().log(Level.SEVERE, "Could not load configuration file.", e);
             backup(key);
             plugin.getLogger().log(Level.WARNING, "Recreating default config");
-            write(resolvePath(key), key.initValue());
+            write(resolvePath(key), key.initValue().get());
         }
-        return key.initValue();
+        return key.initValue().get();
     }
 
     /**
@@ -185,7 +196,7 @@ public abstract class JacksonConfig<T> {
      */
     protected final <V> V createAndLoad(ConfigKey<V> key) {
         var path = resolvePath(key);
-        if (!path.toFile().exists()) write(key.path(), key.initValue());
+        if (!path.toFile().exists()) write(key.path(), key.initValue().get());
         return load(key);
     }
 
@@ -313,6 +324,9 @@ public abstract class JacksonConfig<T> {
 
     private void write(Path path, Object object) {
         try {
+            if (object instanceof ConfigSubscriber sub) {
+                sub.preWrite(this);
+            }
             writer().writeValue(path.toFile(), object);
         } catch (IOException e) {
             throw new ConfigurationException("Could not write configuration file", e);
@@ -321,7 +335,11 @@ public abstract class JacksonConfig<T> {
 
     private <V> V read(Path path, Class<V> clazz) {
         try {
-            return reader().readValue(path.toFile(), clazz);
+            V v = reader().readValue(path.toFile(), clazz);
+            if (v instanceof ConfigSubscriber sub) {
+                sub.postRead(this);
+            }
+            return v;
         } catch (IOException e) {
             throw new ConfigurationException("Could not read configuration file", e);
         }

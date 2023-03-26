@@ -26,10 +26,10 @@ public class DebugLogger extends Logger {
     private final Logger logger;
 
     public DebugLogger(EldoPlugin plugin, Logger logger) {
-        // we still want to use our debugger. so we dont really care about what we are doing here.
+        // we still want to use our debugger. so we don't really care about what we are doing here.
         super(plugin.getName(), null);
         this.logger = logger;
-        setLevel(EldoConfig.getLogLevel(plugin));
+        setLevel(plugin.getLogLevel());
         log(getLevel(), "Debug logger initialized. Log Level: " + getLevel().getName());
     }
 
@@ -37,12 +37,12 @@ public class DebugLogger extends Logger {
     public void log(LogRecord record) {
         var level = record.getLevel().intValue();
         // check if the level is lover than info.
-        // if thats the case we need to change it.
+        // if that's the case we need to change it.
         if (level < 800) {
             // check if we really want to log this level
             if (getLevel().intValue() > level) return;
             // We need to set the level to info to log this shit. Thanks spigot.
-            // Lets append another color to differ between them.
+            // Let's append another color to differ between them.
             // They will all be displayed as info anyway...
             record.setLevel(Level.INFO);
             if (level == Level.CONFIG.intValue()) {
