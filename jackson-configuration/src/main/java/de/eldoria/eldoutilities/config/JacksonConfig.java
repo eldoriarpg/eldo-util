@@ -217,7 +217,7 @@ public abstract class JacksonConfig<T> {
      * @return object mapper instance
      */
     protected final ObjectMapper reader() {
-        if (reader != null) {
+        if (reader == null) {
             reader = createReadMapper();
         }
         return reader;
@@ -229,7 +229,7 @@ public abstract class JacksonConfig<T> {
      * @return object mapper instance
      */
     protected final ObjectMapper writer() {
-        if (writer != null) {
+        if (writer == null) {
             writer = createWriteMapper();
         }
         return writer;
