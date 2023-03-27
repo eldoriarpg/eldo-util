@@ -343,6 +343,7 @@ public abstract class JacksonConfig<T> {
             }
             writer().writeValue(path.toFile(), object);
         } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load configuration file.", e);
             throw new ConfigurationException("Could not write configuration file", e);
         }
     }
@@ -355,6 +356,7 @@ public abstract class JacksonConfig<T> {
             }
             return v;
         } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "Could not read configuration file.", e);
             throw new ConfigurationException("Could not read configuration file", e);
         }
     }
