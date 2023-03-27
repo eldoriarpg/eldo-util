@@ -326,7 +326,7 @@ public abstract class JacksonConfig<T> {
 
     private void backup(ConfigKey<?> key) {
         var target = resolvePath(key);
-        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy.MM.dd_hh:mm").format(LocalDateTime.now()) + "_" + target.getFileName();
+        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy-MM-dd_hh-mm").format(LocalDateTime.now()) + "_" + target.getFileName();
         plugin.getLogger().log(Level.WARNING, "Backing up " + target + " to " + backupName);
         try {
             Files.move(target, target.getParent().resolve(backupName));
@@ -341,7 +341,8 @@ public abstract class JacksonConfig<T> {
             if (object instanceof ConfigSubscriber sub) {
                 sub.preWrite(this);
             }
-            writer().writeValue(path.toFile(), object);
+            // We do this to avoid wiping a file on serialization error.
+            Files.writeString(path, writer().writeValueAsString(object));
         } catch (IOException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not write configuration file to " + path, e);
             throw new ConfigurationException("Could not write configuration file to " + path, e);
