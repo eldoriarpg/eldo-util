@@ -30,7 +30,7 @@ public final class PluginBaseConfiguration {
     @JsonDeserialize(contentUsing = LevelDeserializer.class)
     @JsonSerialize(contentUsing = LevelSerializer.class)
     @JsonProperty
-    private String logLevel = "INFO";
+    private Level logLevel = Level.INFO;
 
     public PluginBaseConfiguration() {
     }
@@ -38,7 +38,7 @@ public final class PluginBaseConfiguration {
     public PluginBaseConfiguration(int version, String lastInstalledVersion, Level level) {
         this.version = version;
         this.lastInstalledVersion = lastInstalledVersion;
-        this.logLevel = level.getName();
+        this.logLevel = level;
     }
 
     public int version() {
@@ -61,7 +61,11 @@ public final class PluginBaseConfiguration {
         this.lastInstalledVersion = plugin.getDescription().getVersion();
     }
 
-    public void logLevel(String logLevel) {
+    public Level logLevel() {
+        return logLevel;
+    }
+
+    public void logLevel(Level logLevel) {
         this.logLevel = logLevel;
     }
 }
