@@ -13,6 +13,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import java.util.Locale;
+
 /**
  * A replacement represents a text placeholder and its replacement.
  */
@@ -30,7 +32,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, String value, Style style) {
-        return Placeholder.component(key, Component.text(value).style(style));
+        return Placeholder.component(sanatizeKey(key), Component.text(value).style(style));
     }
 
     /**
@@ -41,7 +43,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, String value) {
-        return Placeholder.component(key, Component.text(value));
+        return Placeholder.component(sanatizeKey(key), Component.text(value));
     }
 
     /**
@@ -52,7 +54,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, Object value) {
-        return Placeholder.component(key, Component.text(String.valueOf(value)));
+        return Placeholder.component(sanatizeKey(key), Component.text(String.valueOf(value)));
     }
 
     public static TagResolver create(String key, Double value, Style style) {
@@ -105,5 +107,9 @@ public final class Replacement {
      */
     public static TagResolver create(String key, World world, Style style) {
         return create(key, world.getName(), style);
+    }
+
+    private static String sanatizeKey(String key){
+        return key.toLowerCase(Locale.ROOT).replaceAll(" ", "_");
     }
 }
