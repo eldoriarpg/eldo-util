@@ -56,6 +56,10 @@ public final class MessageSender {
         audiences = BukkitAudiences.create(plugin);
     }
 
+    public static void register(MessageSender messageSender){
+        PLUGIN_SENDER.put(messageSender.ownerPlugin, messageSender);
+    }
+
     static MessageSender create(@NotNull Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         if (plugin == null) throw new IllegalArgumentException("Plugin can not be null");
 
