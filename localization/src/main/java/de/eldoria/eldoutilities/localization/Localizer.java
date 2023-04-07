@@ -146,16 +146,16 @@ public class Localizer implements ILocalizer {
 
     private void createDefaults() {
         Map<String, String> locales = new HashMap<>();
-        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
+        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: <SYNTAX>");
         locales.put("error.invalidCommand", "Invalid Command");
-        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n%COMMANDS%");
-        locales.put("error.permission", "You do not have the permissionNode to do this. (<permission>)");
-        locales.put("error.invalidRange", "This value is out of range. Min: <min> Max: <max>");
-        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
+        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<COMMANDS>");
+        locales.put("error.permission", "You do not have the permissionNode to do this. (<PERMISSION>)");
+        locales.put("error.invalidRange", "This value is out of range. Min: <MIN> Max: <MAX>");
+        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <VALUES>.");
         locales.put("error.invalidMaterial", "Invalid material.");
         locales.put("error.invalidNumber", "Invalid number");
-        locales.put("error.invalidBoolean", "Invalid value, <true> or <false>");
-        locales.put("error.invalidLength", "This input is too long. Max: <max> chars.");
+        locales.put("error.invalidBoolean", "Invalid value, <TRUE> or <FALSE>");
+        locales.put("error.invalidLength", "This input is too long. Max: <MAX> chars.");
         locales.put("error.notOnline", "Invalid player. This player is not online.");
         locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
         locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
@@ -163,11 +163,11 @@ public class Localizer implements ILocalizer {
         locales.put("error.onlyPlayer", "This command can only be used by players.");
         locales.put("error.onlyConsole", "This command can only be used by console.");
         locales.put("error.invalidSender", "This command can not be executed from here.");
-        locales.put("error.missingArgument", "Argument %INDEX% is accessed but not present.");
+        locales.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
         locales.put("error.notAsPlayer", "This command can not be executed as player");
-        locales.put("error.tooSmall", "The number is too small. Min: %MIN%");
-        locales.put("error.tooLarge", "The number is too Large. Max: %MAX%");
-        locales.put("about", "<plugin_name> by <authors>\nVersion: <version>\nSpigot: <website>\nSupport: <discord>");
+        locales.put("error.tooSmall", "The number is too small. Min: <MIN>");
+        locales.put("error.tooLarge", "The number is too Large. Max: <MAX>");
+        locales.put("about", "<PLUGIN_NAME> by <AUTHORS>\nVersion: <VERSION>\nSpigot: <WEBSITE>\nSupport: <DISCORD>");
         locales.put("dialog.accept", "accept");
         locales.put("dialog.deny", "deny");
         locales.put("dialog.add", "add");
@@ -392,17 +392,17 @@ public class Localizer implements ILocalizer {
             updateKeys.removeAll(bundleMap.keySet());
 
             if (updateKeys.isEmpty()) {
-                plugin.getLogger().info("§2Locale " + path + " is up to date.");
+                plugin.getLogger().info("Locale " + path + " is up to date.");
                 continue;
             }
-            plugin.getLogger().info("§2Updating " + path + ".");
+            plugin.getLogger().info("Updating " + path + ".");
 
             // check if ref key is in locale
             for (var currKey : updateKeys) {
                 var value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
                 // Add the property with the value if it exists in a internal file.
                 bundleMap.put(currKey, value);
-                plugin.getLogger().info("§2Added: §3" + currKey + "§6=§b" + value.replace("\n", "\\n"));
+                plugin.getLogger().info("Added: " + currKey + "=" + value.replace("\n", "\\n"));
             }
 
             List<String> lines = new ArrayList<>();
@@ -418,7 +418,7 @@ public class Localizer implements ILocalizer {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;
             }
-            plugin.getLogger().info("§2Updated locale " + path + ". Please check your translation.");
+            plugin.getLogger().info("Updated locale " + path + ". Please check your translation.");
         }
     }
 
