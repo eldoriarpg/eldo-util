@@ -69,7 +69,7 @@ public final class MessageSender {
                         : v.update(miniMessage, messageTagResolver, errorTagResolver, prefix));
     }
 
-    static MessageSender anonymous() {
+    public static MessageSender anonymous() {
         var resolver = TagResolver.builder().resolver(Replacement.create("default", "", Style.empty())).build();
         return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }

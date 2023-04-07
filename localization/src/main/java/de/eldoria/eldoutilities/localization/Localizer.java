@@ -68,11 +68,11 @@ public class Localizer implements ILocalizer {
      * <p>
      * This instance will create locale files, which are provided in the resources directory.
      * <p>
-     * After this it will updates all locale files inside the locales directory. For this the ref keys from the internal
+     * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
      * <p>
      * After a update check and a update if needed it will load the provided language or the fallback language if the
-     * provided language does not exists.
+     * provided language does not exist.
      *
      * @param plugin          instance of plugin
      * @param localesPath     path of the locales directory
@@ -104,17 +104,17 @@ public class Localizer implements ILocalizer {
      * <p>
      * This instance will create locale files, which are provided in the resources directory.
      * <p>
-     * After this it will updates all locale files inside the locales directory. For this the ref keys from the internal
+     * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
      * <p>
-     * After a update check and a update if needed it will load the provided language or the fallback language if the
-     * provided language does not exists.
+     * After a update check and an update if needed it will load the provided language or the fallback language if the
+     * provided language does not exist.
      *
      * @param plugin          instance of plugin
      * @param includedLocales internal provided locales
      * @return the created localizer instance
      */
-    static ILocalizer create(Plugin plugin,
+    public static ILocalizer create(Plugin plugin,
                              String... includedLocales) {
         return create(plugin, "messages", "messages", Locale.US, includedLocales);
     }
@@ -124,11 +124,11 @@ public class Localizer implements ILocalizer {
      * <p>
      * This instance will create locale files, which are provided in the resources directory.
      * <p>
-     * After this it will updates all locale files inside the locales directory. For this the ref keys from the internal
+     * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
      * <p>
-     * After a update check and a update if needed it will load the provided language or the fallback language if the
-     * provided language does not exists.
+     * After a update check and an update if needed it will load the provided language or the fallback language if the
+     * provided language does not exist.
      *
      * @param plugin          instance of plugin
      * @param localesPath     path of the locales directory
@@ -137,7 +137,7 @@ public class Localizer implements ILocalizer {
      * @param includedLocales internal provided locales
      * @return the created localizer instance
      */
-    static ILocalizer create(Plugin plugin, String localesPath,
+    public static ILocalizer create(Plugin plugin, String localesPath,
                              String localesPrefix, Locale fallbackLocale, String... includedLocales) {
         ILocalizer localizer = new Localizer(plugin, localesPath, localesPrefix, fallbackLocale, includedLocales);
         LOCALIZER.put(plugin.getClass(), localizer);
@@ -149,13 +149,13 @@ public class Localizer implements ILocalizer {
         locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: %SYNTAX%");
         locales.put("error.invalidCommand", "Invalid Command");
         locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n%COMMANDS%");
-        locales.put("error.permission", "You do not have the permissionNode to do this. (%PERMISSION%)");
-        locales.put("error.invalidRange", "This value is out of range. Min: %MIN% Max: %MAX%");
+        locales.put("error.permission", "You do not have the permissionNode to do this. (<permission>)");
+        locales.put("error.invalidRange", "This value is out of range. Min: <min> Max: <max>");
         locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are %VALUES%.");
         locales.put("error.invalidMaterial", "Invalid material.");
         locales.put("error.invalidNumber", "Invalid number");
-        locales.put("error.invalidBoolean", "Invalid value, %TRUE% or %FALSE%");
-        locales.put("error.invalidLength", "This input is too long. Max: %MAX% chars.");
+        locales.put("error.invalidBoolean", "Invalid value, <true> or <false>");
+        locales.put("error.invalidLength", "This input is too long. Max: <max> chars.");
         locales.put("error.notOnline", "Invalid player. This player is not online.");
         locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
         locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
@@ -167,7 +167,7 @@ public class Localizer implements ILocalizer {
         locales.put("error.notAsPlayer", "This command can not be executed as player");
         locales.put("error.tooSmall", "The number is too small. Min: %MIN%");
         locales.put("error.tooLarge", "The number is too Large. Max: %MAX%");
-        locales.put("about", "%PLUGIN_NAME% by %AUTHORS%\nVersion: %VERSION%\nSpigot: %WEBSITE%\nSupport: %DISCORD%");
+        locales.put("about", "<plugin_name> by <authors>\nVersion: <version>\nSpigot: <website>\nSupport: <discord>");
         locales.put("dialog.accept", "accept");
         locales.put("dialog.deny", "deny");
         locales.put("dialog.add", "add");
