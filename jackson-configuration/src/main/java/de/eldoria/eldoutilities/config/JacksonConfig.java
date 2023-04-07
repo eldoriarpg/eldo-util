@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.eldoria.eldoutilities.config.exceptions.ConfigurationException;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
@@ -266,9 +268,13 @@ public abstract class JacksonConfig<T> {
     protected ObjectMapper createMapper() {
         return YAMLMapper.builder()
                 .addModule(getPlatformModule())
+                // This is very important when using polymorphism and library loader feature.
+                .typeFactory(TypeFactory.defaultInstance().withClassLoader(plugin.getClass().getClassLoader()))
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
+                .disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID)
+                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
                 .build()
                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                 .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
