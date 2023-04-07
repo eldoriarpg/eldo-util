@@ -245,7 +245,7 @@ public abstract class JacksonConfig<T> {
      *
      * @return mapper instance
      */
-    protected ObjectMapper createWriteMapper() {
+    public ObjectMapper createWriteMapper() {
         return mapper();
     }
 
@@ -254,7 +254,7 @@ public abstract class JacksonConfig<T> {
      *
      * @return mapper instance
      */
-    protected ObjectMapper createReadMapper() {
+    public ObjectMapper createReadMapper() {
         return mapper();
     }
 
@@ -285,7 +285,7 @@ public abstract class JacksonConfig<T> {
      *
      * @return object mapper instance
      */
-    protected final ObjectMapper mapper() {
+    public final ObjectMapper mapper() {
         if (mapper == null) {
             mapper = createMapper();
         }
