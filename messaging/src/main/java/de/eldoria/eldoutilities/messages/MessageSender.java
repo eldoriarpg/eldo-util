@@ -233,6 +233,17 @@ public final class MessageSender {
         return PlainTextComponentSerializer.plainText().serialize(serialize(message, messageTagResolver, replacements));
     }
 
+    public Component serializeMessage(String message, TagResolver... placeholder){
+        return serialize(message, messageTagResolver, placeholder);
+    }
+    public Component serializeError(String message, TagResolver... placeholder){
+        return serialize(message, errorTagResolver, placeholder);
+    }
+
+    public MiniMessage miniMessage() {
+        return miniMessage;
+    }
+
     public boolean isAnonymous() {
         return ownerPlugin == null;
     }
