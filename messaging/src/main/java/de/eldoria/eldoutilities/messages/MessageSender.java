@@ -81,6 +81,10 @@ public final class MessageSender {
         return getPluginMessageSender(plugin.getClass());
     }
 
+    public static MessageSenderBuilder builder(Plugin plugin) {
+        return new MessageSenderBuilder(plugin);
+    }
+
     /**
      * Get the message sender created for this plugin.
      *
