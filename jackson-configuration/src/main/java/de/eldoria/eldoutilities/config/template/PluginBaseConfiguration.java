@@ -24,9 +24,9 @@ public final class PluginBaseConfiguration {
             PluginBaseConfiguration.class,
             PluginBaseConfiguration::new);
     @JsonProperty
-    private int version = 0;
+    private int version;
     @JsonProperty
-    private String lastInstalledVersion = null;
+    private String lastInstalledVersion;
     @JsonDeserialize(contentUsing = LevelDeserializer.class)
     @JsonSerialize(contentUsing = LevelSerializer.class)
     @JsonProperty

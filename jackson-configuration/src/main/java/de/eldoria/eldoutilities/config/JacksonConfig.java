@@ -175,6 +175,60 @@ public abstract class JacksonConfig<T> {
     }
 
     /**
+     * Get the object mapper used to read files
+     *
+     * @return object mapper instance
+     */
+    public final ObjectMapper reader() {
+        if (reader == null) {
+            reader = createReadMapper();
+        }
+        return reader;
+    }
+
+    /**
+     * Get the mapper used to write objects
+     *
+     * @return object mapper instance
+     */
+    public final ObjectMapper writer() {
+        if (writer == null) {
+            writer = createWriteMapper();
+        }
+        return writer;
+    }
+
+    /**
+     * Get the object mapper used to read and write objects
+     *
+     * @return object mapper instance
+     */
+    public final ObjectMapper mapper() {
+        if (mapper == null) {
+            mapper = createMapper();
+        }
+        return mapper;
+    }
+
+    /**
+     * Create a mapper for reading files.
+     *
+     * @return mapper instance
+     */
+    protected ObjectMapper createReadMapper() {
+        return mapper();
+    }
+
+    /**
+     * Create a mapper for writing files.
+     *
+     * @return mapper instance
+     */
+    protected ObjectMapper createWriteMapper() {
+        return mapper();
+    }
+
+    /**
      * Load a file defined in the configuration key.
      * <p>
      * Will fail if the file is not present.
@@ -217,48 +271,6 @@ public abstract class JacksonConfig<T> {
     }
 
     /**
-     * Get the object mapper used to read files
-     *
-     * @return object mapper instance
-     */
-    protected final ObjectMapper reader() {
-        if (reader == null) {
-            reader = createReadMapper();
-        }
-        return reader;
-    }
-
-    /**
-     * Get the mapper used to write objects
-     *
-     * @return object mapper instance
-     */
-    protected final ObjectMapper writer() {
-        if (writer == null) {
-            writer = createWriteMapper();
-        }
-        return writer;
-    }
-
-    /**
-     * Create a mapper for writing files.
-     *
-     * @return mapper instance
-     */
-    public ObjectMapper createWriteMapper() {
-        return mapper();
-    }
-
-    /**
-     * Create a mapper for reading files.
-     *
-     * @return mapper instance
-     */
-    public ObjectMapper createReadMapper() {
-        return mapper();
-    }
-
-    /**
      * Create a general mapper for read and write.
      * <p>
      * You can define different wrapper for read and write operations by overwriting {@link #createReadMapper()} and {@link #createWriteMapper()}
@@ -278,18 +290,6 @@ public abstract class JacksonConfig<T> {
                 .build()
                 .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
                 .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
-    }
-
-    /**
-     * Get the object mapper used to read and write objects
-     *
-     * @return object mapper instance
-     */
-    public final ObjectMapper mapper() {
-        if (mapper == null) {
-            mapper = createMapper();
-        }
-        return mapper;
     }
 
     /**
