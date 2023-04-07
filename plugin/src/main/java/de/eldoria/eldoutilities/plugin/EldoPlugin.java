@@ -106,8 +106,10 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     }
 
     protected final void setLoggerLevel() {
-        getLogger().setLevel(EldoConfig.getLogLevel(this));
+        getLogger().setLevel(getLogLevel());
     }
+
+    public abstract Level getLogLevel();
 
     /**
      * Register a tabexecutor for a command.
