@@ -13,7 +13,7 @@ import java.io.Closeable;
  * <p>
  * The file itself will be accessed via the underlying configuration, making it stable for reloads.
  * <p>
- * Using this class inside an auto closable will save the file afterwards.
+ * Using this class inside an auto closable will save the file afterward.
  *
  * @param <T> type of config
  */

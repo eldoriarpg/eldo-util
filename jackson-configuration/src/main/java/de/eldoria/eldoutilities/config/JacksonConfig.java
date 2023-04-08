@@ -8,11 +8,8 @@ package de.eldoria.eldoutilities.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -35,7 +32,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Class allowing to manage multiple configuration files
+ * Class allowing to manage multiple configuration files.
+ * <p>
+ * Each file is associated with a {@link ConfigKey}, which provides a name, path and a default value.
  *
  * @param <T> type of main configuration
  */

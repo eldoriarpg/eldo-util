@@ -7,7 +7,7 @@
 package de.eldoria.eldoutilities.config;
 
 /**
- * This interface may be implemented by plugins.
+ * This interface may be implemented by plugins in config classes.
  * <p>
  * It provides hooks for read and write operations.
  */
