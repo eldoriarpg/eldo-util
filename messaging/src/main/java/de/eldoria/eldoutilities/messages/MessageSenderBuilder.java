@@ -91,7 +91,9 @@ public class MessageSenderBuilder {
         addL18nTag();
         var defaultResolver = defaultTagResolver.build();
         var messageSender = new MessageSender(plugin, localizer,
-                miniMessage.tags(defaultResolver).build(),
+                miniMessage.tags(defaultResolver)
+                           .preProcessor(in -> localizer.localize(in))
+                           .build(),
                 messageTagResolver.build(),
                 errorTagResolver.build(),
                 prefix);
