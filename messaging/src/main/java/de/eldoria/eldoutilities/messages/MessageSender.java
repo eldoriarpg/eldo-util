@@ -47,7 +47,7 @@ public final class MessageSender {
     private TagResolver errorTagResolver;
     private Component prefix;
 
-    MessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    MessageSender(Plugin plugin, ILocalizer localizer, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         this.ownerPlugin = plugin.getClass();
         this.miniMessage = miniMessage;
         this.messageTagResolver = messageTagResolver;
@@ -60,18 +60,18 @@ public final class MessageSender {
         PLUGIN_SENDER.put(messageSender.ownerPlugin, messageSender);
     }
 
-    static MessageSender create(@NotNull Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    static MessageSender create(@NotNull Plugin plugin, ILocalizer localizer, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         if (plugin == null) throw new IllegalArgumentException("Plugin can not be null");
 
         return PLUGIN_SENDER.compute(plugin.getClass(),
                 (k, v) -> v == null
-                        ? new MessageSender(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix)
+                        ? new MessageSender(plugin, localizer, miniMessage, messageTagResolver, errorTagResolver, prefix)
                         : v.update(miniMessage, messageTagResolver, errorTagResolver, prefix));
     }
 
     public static MessageSender anonymous() {
         var resolver = TagResolver.builder().resolver(Replacement.create("default", "", Style.empty())).build();
-        return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
+        return new MessageSender(null, ILocalizer.DEFAULT, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }
 
     /**
@@ -212,13 +212,13 @@ public final class MessageSender {
     }
 
     private Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
-        message = "<default>" + loc().localize(message);
+        message = "<default>" + message;
         if (placeholder.length > 0) {
             var tags = Arrays.copyOf(placeholder, placeholder.length + 1);
             tags[tags.length - 1] = resolver;
             return miniMessage.deserialize(message, tags);
         }
-        return miniMessage.deserialize(loc().localize(message), resolver);
+        return miniMessage.deserialize(message, resolver);
     }
 
     public Component prefix() {

@@ -12,6 +12,7 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -33,7 +34,7 @@ public class MessageComposer {
     }
 
     public static String escape(String propertyKey) {
-        return String.format("$%s$", propertyKey);
+        return String.format("<l18n:%s>", propertyKey);
     }
 
     public MessageComposer localeCode(String propertyKey, TagResolver... replacements) {
@@ -95,8 +96,7 @@ public class MessageComposer {
     }
 
     public MessageComposer space(int spaces) {
-        // TODO: waiting for java 11 migration
-        stringBuilder.append(IntStream.range(0, spaces).mapToObj(i -> " ").collect(Collectors.joining()));
+        stringBuilder.append(" ".repeat(spaces));
         return this;
     }
 
@@ -106,14 +106,12 @@ public class MessageComposer {
 
     public MessageComposer fillLines(int lines) {
         var lineCount = TextUtil.countChars(stringBuilder.toString(), '\n') + 1;
-        // TODO: waiting for java 11 migration
         prependLines(Math.max(lines - lineCount, 0));
         return this;
     }
 
     public MessageComposer prependLines(int lines) {
-        var newLines = IntStream.range(0, Math.max(lines, 0)).mapToObj(i -> "\n").collect(Collectors.joining());
-        stringBuilder.insert(0, newLines);
+        stringBuilder.insert(0, "\n".repeat(lines));
         return this;
     }
 
@@ -129,6 +127,10 @@ public class MessageComposer {
 
     public String build() {
         return stringBuilder.toString();
+    }
+
+    public List<TagResolver> replacements() {
+        return Collections.unmodifiableList(replacements);
     }
 
     public String buildLocalized(ILocalizer localizer) {
