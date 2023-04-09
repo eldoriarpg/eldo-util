@@ -27,8 +27,8 @@ public final class PluginBaseConfiguration {
     private int version;
     @JsonProperty
     private String lastInstalledVersion;
-    @JsonDeserialize(contentUsing = LevelDeserializer.class)
-    @JsonSerialize(contentUsing = LevelSerializer.class)
+    @JsonDeserialize(using = LevelDeserializer.class)
+    @JsonSerialize(using = LevelSerializer.class)
     @JsonProperty
     private Level logLevel = Level.INFO;
 
