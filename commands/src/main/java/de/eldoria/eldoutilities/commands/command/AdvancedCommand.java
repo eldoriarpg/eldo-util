@@ -131,7 +131,7 @@ public abstract class AdvancedCommand implements CommandRoute {
 
         var command = getCommand(args.asString(0));
         if (command.isEmpty()) {
-            return Collections.singletonList(localizer().getMessage("error.invalidCommand"));
+            return Collections.singletonList(localizer().localize("error.invalidCommand"));
         }
         // forward
         return command.get().tabCompleteRoute(sender, args.asString(0), args.subArguments());

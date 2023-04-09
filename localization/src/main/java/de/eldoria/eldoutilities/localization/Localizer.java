@@ -49,7 +49,7 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class Localizer implements ILocalizer {
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?).([a-zA-Z0-9_.\\-]+?)");
+    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?)\\.([a-zA-Z0-9_.\\-]+?)");
 
     private final ResourceBundle fallbackBundle;
     private final Plugin plugin;
@@ -207,7 +207,7 @@ public class Localizer implements ILocalizer {
     public String getMessage(String key) {
         var result = getValue(key);
 
-        if (result == null) {
+        if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
             result = key;
         }
@@ -256,7 +256,7 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaultFiles() {
-        // Create the property files if they do not exists.
+        // Create the property files if they do not exist.
         for (var locale : includedLocales) {
             var localeFile = getLocaleFile(locale).toFile();
             if (localeFile.exists()) {
