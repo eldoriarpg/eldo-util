@@ -49,8 +49,7 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class Localizer implements ILocalizer {
-    private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z0-9_.]+?)\\$");
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_.]+?)");
+    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?)\\.([a-zA-Z0-9_.\\-]+?)");
 
     private final ResourceBundle fallbackBundle;
     private final Plugin plugin;
@@ -115,7 +114,7 @@ public class Localizer implements ILocalizer {
      * @return the created localizer instance
      */
     public static ILocalizer create(Plugin plugin,
-                             String... includedLocales) {
+                                    String... includedLocales) {
         return create(plugin, "messages", "messages", Locale.US, includedLocales);
     }
 
@@ -138,7 +137,7 @@ public class Localizer implements ILocalizer {
      * @return the created localizer instance
      */
     public static ILocalizer create(Plugin plugin, String localesPath,
-                             String localesPrefix, Locale fallbackLocale, String... includedLocales) {
+                                    String localesPrefix, Locale fallbackLocale, String... includedLocales) {
         ILocalizer localizer = new Localizer(plugin, localesPath, localesPrefix, fallbackLocale, includedLocales);
         LOCALIZER.put(plugin.getClass(), localizer);
         return localizer;
@@ -208,7 +207,7 @@ public class Localizer implements ILocalizer {
     public String getMessage(String key) {
         var result = getValue(key);
 
-        if (result == null) {
+        if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
             result = key;
         }
@@ -257,7 +256,7 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaultFiles() {
-        // Create the property files if they do not exists.
+        // Create the property files if they do not exist.
         for (var locale : includedLocales) {
             var localeFile = getLocaleFile(locale).toFile();
             if (localeFile.exists()) {
@@ -316,8 +315,8 @@ public class Localizer implements ILocalizer {
     private Map<String, String> bundleMap(Path path) throws IOException {
         var map = new TreeMap<String, String>(String::compareToIgnoreCase);
         Files.readAllLines(path, StandardCharsets.UTF_8).stream()
-                .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
-                .forEach(line -> map.put(line[0], line[1]));
+             .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
+             .forEach(line -> map.put(line[0], line[1]));
         return map;
     }
 
@@ -409,8 +408,8 @@ public class Localizer implements ILocalizer {
             lines.add("# File automatically updated at " + timestamp());
 
             bundleMap.entrySet().stream()
-                    .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
-                    .forEach(lines::add);
+                     .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
+                     .forEach(lines::add);
 
             try {
                 Files.write(path, lines, StandardCharsets.UTF_8);
@@ -447,31 +446,12 @@ public class Localizer implements ILocalizer {
             return null;
         }
 
-        // If the matcher doesn't find any key we assume its a simple message.
-        if (!EMBED_LOCALIZATION_CODE.matcher(message).find()) {
-            if (LOCALIZATION_CODE.matcher(message).matches()) {
-                message = getMessage(message);
-            }
+        // Check if input is a locale key.
+        if (LOCALIZATION_CODE.matcher(message).matches()) {
+            message = getMessage(message);
         }
 
-        // find locale codes in message
-        var matcher = EMBED_LOCALIZATION_CODE.matcher(message);
-        List<String> keys = new ArrayList<>();
-        while (matcher.find()) {
-            keys.add(matcher.group(1));
-        }
-
-        var result = message;
-        for (var match : keys) {
-            //Replace current locale code with result
-            result = result.replace("$" + match + "$", getMessage(match));
-        }
-
-        if (EMBED_LOCALIZATION_CODE.matcher(result).find()) {
-            return localize(result);
-        }
-
-        return result;
+        return message;
     }
 
     /**

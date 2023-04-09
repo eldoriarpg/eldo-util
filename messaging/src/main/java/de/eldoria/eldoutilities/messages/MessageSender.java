@@ -212,13 +212,13 @@ public final class MessageSender {
     }
 
     private Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
-        message = "<default>" + loc().localize(message);
+        message = "<default>" + message;
         if (placeholder.length > 0) {
             var tags = Arrays.copyOf(placeholder, placeholder.length + 1);
             tags[tags.length - 1] = resolver;
             return miniMessage.deserialize(message, tags);
         }
-        return miniMessage.deserialize(loc().localize(message), resolver);
+        return miniMessage.deserialize(message, resolver);
     }
 
     public Component prefix() {
