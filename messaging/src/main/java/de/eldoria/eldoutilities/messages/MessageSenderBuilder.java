@@ -108,6 +108,6 @@ public class MessageSenderBuilder {
     }
 
     private Tag localizeTag(ArgumentQueue args, Context ctx) {
-        return Tag.inserting(ctx.deserialize(localizer.localize(args.popOr("locale tag required").value())));
+        return Tag.selfClosingInserting(ctx.deserialize(localizer.localize(args.popOr("locale tag required").value())));
     }
 }
