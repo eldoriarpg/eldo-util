@@ -22,7 +22,7 @@ Maven
 
 ``` xml
 <repository>
-    <id>EldoNexus</id>
+    <id>EldoNexus</id>\
     <url>https://eldonexus.de/repository/maven-public/</url>
 </repository>
 
