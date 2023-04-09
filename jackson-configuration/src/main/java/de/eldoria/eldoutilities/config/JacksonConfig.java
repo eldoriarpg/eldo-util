@@ -319,7 +319,7 @@ public abstract class JacksonConfig<T> {
      *
      * @return module
      */
-    protected final Module getPlatformModule() {
+    public final Module getPlatformModule() {
         if (plugin.getServer().getName().toLowerCase(Locale.ROOT).contains("spigot")) {
             return getBukkitModule();
         }
