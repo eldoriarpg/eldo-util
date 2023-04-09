@@ -15,6 +15,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.Consumer;
@@ -89,9 +90,13 @@ public class MessageSenderBuilder {
 
     public MessageSender register() {
         addL18nTag();
-        var defaultResolver = defaultTagResolver.build();
+        var defaultResolver = defaultTagResolver.
+                resolver(StandardTags.defaults())
+                .build();
         var messageSender = new MessageSender(plugin, localizer,
-                miniMessage.tags(defaultResolver)
+                miniMessage.tags(TagResolver.builder()
+
+                                   .build())
                            .preProcessor(in -> localizer.localize(in))
                            .build(),
                 TagResolver.resolver(defaultResolver, messageTagResolver.build()),
