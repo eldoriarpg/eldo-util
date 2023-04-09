@@ -8,13 +8,15 @@ package de.eldoria.eldoutilities.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.eldoria.eldoutilities.config.exceptions.ConfigurationException;
-import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import org.bukkit.plugin.Plugin;
@@ -122,6 +124,28 @@ public abstract class JacksonConfig<T> {
      */
     public <V> Wrapper<V> secondaryWrapped(ConfigKey<V> key) {
         return Wrapper.of(key, this);
+    }
+
+    /**
+     * Checks whether the config file was created already
+     *
+     * @param key key
+     * @param <V> type
+     * @return true when exists
+     */
+    public <V> boolean exists(ConfigKey<V> key) {
+        return resolvePath(key).toFile().exists();
+    }
+
+    /**
+     * Checks whether the config file was already loaded
+     *
+     * @param key key
+     * @param <V> type
+     * @return true when loaded
+     */
+    public <V> boolean loaded(ConfigKey<V> key) {
+        return files.containsKey(key);
     }
 
     /**
@@ -238,7 +262,7 @@ public abstract class JacksonConfig<T> {
      * @return instance of file
      */
     protected final <V> V load(ConfigKey<V> key) {
-        if (!resolvePath(key).toFile().exists()) return null;
+        if (!exists(key)) return null;
         try {
             return read(resolvePath(key), key.configClazz());
         } catch (ConfigurationException e) {
@@ -261,7 +285,7 @@ public abstract class JacksonConfig<T> {
      */
     protected final <V> V createAndLoad(ConfigKey<V> key) {
         var path = resolvePath(key);
-        if (!path.toFile().exists()) {
+        if (!exists(key)) {
             plugin.getLogger().info("Configuration file: " + path + " does not exist. Creating.");
             write(path, key.initValue().get());
         }
@@ -330,7 +354,8 @@ public abstract class JacksonConfig<T> {
 
     private void backup(ConfigKey<?> key) {
         var target = resolvePath(key);
-        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy-MM-dd_hh-mm").format(LocalDateTime.now()) + "_" + target.getFileName();
+        var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy-MM-dd_hh-mm")
+                                                      .format(LocalDateTime.now()) + "_" + target.getFileName();
         plugin.getLogger().log(Level.WARNING, "Backing up " + target + " to " + backupName);
         try {
             Files.move(target, target.getParent().resolve(backupName));
