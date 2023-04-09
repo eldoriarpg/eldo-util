@@ -40,7 +40,7 @@ allprojects {
         testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
         testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
         testImplementation("org.mockito", "mockito-core", "5.2.0")
-        testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
+        testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.1")
     }
 
     java {
