@@ -50,7 +50,7 @@ import java.util.regex.Pattern;
  */
 public class Localizer implements ILocalizer {
     private static final Pattern EMBED_LOCALIZATION_CODE = Pattern.compile("\\$([a-zA-Z0-9_.]+?)\\$");
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_.]+?)");
+    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?).([a-zA-Z0-9_.\\-]+?)");
 
     private final ResourceBundle fallbackBundle;
     private final Plugin plugin;
