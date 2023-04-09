@@ -55,7 +55,6 @@ public abstract class JacksonConfig<T> {
     public JacksonConfig(@NotNull Plugin plugin, @NotNull ConfigKey<T> mainKey) {
         this.plugin = plugin;
         this.mainKey = mainKey;
-        secondary(PluginBaseConfiguration.KEY);
     }
 
     /**
