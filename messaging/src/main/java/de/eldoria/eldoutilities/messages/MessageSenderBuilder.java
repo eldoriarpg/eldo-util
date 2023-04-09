@@ -94,8 +94,8 @@ public class MessageSenderBuilder {
                 miniMessage.tags(defaultResolver)
                            .preProcessor(in -> localizer.localize(in))
                            .build(),
-                messageTagResolver.build(),
-                errorTagResolver.build(),
+                TagResolver.resolver(defaultResolver, messageTagResolver.build()),
+                TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                 prefix);
         MessageSender.register(messageSender);
         return messageSender;
