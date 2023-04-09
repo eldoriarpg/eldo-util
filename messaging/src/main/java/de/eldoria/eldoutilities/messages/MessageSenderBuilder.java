@@ -17,8 +17,11 @@ import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 public class MessageSenderBuilder {
     private final MiniMessage.Builder miniMessage = MiniMessage.builder();
@@ -31,16 +34,17 @@ public class MessageSenderBuilder {
     private final Plugin plugin;
     private Component prefix = Component.empty();
     private ILocalizer localizer = ILocalizer.DEFAULT;
+    private UnaryOperator<String> preProcessor = s -> s;
 
     public MessageSenderBuilder(Plugin plugin) {
         this.plugin = plugin;
     }
 
     /**
-     * The localizer used to serialize messages via the {@code <i8ln>}
+     * The localizer used to serialize messages via the {@code <i8ln>} tag
      *
-     * @param localizer
-     * @return
+     * @param localizer localizer instance
+     * @return builder instance
      */
     public MessageSenderBuilder localizer(ILocalizer localizer) {
         this.localizer = localizer;
@@ -83,11 +87,27 @@ public class MessageSenderBuilder {
         return this;
     }
 
-    public MessageSenderBuilder miniMessage(Consumer<MiniMessage.Builder> consumer) {
-        consumer.accept(miniMessage);
+    public MiniMessage.@NotNull Builder strict(boolean strict) {
+        return miniMessage.strict(strict);
+    }
+
+    public MiniMessage.@NotNull Builder debug(@Nullable Consumer<String> debugOutput) {
+        return miniMessage.debug(debugOutput);
+    }
+
+    public MiniMessage.@NotNull Builder postProcessor(@NotNull UnaryOperator<Component> postProcessor) {
+        return miniMessage.postProcessor(postProcessor);
+    }
+
+    public MessageSenderBuilder preProcessor(@NotNull UnaryOperator<String> preProcessor) {
+        this.preProcessor = preProcessor;
         return this;
     }
 
+    /**
+     * Builds and registers the message sender for the provided plugin
+     * @return registered message sender
+     */
     public MessageSender register() {
         addL18nTag();
         var defaultResolver = defaultTagResolver
@@ -95,7 +115,7 @@ public class MessageSenderBuilder {
                 .build();
         var messageSender = new MessageSender(plugin,
                 miniMessage.tags(defaultResolver)
-                           .preProcessor(in -> localizer.localize(in))
+                           .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
                            .build(),
                 TagResolver.resolver(defaultResolver, messageTagResolver.build()),
                 TagResolver.resolver(defaultResolver, errorTagResolver.build()),
