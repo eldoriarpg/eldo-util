@@ -96,7 +96,7 @@ public class MessageComposer {
     }
 
     public MessageComposer space(int spaces) {
-        stringBuilder.append("".repeat(spaces));
+        stringBuilder.append(" ".repeat(spaces));
         return this;
     }
 
