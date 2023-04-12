@@ -41,7 +41,7 @@ import java.util.logging.Level;
  *
  * @param <T> type of main configuration
  */
-public abstract class JacksonConfig<T> {
+public class JacksonConfig<T> {
     private final Plugin plugin;
     private final ConfigKey<T> mainKey;
     private final Map<ConfigKey<?>, Object> files = new HashMap<>();
