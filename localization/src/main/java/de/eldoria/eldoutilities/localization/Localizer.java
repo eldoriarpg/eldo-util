@@ -146,16 +146,16 @@ public class Localizer implements ILocalizer {
 
     private void createDefaults() {
         Map<String, String> locales = new HashMap<>();
-        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: <SYNTAX>");
+        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><SYNTAX><default>");
         locales.put("error.invalidCommand", "Invalid Command");
-        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<COMMANDS>");
-        locales.put("error.permission", "You do not have the permissionNode to do this. (<PERMISSION>)");
-        locales.put("error.invalidRange", "This value is out of range. Min: <MIN> Max: <MAX>");
-        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <VALUES>.");
+        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><COMMANDS><default>");
+        locales.put("error.permission", "You do not have the permission to do this. (<gold><PERMISSION><default>)");
+        locales.put("error.invalidRange", "This value is out of range. Min: <gold><MIN><default> Max: <gold><MAX><default>");
+        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><VALUES><default>.");
         locales.put("error.invalidMaterial", "Invalid material.");
         locales.put("error.invalidNumber", "Invalid number");
-        locales.put("error.invalidBoolean", "Invalid value, <TRUE> or <FALSE>");
-        locales.put("error.invalidLength", "This input is too long. Max: <MAX> chars.");
+        locales.put("error.invalidBoolean", "Invalid value, <gold><TRUE><default> or <gold><FALSE><default>");
+        locales.put("error.invalidLength", "This input is too long. Max: <gold><MAX><default> chars.");
         locales.put("error.notOnline", "Invalid player. This player is not online.");
         locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
         locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
@@ -165,9 +165,9 @@ public class Localizer implements ILocalizer {
         locales.put("error.invalidSender", "This command can not be executed from here.");
         locales.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
         locales.put("error.notAsPlayer", "This command can not be executed as player");
-        locales.put("error.tooSmall", "The number is too small. Min: <MIN>");
-        locales.put("error.tooLarge", "The number is too Large. Max: <MAX>");
-        locales.put("about", "<PLUGIN_NAME> by <AUTHORS>\nVersion: <VERSION>\nSpigot: <WEBSITE>\nSupport: <DISCORD>");
+        locales.put("error.tooSmall", "The number is too small. Min: <gold><MIN>");
+        locales.put("error.tooLarge", "The number is too Large. Max: <gold><MAX>");
+        locales.put("about", "<bold><gold><PLUGIN_NAME></bold><default> by <bold><AUTHORS></bold>\nVersion: <bold><VERSION></bold>\nSpigot: <bold><WEBSITE></bold>\nSupport: <bold><DISCORD></bold>");
         locales.put("dialog.accept", "accept");
         locales.put("dialog.deny", "deny");
         locales.put("dialog.add", "add");

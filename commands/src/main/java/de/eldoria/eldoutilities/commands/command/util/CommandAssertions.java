@@ -37,7 +37,7 @@ public final class CommandAssertions {
     public static void unexpectedRouteEnd(CommandMeta meta, Arguments arguments) throws CommandException {
         if (arguments.isEmpty() && meta.defaultCommand() == null) {
             var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
-            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands, Style.style(NamedTextColor.GOLD)));
+            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands));
         }
     }
 
@@ -45,7 +45,7 @@ public final class CommandAssertions {
     public static void unexpectedRouteEnd(CommandMeta meta, Optional<AdvancedCommand> command) throws CommandException {
         if (command.isEmpty()) {
             var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
-            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands, Style.style(NamedTextColor.GOLD)));
+            throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands));
         }
     }
 
@@ -58,7 +58,7 @@ public final class CommandAssertions {
      */
     public static void invalidArguments(CommandMeta meta, String[] args) throws CommandException {
         isFalse(args.length < meta.requiredArguments(), "error.invalidArguments",
-                Replacement.create("SYNTAX", meta.name() + " " + meta.argumentString(), Style.style(NamedTextColor.GOLD)));
+                Replacement.create("SYNTAX", meta.name() + " " + meta.argumentString()));
     }
 
     /**
@@ -70,7 +70,7 @@ public final class CommandAssertions {
      */
     public static void invalidArguments(CommandMeta meta, Arguments args) throws CommandException {
         isFalse(args.size() < meta.requiredArguments(), "error.invalidArguments",
-                Replacement.create("SYNTAX", meta.createCommandCall() + " " + meta.argumentString(), Style.style(NamedTextColor.GOLD)));
+                Replacement.create("SYNTAX", meta.createCommandCall() + " " + meta.argumentString()));
     }
 
     /**
@@ -85,7 +85,7 @@ public final class CommandAssertions {
         var required = Arrays.stream(args).filter(Argument::isRequired).count();
         var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
-                Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString));
     }
 
     /**
@@ -102,7 +102,7 @@ public final class CommandAssertions {
         var required = Arrays.stream(args).filter(Argument::isRequired).count();
         var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
         isFalse(arguments.size() < required, "error.invalidArguments",
-                Replacement.create("SYNTAX", argumentString, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("SYNTAX", argumentString));
     }
 
     /**
@@ -179,8 +179,8 @@ public final class CommandAssertions {
      */
     public static void range(double value, double min, double max) throws CommandException {
         isTrue(value <= max && value >= min, "error.invalidRange",
-                Replacement.create("MIN", min, Style.style(NamedTextColor.GOLD)),
-                Replacement.create("MAX", max, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MIN", min),
+                Replacement.create("MAX", max));
     }
 
     /**
@@ -192,8 +192,8 @@ public final class CommandAssertions {
      */
     public static void range(int value, int min, int max) throws CommandException {
         isTrue(value <= max && value >= min, "error.invalidRange",
-                Replacement.create("MIN", min, Style.style(NamedTextColor.GOLD)),
-                Replacement.create("MAX", max, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MIN", min),
+                Replacement.create("MAX", max));
     }
 
     /**
@@ -204,7 +204,7 @@ public final class CommandAssertions {
      */
     public static void min(int value, int min) throws CommandException {
         isTrue(value >= min, "error.tooLow",
-                Replacement.create("MIN", min, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MIN", min));
     }
 
     /**
@@ -215,7 +215,7 @@ public final class CommandAssertions {
      */
     public static void min(double value, double min) throws CommandException {
         isTrue(value >= min, "error.tooLow",
-                Replacement.create("MIN", min, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MIN", min));
     }
 
     /**
@@ -226,7 +226,7 @@ public final class CommandAssertions {
      */
     public static void max(int value, int max) throws CommandException {
         isTrue(value <= max, "error.tooLarge",
-                Replacement.create("MAX", max, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MAX", max));
     }
 
     /**
@@ -237,7 +237,7 @@ public final class CommandAssertions {
      */
     public static void max(double value, double max) throws CommandException {
         isTrue(value <= max, "error.tooLarge",
-                Replacement.create("MAX", max, Style.style(NamedTextColor.GOLD)));
+                Replacement.create("MAX", max));
     }
 
     /**
@@ -250,7 +250,7 @@ public final class CommandAssertions {
      */
     public static <T extends Enum<T>> void enumValue(String value, Class<T> clazz) throws CommandException {
         isTrue(EnumUtil.parse(value, clazz).isPresent(), "error.invalidEnumValue", Replacement.create("VALUES",
-                Replacement.create("VALUES", EnumUtil.enumValues(clazz), Style.style(NamedTextColor.GOLD))));
+                Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
     }
 
     public static void invalidNumber() throws CommandException {

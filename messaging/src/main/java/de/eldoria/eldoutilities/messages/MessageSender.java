@@ -70,7 +70,7 @@ public final class MessageSender {
     }
 
     public static MessageSender anonymous() {
-        var resolver = TagResolver.builder().resolver(Replacement.create("default", "", Style.empty())).build();
+        var resolver = TagResolver.builder().resolver(Replacement.create("default", "")).build();
         return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }
 
