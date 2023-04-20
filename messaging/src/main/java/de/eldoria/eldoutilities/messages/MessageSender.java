@@ -216,12 +216,18 @@ public final class MessageSender {
             message = ILocalizer.escape(message);
         }
         message = "<default>" + message;
+        var finalResolver = new TagResolver[]{resolver};
         if (placeholder.length > 0) {
             var tags = Arrays.copyOf(placeholder, placeholder.length + 1);
             tags[tags.length - 1] = resolver;
-            return miniMessage.deserialize(message, tags);
+            finalResolver = tags;
         }
-        return miniMessage.deserialize(message, resolver);
+        var component = miniMessage.deserialize(message, finalResolver);
+        var newMessage = miniMessage.serialize(component);
+        if (newMessage.equals(message)) {
+            return component;
+        }
+        return serialize(newMessage, resolver, placeholder);
     }
 
     public Component prefix() {

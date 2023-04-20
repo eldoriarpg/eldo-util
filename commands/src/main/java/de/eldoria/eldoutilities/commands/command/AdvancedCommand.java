@@ -196,8 +196,8 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     public void handleCommandError(CommandSender sender, Throwable e) {
-        if (e instanceof CommandException) {
-            messageSender().sendError(sender, e.getMessage(), ((CommandException) e).replacements());
+        if (e instanceof CommandException cmd) {
+            messageSender().sendError(sender, e.getMessage(), cmd.replacements());
             plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
             return;
         }
