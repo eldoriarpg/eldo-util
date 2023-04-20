@@ -14,8 +14,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Class to compose localized messages.
@@ -31,6 +29,10 @@ public class MessageComposer {
 
     public static MessageComposer create() {
         return new MessageComposer();
+    }
+
+    public static String escape(String text) {
+        return ILocalizer.escape(text);
     }
 
     public MessageComposer localeCode(String propertyKey, TagResolver... replacements) {
