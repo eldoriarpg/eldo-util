@@ -33,6 +33,8 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
+import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
+
 /**
  * Compact localizer class.
  * <p>
@@ -49,7 +51,6 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 public class Localizer implements ILocalizer {
-    private static final Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?)\\.([a-zA-Z0-9_.\\-]+?)");
 
     private final ResourceBundle fallbackBundle;
     private final Plugin plugin;
@@ -447,7 +448,7 @@ public class Localizer implements ILocalizer {
         }
 
         // Check if input is a locale key.
-        if (LOCALIZATION_CODE.matcher(message).matches()) {
+        if (isLocaleCode(message)) {
             message = getMessage(message);
         }
 

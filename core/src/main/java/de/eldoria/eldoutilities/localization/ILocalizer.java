@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Basic Interface for localizer implementations.
@@ -22,6 +23,7 @@ import java.util.Map;
 public interface ILocalizer {
     Map<Class<? extends Plugin>, ILocalizer> LOCALIZER = new HashMap<>();
     ILocalizer DEFAULT = new DummyLocalizer();
+    Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?)\\.([a-zA-Z0-9_.\\-]+?)");
 
     static ILocalizer getPluginLocalizer(Plugin plugin) {
         if (plugin == null) return DEFAULT;
@@ -33,8 +35,12 @@ public interface ILocalizer {
         return LOCALIZER.getOrDefault(plugin, DEFAULT);
     }
 
-    static String escape(String string) {
-        return String.format("$%s$", string);
+    static String escape(String propertyKey) {
+        return String.format("<l18n:%s>", propertyKey);
+    }
+
+    static boolean isLocaleCode(String message) {
+        return LOCALIZATION_CODE.matcher(message).matches();
     }
 
     /**

@@ -33,12 +33,8 @@ public class MessageComposer {
         return new MessageComposer();
     }
 
-    public static String escape(String propertyKey) {
-        return String.format("<l18n:%s>", propertyKey);
-    }
-
     public MessageComposer localeCode(String propertyKey, TagResolver... replacements) {
-        stringBuilder.append(escape(propertyKey));
+        stringBuilder.append(ILocalizer.escape(propertyKey));
         this.replacements.addAll(Arrays.asList(replacements));
         return this;
     }

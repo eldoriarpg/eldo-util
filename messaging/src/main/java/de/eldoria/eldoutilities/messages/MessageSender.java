@@ -56,7 +56,7 @@ public final class MessageSender {
         audiences = BukkitAudiences.create(plugin);
     }
 
-    public static void register(MessageSender messageSender){
+    public static void register(MessageSender messageSender) {
         PLUGIN_SENDER.put(messageSender.ownerPlugin, messageSender);
     }
 
@@ -212,6 +212,9 @@ public final class MessageSender {
     }
 
     private Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
+        if (ILocalizer.isLocaleCode(message)) {
+            message = ILocalizer.escape(message);
+        }
         message = "<default>" + message;
         if (placeholder.length > 0) {
             var tags = Arrays.copyOf(placeholder, placeholder.length + 1);
@@ -233,10 +236,11 @@ public final class MessageSender {
         return PlainTextComponentSerializer.plainText().serialize(serialize(message, messageTagResolver, replacements));
     }
 
-    public Component serializeMessage(String message, TagResolver... placeholder){
+    public Component serializeMessage(String message, TagResolver... placeholder) {
         return serialize(message, messageTagResolver, placeholder);
     }
-    public Component serializeError(String message, TagResolver... placeholder){
+
+    public Component serializeError(String message, TagResolver... placeholder) {
         return serialize(message, errorTagResolver, placeholder);
     }
 
