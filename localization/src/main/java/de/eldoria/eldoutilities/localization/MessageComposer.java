@@ -20,7 +20,7 @@ import java.util.List;
  * Handles escaping and concatenation of messages.
  */
 @SuppressWarnings("unused")
-public class MessageComposer {
+public class MessageComposer implements IMessageComposer {
     private final StringBuilder stringBuilder = new StringBuilder();
     private final List<TagResolver> replacements = new ArrayList<>();
 
@@ -123,10 +123,12 @@ public class MessageComposer {
         return this;
     }
 
+    @Override
     public String build() {
         return stringBuilder.toString();
     }
 
+    @Override
     public List<TagResolver> replacements() {
         return Collections.unmodifiableList(replacements);
     }
