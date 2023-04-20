@@ -222,12 +222,17 @@ public final class MessageSender {
             tags[tags.length - 1] = resolver;
             finalResolver = tags;
         }
-        var component = miniMessage.deserialize(message, finalResolver);
+        return resolveTags(message, finalResolver);
+    }
+
+    private Component resolveTags(String message, TagResolver... resolver) {
+        var component = miniMessage.deserialize(message, resolver);
         var newMessage = miniMessage.serialize(component);
         if (newMessage.equals(message)) {
             return component;
         }
-        return serialize(newMessage, resolver, placeholder);
+        return resolveTags(newMessage, resolver);
+
     }
 
     public Component prefix() {
