@@ -34,10 +34,10 @@ public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
     public void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) {
         var descr = plugin().getDescription();
         messageSender().sendMessage(sender, "about",
-                Replacement.create("PLUGIN_NAME", descr.getName(), Style.style(NamedTextColor.GOLD, TextDecoration.BOLD)),
-                Replacement.create("AUTHORS", String.join(", ", descr.getAuthors()), Style.style(TextDecoration.BOLD)),
-                Replacement.create("VERSION", descr.getVersion(), Style.style(TextDecoration.BOLD)),
-                Replacement.create("WEBSITE", descr.getWebsite(), Style.style(TextDecoration.BOLD)),
-                Replacement.create("DISCORD", "https://discord.gg/" + discord, Style.style(TextDecoration.BOLD)));
+                Replacement.create("PLUGIN_NAME", descr.getName()),
+                Replacement.create("AUTHORS", String.join(", ", descr.getAuthors())),
+                Replacement.create("VERSION", descr.getVersion()),
+                Replacement.create("WEBSITE", descr.getWebsite()),
+                Replacement.create("DISCORD", "https://discord.gg/" + discord));
     }
 }

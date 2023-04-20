@@ -7,10 +7,10 @@
 package de.eldoria.eldoutilities.messages;
 
 import de.eldoria.eldoutilities.localization.ILocalizer;
+import de.eldoria.eldoutilities.localization.IMessageComposer;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
@@ -70,7 +70,7 @@ public final class MessageSender {
     }
 
     public static MessageSender anonymous() {
-        var resolver = TagResolver.builder().resolver(Replacement.create("default", "", Style.empty())).build();
+        var resolver = TagResolver.builder().resolver(Replacement.create("default", "")).build();
         return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }
 
@@ -122,10 +122,29 @@ public final class MessageSender {
      * and $code.more.code$}. You can write what you want between locale codes.
      *
      * @param sender  receiver of the message
-     * @param message message with optinal color codes
+     * @param message message with optional color codes
      */
     public void sendMessage(CommandSender sender, String message, TagResolver... placeholder) {
         sendMessage(sender, serialize(message, messageTagResolver, placeholder));
+    }
+
+
+    /**
+     * Send a message to a sender
+     * <p>
+     * The message will be localized if a localizer is available and a locale code is detected.
+     * <p>
+     * The message can be a simple locale code in the format "code" or "code.code....".
+     * <p>
+     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
+     * and $code.more.code$}. You can write what you want between locale codes.
+     *
+     * @param sender   receiver of the message
+     * @param composer message composer
+     */
+    public void sendMessage(CommandSender sender, IMessageComposer composer) {
+        sendMessage(sender, serialize(composer.build(), messageTagResolver,
+                composer.replacements().toArray(new TagResolver[0])));
     }
 
     /**
@@ -143,6 +162,24 @@ public final class MessageSender {
      */
     public void sendError(CommandSender sender, String message, TagResolver... placeholder) {
         sendMessage(sender, serialize(message, errorTagResolver, placeholder));
+    }
+
+    /**
+     * Sends an error to a sender
+     * <p>
+     * The message will be localized if a localizer is available and a locale code is detected.
+     * <p>
+     * The message can be a simple locale code in the format "code" or "code.code....".
+     * <p>
+     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
+     * and $code.more.code$}. You can write what you want between locale codes.
+     *
+     * @param sender   receiver of the message
+     * @param composer message composer
+     */
+    public void sendError(CommandSender sender, IMessageComposer composer) {
+        sendMessage(sender, serialize(composer.build(), errorTagResolver,
+                composer.replacements().toArray(new TagResolver[0])));
     }
 
     public void sendMessage(CommandSender sender, Component component) {

@@ -148,7 +148,7 @@ public class Input {
     public <T extends Enum<T>> T asEnum(Class<T> clazz, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
         return EnumUtil.parse(asString(), clazz, stripStrings)
                 .orElseThrow(() -> CommandException.message("error.invalidEnumValue",
-                        Replacement.create("VALUES", EnumUtil.enumValues(clazz), Style.style(NamedTextColor.GOLD))));
+                        Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
     }
 
     /**

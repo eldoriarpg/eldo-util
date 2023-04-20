@@ -28,22 +28,10 @@ public final class Replacement {
      *
      * @param key   key of replacement
      * @param value value for replacement
-     * @param style format which should be applied on the replacement.
-     * @return replacement with registered replacement
-     */
-    public static TagResolver create(String key, String value, Style style) {
-        return Placeholder.component(sanatizeKey(key), Component.text(value).style(style));
-    }
-
-    /**
-     * Creates a new replacement.
-     *
-     * @param key   key of replacement
-     * @param value value for replacement
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, String value) {
-        return Placeholder.component(sanatizeKey(key), Component.text(value));
+        return Placeholder.parsed(sanatizeKey(key), value);
     }
 
     /**
@@ -54,23 +42,11 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, Object value) {
-        return Placeholder.component(sanatizeKey(key), Component.text(String.valueOf(value)));
+        return Placeholder.parsed(sanatizeKey(key), String.valueOf(value));
     }
 
-    public static TagResolver create(String key, Double value, Style style) {
-        return create(key, String.format("%.2f", value), style);
-    }
-
-    /**
-     * Creates a new replacement.
-     *
-     * @param key   key of replacement
-     * @param value value which provides a string via {@link Object#toString()}
-     * @param style format which should be applied on the replacement.
-     * @return replacement with registered replacement
-     */
-    public static TagResolver create(String key, Object value, Style style) {
-        return create(key, value.toString(), style);
+    public static TagResolver create(String key, Double value) {
+        return create(key, String.format("%.2f", value));
     }
 
     /**
@@ -78,11 +54,10 @@ public final class Replacement {
      *
      * @param key    key of replacement
      * @param anEnum value which provides a string via {@link Enum#name()}
-     * @param style  format which should be applied on the replacement.
      * @return replacement with registered replacement
      */
-    public static TagResolver create(String key, Enum<?> anEnum, Style style) {
-        return create(key, anEnum.name(), style);
+    public static TagResolver create(String key, Enum<?> anEnum) {
+        return create(key, anEnum.name());
     }
 
     /**
@@ -90,11 +65,10 @@ public final class Replacement {
      *
      * @param key    key of replacement
      * @param player value which provides the name of the player
-     * @param style  format which should be applied on the replacement.
      * @return replacement with registered replacement
      */
-    public static TagResolver create(String key, Player player, Style style) {
-        return create(key, player.getName(), style);
+    public static TagResolver create(String key, Player player) {
+        return create(key, player.getName());
     }
 
     /**
@@ -102,11 +76,10 @@ public final class Replacement {
      *
      * @param key   key of replacement
      * @param world world which provides the name of the world
-     * @param style format which should be applied on the replacement.
      * @return replacement with registered replacement
      */
-    public static TagResolver create(String key, World world, Style style) {
-        return create(key, world.getName(), style);
+    public static TagResolver create(String key, World world) {
+        return create(key, world.getName());
     }
 
     private static String sanatizeKey(String key){
