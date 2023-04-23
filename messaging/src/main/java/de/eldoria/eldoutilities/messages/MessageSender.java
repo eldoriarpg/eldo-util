@@ -277,7 +277,7 @@ public final class MessageSender {
     }
 
     private Component applyPrefix(Component component) {
-        return prefix.append(component);
+        return prefix.appendSpace().append(component);
     }
 
     public String translatePlain(String message, TagResolver... replacements) {
