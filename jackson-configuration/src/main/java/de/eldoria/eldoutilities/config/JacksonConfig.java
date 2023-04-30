@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.eldoria.eldoutilities.config.exceptions.ConfigurationException;
+import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
 import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import org.bukkit.plugin.Plugin;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 /**
@@ -92,6 +94,17 @@ public class JacksonConfig<T> {
      * @return configuration file
      */
     public <V> V secondary(ConfigKey<V> key) {
+        // This configuration might be called to retrieve the logging level.
+        // This will cause a recursive call
+        if (key == PluginBaseConfiguration.KEY) {
+            if (!exists(key)) {
+                // We schedule the loading of the plugin
+                plugin.getServer().getScheduler().runTaskLater(plugin, () -> files.computeIfAbsent(key, k -> createAndLoad(key)), 10);
+                // Return the default value for now.
+                return key.initValue().get();
+            }
+        }
+
         return (V) files.computeIfAbsent(key, k -> createAndLoad(key));
     }
 
@@ -313,11 +326,11 @@ public class JacksonConfig<T> {
                 .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS);
         if (builder instanceof YAMLMapper.Builder yaml) {
             yaml.disable(YAMLGenerator.Feature.USE_NATIVE_TYPE_ID)
-                .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
+                    .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER);
         }
         return builder.build()
-                      .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
-                      .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
+                .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
+                .setVisibility(PropertyAccessor.GETTER, JsonAutoDetect.Visibility.NONE);
     }
 
     /**
@@ -361,7 +374,7 @@ public class JacksonConfig<T> {
     private void backup(ConfigKey<?> key) {
         var target = resolvePath(key);
         var backupName = "backup_" + DateTimeFormatter.ofPattern("yyyy-MM-dd_hh-mm")
-                                                      .format(LocalDateTime.now()) + "_" + target.getFileName();
+                .format(LocalDateTime.now()) + "_" + target.getFileName();
         plugin.getLogger().log(Level.WARNING, "Backing up " + target + " to " + backupName);
         try {
             Files.move(target, target.getParent().resolve(backupName));
@@ -376,6 +389,7 @@ public class JacksonConfig<T> {
             if (object instanceof ConfigSubscriber sub) {
                 sub.preWrite(this);
             }
+            Files.createDirectories(path.getParent());
             // We do this to avoid wiping a file on serialization error.
             Files.writeString(path, writer().writeValueAsString(object));
         } catch (IOException e) {
