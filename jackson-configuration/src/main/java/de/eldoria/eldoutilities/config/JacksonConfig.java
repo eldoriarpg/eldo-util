@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /**
@@ -99,7 +100,7 @@ public class JacksonConfig<T> {
         if (key == PluginBaseConfiguration.KEY) {
             if (!exists(key)) {
                 // We schedule the loading of the plugin
-                plugin.getServer().getScheduler().runTaskLater(plugin, () -> files.computeIfAbsent(key, k -> createAndLoad(key)), 10);
+                CompletableFuture.delayedExecutor(10, TimeUnit.SECONDS).execute(() -> files.computeIfAbsent(key, k -> createAndLoad(key)));
                 // Return the default value for now.
                 return key.initValue().get();
             }
