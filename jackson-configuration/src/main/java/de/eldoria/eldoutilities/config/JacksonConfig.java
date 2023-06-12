@@ -29,8 +29,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -218,7 +220,7 @@ public class JacksonConfig<T> {
      */
     public final ObjectMapper reader() {
         if (reader == null) {
-            reader = createReadMapper();
+            reader = registerAdditionalModules(createReadMapper());
         }
         return reader;
     }
@@ -230,7 +232,7 @@ public class JacksonConfig<T> {
      */
     public final ObjectMapper writer() {
         if (writer == null) {
-            writer = createWriteMapper();
+            writer = registerAdditionalModules(createWriteMapper());
         }
         return writer;
     }
@@ -242,7 +244,14 @@ public class JacksonConfig<T> {
      */
     public final ObjectMapper mapper() {
         if (mapper == null) {
-            mapper = createMapper();
+            mapper = registerAdditionalModules(createMapper());
+        }
+        return mapper;
+    }
+
+    private ObjectMapper registerAdditionalModules(ObjectMapper mapper) {
+        for (Module module : additionalModules()) {
+            mapper.registerModule(module);
         }
         return mapper;
     }
@@ -344,6 +353,15 @@ public class JacksonConfig<T> {
             return getBukkitModule();
         }
         return getPaperModule();
+    }
+
+    /**
+     * Allows to register additional modules to the mapper.
+     *
+     * @return list of modules.
+     */
+    protected List<Module> additionalModules() {
+        return Collections.emptyList();
     }
 
     /**
