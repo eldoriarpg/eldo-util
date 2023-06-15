@@ -93,7 +93,8 @@ public final class ItemStackBuilder {
      */
     public ItemStackBuilder withMetaValue(Consumer<@NotNull ItemMeta> itemMetaConsumer) {
         var meta = itemStack.getItemMeta();
-        if (meta != null) itemStack.setItemMeta(meta);
+        if (meta != null) itemMetaConsumer.accept(meta);
+        itemStack.setItemMeta(meta);
         return this;
     }
 
