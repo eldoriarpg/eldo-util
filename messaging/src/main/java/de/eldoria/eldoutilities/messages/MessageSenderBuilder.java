@@ -7,6 +7,9 @@
 package de.eldoria.eldoutilities.messages;
 
 import de.eldoria.eldoutilities.localization.ILocalizer;
+import de.eldoria.eldoutilities.messages.impl.PaperMessageSender;
+import de.eldoria.eldoutilities.messages.impl.SpigotMessageSender;
+import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -31,12 +34,13 @@ public class MessageSenderBuilder {
             .tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
 
+    @Nullable
     private final Plugin plugin;
     private Component prefix = Component.empty();
     private ILocalizer localizer = ILocalizer.DEFAULT;
     private UnaryOperator<String> preProcessor = s -> s;
 
-    public MessageSenderBuilder(Plugin plugin) {
+    public MessageSenderBuilder(@Nullable Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -59,7 +63,7 @@ public class MessageSenderBuilder {
 
     public MessageSenderBuilder prefix(String prefix) {
         return prefix(MiniMessage.miniMessage()
-                                 .deserialize(prefix));
+                .deserialize(prefix));
     }
 
     public MessageSenderBuilder messageColor(TextColor color) {
@@ -106,6 +110,7 @@ public class MessageSenderBuilder {
 
     /**
      * Builds and registers the message sender for the provided plugin
+     *
      * @return registered message sender
      */
     public MessageSender register() {
@@ -113,13 +118,30 @@ public class MessageSenderBuilder {
         var defaultResolver = defaultTagResolver
                 .resolver(StandardTags.defaults())
                 .build();
-        var messageSender = new MessageSender(plugin,
-                miniMessage.tags(defaultResolver)
-                           .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                           .build(),
-                TagResolver.resolver(defaultResolver, messageTagResolver.build()),
-                TagResolver.resolver(defaultResolver, errorTagResolver.build()),
-                prefix);
+        var legacy = false;
+        try {
+            Class.forName(BukkitAudiences.class.getName());
+        } catch (ClassNotFoundException e) {
+            legacy = true;
+        }
+        MessageSender messageSender;
+        if (legacy) {
+            messageSender = new SpigotMessageSender(plugin,
+                    miniMessage.tags(defaultResolver)
+                            .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                            .build(),
+                    TagResolver.resolver(defaultResolver, messageTagResolver.build()),
+                    TagResolver.resolver(defaultResolver, errorTagResolver.build()),
+                    prefix);
+        } else {
+            messageSender = new SpigotMessageSender(plugin,
+                    miniMessage.tags(defaultResolver)
+                            .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                            .build(),
+                    TagResolver.resolver(defaultResolver, messageTagResolver.build()),
+                    TagResolver.resolver(defaultResolver, errorTagResolver.build()),
+                    prefix);
+        }
         MessageSender.register(messageSender);
         return messageSender;
     }

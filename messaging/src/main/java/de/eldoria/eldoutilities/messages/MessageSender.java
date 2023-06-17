@@ -12,6 +12,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -37,41 +38,28 @@ import java.util.Set;
  *
  * @since 1.0.0
  */
-public final class MessageSender {
+public abstract class MessageSender {
     private static final Map<Class<? extends Plugin>, MessageSender> PLUGIN_SENDER = new HashMap<>();
     @Nullable
     private final Class<? extends Plugin> ownerPlugin;
-    private final BukkitAudiences audiences;
+    private final Plugin plugin;
     private MiniMessage miniMessage;
     private TagResolver messageTagResolver;
     private TagResolver errorTagResolver;
     private Component prefix;
 
-    MessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    public MessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         this.ownerPlugin = plugin.getClass();
+        this.plugin = plugin;
         this.miniMessage = miniMessage;
         this.messageTagResolver = messageTagResolver;
         this.errorTagResolver = errorTagResolver;
         this.prefix = prefix;
-        audiences = BukkitAudiences.create(plugin);
     }
 
     public static void register(MessageSender messageSender) {
+        if(messageSender.ownerPlugin == null) return;
         PLUGIN_SENDER.put(messageSender.ownerPlugin, messageSender);
-    }
-
-    static MessageSender create(@NotNull Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
-        if (plugin == null) throw new IllegalArgumentException("Plugin can not be null");
-
-        return PLUGIN_SENDER.compute(plugin.getClass(),
-                (k, v) -> v == null
-                        ? new MessageSender(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix)
-                        : v.update(miniMessage, messageTagResolver, errorTagResolver, prefix));
-    }
-
-    public static MessageSender anonymous() {
-        var resolver = TagResolver.builder().resolver(Replacement.create("default", "")).build();
-        return new MessageSender(null, MiniMessage.miniMessage(), resolver, resolver, Component.empty());
     }
 
     /**
@@ -182,13 +170,9 @@ public final class MessageSender {
                 composer.replacements().toArray(new TagResolver[0])));
     }
 
-    public void sendMessage(CommandSender sender, Component component) {
-        audiences.sender(sender).sendMessage(applyPrefix(component));
-    }
+    public abstract void sendMessage(CommandSender sender, Component component);
 
-    public void broadcast(String message) {
-        audiences.all().sendMessage(serialize(message, messageTagResolver));
-    }
+    public abstract void broadcast(String message);
 
     /**
      * Send a localized title to a player
@@ -206,9 +190,7 @@ public final class MessageSender {
      * @param player player to send
      * @param title  title to send
      */
-    public void sendTitle(Player player, Title title) {
-        audiences.player(player).showTitle(title);
-    }
+    public abstract void sendTitle(Player player, Title title);
 
     /**
      * Send a localized action bar to a player
@@ -216,9 +198,7 @@ public final class MessageSender {
      * @param player  player to send
      * @param message message to send
      */
-    public void sendActionBar(Player player, String message, TagResolver... placeholder) {
-        audiences.player(player).sendActionBar(serialize(message, messageTagResolver, placeholder));
-    }
+    public abstract void sendActionBar(Player player, String message, TagResolver... placeholder);
 
     /**
      * Send a localized action bar to a player
@@ -226,29 +206,19 @@ public final class MessageSender {
      * @param player  player to send
      * @param message message to send
      */
-    public void sendErrorActionBar(Player player, String message, TagResolver... placeholder) {
-        audiences.player(player).sendActionBar(serialize(message, errorTagResolver, placeholder));
-    }
+    public abstract void sendErrorActionBar(Player player, String message, TagResolver... placeholder);
 
-    public void sendBossBar(Player player, BossBar bossBar) {
-        audiences.player(player).showBossBar(bossBar);
-    }
+    public abstract void sendBossBar(Player player, BossBar bossBar) ;
 
-    public BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags) {
-        var bossBar = BossBar.bossBar(serialize(message, messageTagResolver), progress, color, overlay, flags);
-        audiences.player(player).showBossBar(bossBar);
-        return bossBar;
-    }
+    public abstract BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags);
 
-    public void hideBossBar(Player player, BossBar bossBar) {
-        audiences.player(player).hideBossBar(bossBar);
-    }
+    public abstract void hideBossBar(Player player, BossBar bossBar);
 
     private ILocalizer loc() {
         return ILocalizer.getPluginLocalizer(ownerPlugin);
     }
 
-    private Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
+    protected Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
         if (ILocalizer.isLocaleCode(message)) {
             message = ILocalizer.escape(message);
         }
@@ -276,7 +246,7 @@ public final class MessageSender {
         return prefix;
     }
 
-    private Component applyPrefix(Component component) {
+    protected Component applyPrefix(Component component) {
         return prefix.appendSpace().append(component);
     }
 
@@ -298,5 +268,17 @@ public final class MessageSender {
 
     public boolean isAnonymous() {
         return ownerPlugin == null;
+    }
+
+    protected TagResolver messageTagResolver() {
+        return messageTagResolver;
+    }
+
+    protected TagResolver errorTagResolver() {
+        return errorTagResolver;
+    }
+
+    protected Plugin plugin() {
+        return plugin;
     }
 }

@@ -11,7 +11,7 @@ plugins {
 group = "de.eldoria.util"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "2.0.0"
+version = "2.0.1"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 allprojects {
