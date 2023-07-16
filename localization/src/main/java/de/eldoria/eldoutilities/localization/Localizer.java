@@ -50,6 +50,7 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  *
  * @since 1.0.0
  */
+@SuppressWarnings("unused")
 public class Localizer implements ILocalizer {
 
     private final ResourceBundle fallbackBundle;
@@ -286,6 +287,10 @@ public class Localizer implements ILocalizer {
 
     private ResourceBundle getDefaultBundle() throws IOException {
         try (var input = plugin.getResource(localesPrefix + ".properties")) {
+            if (input == null) {
+                plugin.getLogger().severe("Could not load locale file " + localesPrefix + ".properties. Does it exist?");
+                return new DummyResourceBundle();
+            }
             //TODO: Lazy getter
             return new PropertyResourceBundle(input);
         }
@@ -294,6 +299,7 @@ public class Localizer implements ILocalizer {
     private ResourceBundle getBundle(String locale) throws IOException {
         try (var input = plugin.getResource(getLocaleFileName(locale))) {
             if (input == null) {
+                plugin.getLogger().severe("Could not load locale file " + getLocaleFileName(locale) + ".properties. Does it exist?");
                 return getDefaultBundle();
             }
             return new PropertyResourceBundle(input);
@@ -316,8 +322,8 @@ public class Localizer implements ILocalizer {
     private Map<String, String> bundleMap(Path path) throws IOException {
         var map = new TreeMap<String, String>(String::compareToIgnoreCase);
         Files.readAllLines(path, StandardCharsets.UTF_8).stream()
-             .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
-             .forEach(line -> map.put(line[0], line[1]));
+                .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
+                .forEach(line -> map.put(line[0], line[1]));
         return map;
     }
 
@@ -372,14 +378,6 @@ public class Localizer implements ILocalizer {
                 continue;
             }
 
-            ResourceBundle bundle;
-            try {
-                bundle = getBundle(path);
-            } catch (IOException e) {
-                plugin.getLogger().log(Level.SEVERE, "Could not load bundle " + path, e);
-                continue;
-            }
-
             // load the external property file.
             Map<String, String> bundleMap;
             try {
@@ -409,8 +407,8 @@ public class Localizer implements ILocalizer {
             lines.add("# File automatically updated at " + timestamp());
 
             bundleMap.entrySet().stream()
-                     .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
-                     .forEach(lines::add);
+                    .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
+                    .forEach(lines::add);
 
             try {
                 Files.write(path, lines, StandardCharsets.UTF_8);
@@ -426,11 +424,11 @@ public class Localizer implements ILocalizer {
         var matcher = localePattern.matcher(filename.toFile().getName());
         if (matcher.find()) {
             var group = matcher.group(1);
-            var s = group.split("_");
-            if (s.length == 1) {
-                return new Locale(s[0]);
+            var part = group.split("_");
+            if (part.length == 1) {
+                return new Locale(part[0]);
             }
-            return new Locale(s[0], s[1]);
+            return new Locale(part[0], part[1]);
         }
         return null;
     }
@@ -475,7 +473,7 @@ public class Localizer implements ILocalizer {
         childs.add(localizer);
     }
 
-    private class DummyResourceBundle extends ResourceBundle {
+    private static class DummyResourceBundle extends ResourceBundle {
 
         @Override
         protected Object handleGetObject(@NotNull String key) {
