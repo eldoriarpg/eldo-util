@@ -30,12 +30,12 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
@@ -46,10 +46,11 @@ import java.util.logging.Level;
  *
  * @param <T> type of main configuration
  */
+@SuppressWarnings("unused")
 public class JacksonConfig<T> {
     private final Plugin plugin;
     private final ConfigKey<T> mainKey;
-    private final Map<ConfigKey<?>, Object> files = new HashMap<>();
+    private final Map<ConfigKey<?>, Object> files = new ConcurrentHashMap<>();
     private ObjectMapper mapper;
     private ObjectMapper writer;
     private ObjectMapper reader;
@@ -96,7 +97,8 @@ public class JacksonConfig<T> {
      * @param <V> type of configuration
      * @return configuration file
      */
-    public <V> V secondary(ConfigKey<V> key) {
+    @SuppressWarnings("unchecked")
+    public synchronized <V> V secondary(ConfigKey<V> key) {
         // This configuration might be called to retrieve the logging level.
         // This will cause a recursive call
         if (key == PluginBaseConfiguration.KEY) {
@@ -107,7 +109,6 @@ public class JacksonConfig<T> {
                 return key.initValue().get();
             }
         }
-
         return (V) files.computeIfAbsent(key, k -> createAndLoad(key));
     }
 
