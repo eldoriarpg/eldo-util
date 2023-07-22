@@ -26,6 +26,6 @@ public class FailsaveCommand extends DefaultDebug {
             super.onCommand(sender, alias, args);
             return;
         }
-        messageSender().sendMessage(sender, "<red>The plugin failed to load correctly. Please use <gold>/" + alias + "§c debug to create a debug paste and send it to the developer.");
+        messageSender().sendMessage(sender, "<red>The plugin failed to load correctly. Please use <gold>/" + alias + "<red> debug to create a debug paste and send it to the developer.");
     }
 }

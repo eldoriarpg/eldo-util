@@ -22,7 +22,7 @@ public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
     private final String discord;
 
     public DefaultAbout(Plugin plugin) {
-        this(plugin, "rfRuUge");
+        this(plugin, "https://discord.eldoria.de");
     }
 
     public DefaultAbout(Plugin plugin, String discord) {
@@ -38,6 +38,6 @@ public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
                 Replacement.create("AUTHORS", String.join(", ", descr.getAuthors())),
                 Replacement.create("VERSION", descr.getVersion()),
                 Replacement.create("WEBSITE", descr.getWebsite()),
-                Replacement.create("DISCORD", "https://discord.gg/" + discord));
+                Replacement.create("DISCORD", discord));
     }
 }
