@@ -9,10 +9,6 @@
 Gradle
 
 ``` kotlin
-repositories {
-    maven("https://eldonexus.de/repository/maven-public")
-}
-
 dependencies {
     implementation("de.eldoria.util", "eldo-util", "version")
 }
@@ -21,11 +17,6 @@ dependencies {
 Maven
 
 ``` xml
-<repository>
-    <id>EldoNexus</id>
-    <url>https://eldonexus.de/repository/maven-public/</url>
-</repository>
-
 <dependency>
     <groupId>de.eldoria.util</groupId>
     <artifactId>eldo-util</artifactId>
