@@ -59,7 +59,31 @@ allprojects {
     }
 
     indra {
-        configureIndra(this)
+        javaVersions {
+            target(17)
+            testWith(17)
+        }
+
+        github("eldoriarpg", "jackson-bukkit") {
+            ci(true)
+        }
+
+        lgpl3OrLaterLicense()
+
+        signWithKeyFromPrefixedProperties("rainbowdashlabs")
+
+        configurePublications {
+            pom {
+                developers {
+                    developer {
+                        id.set("rainbowdashlabs")
+                        name.set("Florian Fülling")
+                        email.set("mail@chojo.dev")
+                        url.set("https://github.com/rainbowdashlabs")
+                    }
+                }
+            }
+        }
     }
 
     spotless {
@@ -86,34 +110,6 @@ allprojects {
             useJUnitPlatform()
             testLogging {
                 events("passed", "skipped", "failed")
-            }
-        }
-    }
-}
-
-fun configureIndra(extension: IndraExtension) {
-    extension.javaVersions {
-        target(17)
-        testWith(17)
-    }
-
-    extension.github("eldoriarpg", "jackson-bukkit") {
-        ci(true)
-    }
-
-    extension.lgpl3OrLaterLicense()
-
-    extension.signWithKeyFromPrefixedProperties("rainbowdashlabs")
-
-    extension.configurePublications {
-        pom {
-            developers {
-                developer {
-                    id.set("rainbowdashlabs")
-                    name.set("Florian Fülling")
-                    email.set("mail@chojo.dev")
-                    url.set("https://github.com/rainbowdashlabs")
-                }
             }
         }
     }
