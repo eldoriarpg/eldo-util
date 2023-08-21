@@ -24,8 +24,6 @@ jobs:
           java-version: 17
       - name: Build with Gradle
         run: ./gradlew --build-cache build
-      - name: Test with Gradle
-        run: ./gradlew test
       - name: Publish to Maven Central
         run: ./gradlew publish -PforceSign=true
         env:
