@@ -1,26 +1,41 @@
 import com.diffplug.gradle.spotless.SpotlessPlugin
 import de.chojo.PublishData
+import net.kyori.indra.IndraExtension
+import net.kyori.indra.IndraPlugin
+import net.kyori.indra.IndraPublishingPlugin
 
 plugins {
     java
     `maven-publish`
     `java-library`
-    id("de.chojo.publishdata") version "1.2.4"
-    id("com.diffplug.spotless") version "6.18.0"
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.publishdata)
+    alias(libs.plugins.indra.core)
+    alias(libs.plugins.indra.publishing)
+    alias(libs.plugins.indra.sonatype)
 }
+publishData {
+    useEldoNexusRepos()
+    publishingVersion = "2.0.1"
+}
+version = publishData.getVersion()
+
 group = "de.eldoria.util"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "2.0.1"
-description = "Utility Library for spigot plugins used by the eldoria team."
+description = "Utility Library for spigot plugins."
 
 allprojects {
     apply {
-        plugin<JavaLibraryPlugin>()
-        plugin<SpotlessPlugin>()
+        // We want to apply several plugins to subprojects
         plugin<JavaPlugin>()
-        plugin<MavenPublishPlugin>()
+        plugin<SpotlessPlugin>()
         plugin<PublishData>()
+        plugin<JavaLibraryPlugin>()
+        plugin<MavenPublishPlugin>()
+        plugin<IndraPlugin>()
+        plugin<IndraPublishingPlugin>()
+        plugin<SigningPlugin>()
     }
 
     repositories {
@@ -43,37 +58,8 @@ allprojects {
         testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
     }
 
-    java {
-        withSourcesJar()
-        withJavadocJar()
-        toolchain {
-            languageVersion.set(JavaLanguageVersion.of(17))
-        }
-    }
-
-    publishData{
-        useEldoNexusRepos()
-        publishComponent("java")
-    }
-
-    publishing {
-        publications.create<MavenPublication>("maven") {
-            publishData.configurePublication(this);
-        }
-
-        repositories {
-            maven {
-                authentication {
-                    credentials(PasswordCredentials::class) {
-                        username = System.getenv("NEXUS_USERNAME")
-                        password = System.getenv("NEXUS_PASSWORD")
-                    }
-                }
-
-                name = "EldoNexus"
-                setUrl(publishData.getRepository())
-            }
-        }
+    indra {
+        configureIndra(this)
     }
 
     spotless {
@@ -105,7 +91,40 @@ allprojects {
     }
 }
 
-dependencies{
+fun configureIndra(extension: IndraExtension) {
+    extension.javaVersions {
+        target(17)
+        testWith(17)
+    }
+
+    extension.github("eldoriarpg", "jackson-bukkit") {
+        ci(true)
+    }
+
+    extension.lgpl3OrLaterLicense()
+
+    extension.signWithKeyFromPrefixedProperties("rainbowdashlabs")
+
+    extension.configurePublications {
+        pom {
+            developers {
+                developer {
+                    id.set("rainbowdashlabs")
+                    name.set("Florian Fülling")
+                    email.set("mail@chojo.dev")
+                    url.set("https://github.com/rainbowdashlabs")
+                }
+            }
+        }
+    }
+}
+
+indraSonatype {
+    useAlternateSonatypeOSSHost("s01")
+}
+
+
+dependencies {
     api(project(":commands"))
     api(project(":configuration"))
     api(project(":core"))
