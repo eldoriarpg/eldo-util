@@ -1,3 +1,5 @@
+description = "Utilities for message dispatching"
+
 dependencies {
     api("net.kyori", "adventure-platform-bukkit", "4.3.0")
     api("net.kyori", "adventure-text-minimessage", "4.13.0")

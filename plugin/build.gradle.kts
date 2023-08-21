@@ -1,3 +1,5 @@
+description = "Utilities for plugin creation and base class"
+
 dependencies {
     api(project(":commands"))
     api(project(":core"))
