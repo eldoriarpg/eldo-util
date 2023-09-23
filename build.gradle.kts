@@ -1,5 +1,6 @@
 import com.diffplug.gradle.spotless.SpotlessPlugin
 import de.chojo.PublishData
+import de.chojo.Repo
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
@@ -15,7 +16,8 @@ plugins {
     alias(libs.plugins.indra.sonatype)
 }
 publishData {
-    useEldoNexusRepos()
+    addRepo(Repo.main("","", false))
+    addRepo(Repo.snapshot("-SNAPSHOT","", false))
     publishingVersion = "2.0.2"
 }
 version = publishData.getVersion()
