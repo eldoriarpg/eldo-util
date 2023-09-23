@@ -114,15 +114,16 @@ public class MessageSenderBuilder {
      * @return registered message sender
      */
     public MessageSender register() {
-        addL18nTag();
+        addI18nTag();
         var defaultResolver = defaultTagResolver
                 .resolver(StandardTags.defaults())
                 .build();
         var legacy = false;
         try {
             Class.forName(BukkitAudiences.class.getName());
-        } catch (ClassNotFoundException e) {
             legacy = true;
+        } catch (ClassNotFoundException e) {
+            // ignore
         }
         MessageSender messageSender;
         if (legacy) {
@@ -134,7 +135,7 @@ public class MessageSenderBuilder {
                     TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                     prefix);
         } else {
-            messageSender = new SpigotMessageSender(plugin,
+            messageSender = new PaperMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
                             .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
                             .build(),
@@ -146,9 +147,9 @@ public class MessageSenderBuilder {
         return messageSender;
     }
 
-    private void addL18nTag() {
+    private void addI18nTag() {
         if (localizer != ILocalizer.DEFAULT) {
-            defaultTagResolver.tag("l18n", this::localizeTag);
+            defaultTagResolver.tag("i18n", this::localizeTag);
         }
     }
 
