@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // plugins
-            plugin("spotless", "com.diffplug.spotless").version("6.20.0")
+            plugin("spotless", "com.diffplug.spotless").version("6.21.0")
             plugin("publishdata", "de.chojo.publishdata").version("1.2.5")
 
             version("indra", "3.1.2")
