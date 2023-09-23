@@ -52,8 +52,8 @@ allprojects {
 
         testImplementation("org.jetbrains", "annotations", "24.0.1")
         testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-        testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
-        testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
+        testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.0")
+        testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.10.0")
         testImplementation("org.mockito", "mockito-core", "5.5.0")
         testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
     }
