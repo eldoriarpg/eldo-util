@@ -35,6 +35,9 @@ dependencyResolutionManagement {
             plugin("spotless", "com.diffplug.spotless").version("6.21.0")
             plugin("publishdata", "de.chojo.publishdata").version("1.2.5")
 
+            library("paper", "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
+            library("spigot", "org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
+
             version("indra", "3.1.3")
             plugin("indra-core", "net.kyori.indra").versionRef("indra")
             plugin("indra-publishing", "net.kyori.indra.publishing").versionRef("indra")

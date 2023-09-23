@@ -8,4 +8,5 @@ dependencies {
     api(project(":core")){
         exclude("org.spigot")
     }
+    compileOnly(libs.spigot)
 }

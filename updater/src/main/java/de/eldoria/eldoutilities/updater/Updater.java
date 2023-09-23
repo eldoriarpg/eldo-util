@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.updater;
 
+import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateChecker;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
@@ -161,7 +162,11 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
     private void logUpdateMessage() {
         data.updateMessage(lastCheck).lines().forEach(line -> {
-            plugin.getLogger().info(line.replaceAll("§[0-9a-fklmnor]", ""));
+            try {
+                plugin.getComponentLogger().info(MessageSender.getPluginMessageSender(plugin).miniMessage().deserialize(line));
+            } catch (Throwable e) {
+                plugin.getLogger().info(line.replaceAll("(§[0-9a-fklmnor])|(<+.?>)", ""));
+            }
         });
     }
 
