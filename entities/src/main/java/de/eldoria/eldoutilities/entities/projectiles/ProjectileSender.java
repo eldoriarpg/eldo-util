@@ -11,6 +11,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 
+import java.util.function.Consumer;
+
 /**
  * A class which represends a result used by {@link ProjectileUtil#getProjectileSource(Entity)}.
  *
@@ -45,7 +47,24 @@ public class ProjectileSender {
     }
 
     /**
-     * Checks if a entity is present.
+     * If an entity is present, perform the given operation on it.
+     *
+     * @param entity the operation to be performed on the entity
+     */
+    public void ifEntity(Consumer<Entity> entity) {
+        if (isEntity()) entity.accept(getEntity());
+    }
+    /**
+     * Executes the given consumer if a block is present.
+     *
+     * @param entity the consumer to be executed if a block is present.
+     */
+    public void ifBlock(Consumer<Block> entity) {
+        if (isBlock()) entity.accept(getBlock());
+    }
+
+    /**
+     * Checks if an entity is present.
      *
      * @return true if the sender is a entity
      */

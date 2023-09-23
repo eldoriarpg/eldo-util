@@ -1,5 +1,6 @@
 import com.diffplug.gradle.spotless.SpotlessPlugin
 import de.chojo.PublishData
+import de.chojo.Repo
 import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
@@ -15,8 +16,9 @@ plugins {
     alias(libs.plugins.indra.sonatype)
 }
 publishData {
-    useEldoNexusRepos()
-    publishingVersion = "2.0.1"
+    addRepo(Repo.main("","", false))
+    addRepo(Repo.snapshot("SNAPSHOT","", false))
+    publishingVersion = "2.0.2"
 }
 version = publishData.getVersion()
 
@@ -47,14 +49,13 @@ allprojects {
     }
 
     dependencies {
-        compileOnly("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
         compileOnly("org.jetbrains", "annotations", "24.0.1")
 
         testImplementation("org.jetbrains", "annotations", "24.0.1")
         testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
-        testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.9.2")
-        testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.9.2")
-        testImplementation("org.mockito", "mockito-core", "5.2.0")
+        testImplementation("org.junit.jupiter", "junit-jupiter-api", "5.10.0")
+        testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "5.10.0")
+        testImplementation("org.mockito", "mockito-core", "5.5.0")
         testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
     }
 
@@ -64,7 +65,7 @@ allprojects {
             testWith(17)
         }
 
-        github("eldoriarpg", "jackson-bukkit") {
+        github("eldoriarpg", "eldo-util") {
             ci(true)
         }
 
@@ -156,7 +157,7 @@ tasks {
         dependsOn(javadocJar)
         applyJavaDocOptions(options)
 
-        destinationDir = file("${buildDir}/docs/javadoc")
+        destinationDir = file("${layout.buildDirectory}/docs/javadoc")
         val projects = project.rootProject.allprojects
         setSource(projects.map { p -> p.sourceSets.main.get().allJava })
         classpath = files(projects.map { p -> p.sourceSets.main.get().compileClasspath })

@@ -5,4 +5,5 @@ dependencies {
     api(project(":messaging"))
     api(project(":debugging"))
     api(project(":localization"))
+    compileOnly(libs.spigot)
 }

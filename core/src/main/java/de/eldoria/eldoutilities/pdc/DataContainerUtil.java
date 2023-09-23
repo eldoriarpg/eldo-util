@@ -4,7 +4,7 @@
  *     Copyright (C) EldoriaRPG Team and Contributor
  */
 
-package de.eldoria.eldoutilities.utils;
+package de.eldoria.eldoutilities.pdc;
 
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -28,6 +28,21 @@ public final class DataContainerUtil {
     /**
      * Sets a value in a data container if it is absent.
      *
+     * @param container the {@link PersistentDataContainer}
+     * @param key       key to set
+     * @param type      type of key
+     * @param value     value of key
+     * @param <T>       type of key
+     * @param <Z>       type of value
+     */
+    public static <T, Z> void setIfAbsent(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        if (container.has(key, type)) return;
+        container.set(key, type, value);
+    }
+
+    /**
+     * Sets a value in a data container if it is absent.
+     *
      * @param holder holder of the {@link PersistentDataContainer}
      * @param key    key to set
      * @param type   type of key
@@ -39,9 +54,7 @@ public final class DataContainerUtil {
         if (holder == null) return;
 
         var container = holder.getPersistentDataContainer();
-        if (container.has(key, type)) return;
-
-        container.set(key, type, value);
+        setIfAbsent(container, key, type, value);
     }
 
     /**
@@ -65,6 +78,26 @@ public final class DataContainerUtil {
     /**
      * Compute a value in a {@link PersistentDataContainer} based on the current value
      *
+     * @param container holder of the {@link PersistentDataContainer}
+     * @param key       key to compute
+     * @param type      type of key
+     * @param map       map the current value to the new value. Current value is null if key is not set.
+     * @param <T>       type of value
+     * @param <Z>       type of value
+     * @return the mapped value. can be null if mapping function returns null or holder is null
+     */
+    public static @Nullable <T, Z> Z compute(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Function<@Nullable Z, Z> map) {
+        if (!container.has(key, type)) {
+            container.set(key, type, map.apply(null));
+            return container.get(key, type);
+        }
+        container.set(key, type, map.apply(container.get(key, type)));
+        return container.get(key, type);
+    }
+
+    /**
+     * Compute a value in a {@link PersistentDataContainer} based on the current value
+     *
      * @param holder holder of the {@link PersistentDataContainer}
      * @param key    key to compute
      * @param type   type of key
@@ -77,12 +110,7 @@ public final class DataContainerUtil {
         if (holder == null) return null;
 
         var container = holder.getPersistentDataContainer();
-        if (!container.has(key, type)) {
-            container.set(key, type, map.apply(null));
-            return container.get(key, type);
-        }
-        container.set(key, type, map.apply(container.get(key, type)));
-        return container.get(key, type);
+        return compute(container, key, type, map);
     }
 
     /**
@@ -110,6 +138,27 @@ public final class DataContainerUtil {
     /**
      * Compute a value in a {@link PersistentDataContainer} if it is not set.
      *
+     * @param container holder of the {@link PersistentDataContainer}
+     * @param key       key to compute
+     * @param type      type of key
+     * @param value     value which should be set if the key is not present.
+     * @param <T>       type of value
+     * @param <Z>       type of value
+     * @return the value associated with this key. can be null if holder is null.
+     */
+    @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
+    public static @Nullable <T, Z> Z computeIfAbsent(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        return compute(container, key, type, v -> {
+            if (v == null) {
+                return value;
+            }
+            return v;
+        });
+    }
+
+    /**
+     * Compute a value in a {@link PersistentDataContainer} if it is not set.
+     *
      * @param holder holder of the {@link PersistentDataContainer}
      * @param key    key to compute
      * @param type   type of key
@@ -121,7 +170,6 @@ public final class DataContainerUtil {
     @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
     public static @Nullable <T, Z> Z computeIfAbsent(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
         if (holder == null) return null;
-
         return compute(holder, key, type, v -> {
             if (v == null) {
                 return value;
@@ -149,6 +197,29 @@ public final class DataContainerUtil {
         holder.setItemMeta(itemMeta);
 
         return z;
+    }
+
+    /**
+     * Compute a value in a {@link PersistentDataContainer} if is set.
+     *
+     * @param container       the {@link PersistentDataContainer}
+     * @param key             key to compute
+     * @param type            type of key
+     * @param mappingFunction function to map the current value to the new value.
+     * @param <T>             type of value
+     * @param <Z>             type of value
+     * @return the value associated with this key. can be null if holder is null.
+     */
+    @Contract("null, _, _, _ -> null; !null, _, _, _, -> !null")
+    public static @Nullable <T, Z> Z computeIfPresent(@Nullable PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> mappingFunction) {
+        if (container == null) return null;
+
+        return compute(container, key, type, v -> {
+            if (v != null) {
+                return mappingFunction.apply(v);
+            }
+            return null;
+        });
     }
 
     /**
@@ -199,17 +270,14 @@ public final class DataContainerUtil {
     /**
      * Get a value from a persistent data holder.
      *
-     * @param holder holder of the {@link PersistentDataContainer}
-     * @param key    key to get
-     * @param type   type of key
-     * @param <T>    type of value
-     * @param <Z>    type of value
+     * @param container holder of the {@link PersistentDataContainer}
+     * @param key       key to get
+     * @param type      type of key
+     * @param <T>       type of value
+     * @param <Z>       type of value
      * @return result wrapped in an optional if present.
      */
-    public static <T, Z> Optional<Z> get(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
-        if (holder == null) return Optional.empty();
-
-        var container = holder.getPersistentDataContainer();
+    public static <T, Z> Optional<Z> get(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (container.has(key, type)) {
             return Optional.ofNullable(container.get(key, type));
         }
@@ -226,9 +294,40 @@ public final class DataContainerUtil {
      * @param <Z>    type of value
      * @return result wrapped in an optional if present.
      */
+    public static <T, Z> Optional<Z> get(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
+        if (holder == null) return Optional.empty();
+
+        return get(holder.getPersistentDataContainer(), key, type);
+    }
+
+    /**
+     * Get a value from a persistent data holder.
+     *
+     * @param holder holder of the {@link PersistentDataContainer}
+     * @param key    key to get
+     * @param type   type of key
+     * @param <T>    type of value
+     * @param <Z>    type of value
+     * @return result wrapped in an optional if present.
+     */
     public static <T, Z> Optional<Z> get(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return Optional.empty();
         return get(holder.getItemMeta(), key, type);
+    }
+
+    /**
+     * Get a value from a persistent data holder.
+     *
+     * @param container    holder of the {@link PersistentDataContainer}
+     * @param key          key to get
+     * @param type         type of key
+     * @param defaultValue default value if key is absent
+     * @param <T>          type of value
+     * @param <Z>          type of value
+     * @return result wrapped in an optional if present.
+     */
+    public static <T, Z> Z getOrDefault(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue) {
+        return get(container, key, type).orElse(defaultValue);
     }
 
     /**
@@ -260,6 +359,20 @@ public final class DataContainerUtil {
     public static <T, Z> Z getOrDefault(@Nullable ItemStack holder, NamespacedKey key, PersistentDataType<T, Z> type, Z defaultValue) {
         if (holder == null) return defaultValue;
         return getOrDefault(holder.getItemMeta(), key, type, defaultValue);
+    }
+
+    /**
+     * Set a value in a {@link PersistentDataContainer}.
+     *
+     * @param container the {@link PersistentDataContainer}
+     * @param key       key to set
+     * @param type      type of key
+     * @param value     value to set
+     * @param <T>       type of value
+     * @param <Z>       type of value
+     */
+    public static <T, Z> void putValue(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type, Z value) {
+        compute(container, key, type, v -> value);
     }
 
     /**
@@ -297,6 +410,19 @@ public final class DataContainerUtil {
     /**
      * Check if a key is present in the {@link PersistentDataContainer}.
      *
+     * @param container the {@link PersistentDataContainer}
+     * @param key    key to check
+     * @param type   type of key
+     * @param <T>    type of value
+     * @param <Z>    type of value
+     * @return true if the key is set
+     */
+    public static <T, Z> boolean hasKey(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type) {
+        return get(container, key, type).isPresent();
+    }
+    /**
+     * Check if a key is present in the {@link PersistentDataContainer}.
+     *
      * @param holder holder of the {@link PersistentDataContainer}
      * @param key    key to check
      * @param type   type of key
@@ -328,6 +454,23 @@ public final class DataContainerUtil {
     /**
      * Remove a key from the {@link PersistentDataContainer} if it is set.
      *
+     * @param container holder of the {@link PersistentDataContainer}
+     * @param key    key to check
+     * @param type   type of key
+     * @param <T>    type of value
+     * @param <Z>    type of value
+     * @return true if the key was present and removed.
+     */
+    public static <T, Z> boolean remove(PersistentDataContainer container, NamespacedKey key, PersistentDataType<T, Z> type) {
+        if (container.has(key, type)) {
+            container.remove(key);
+            return true;
+        }
+        return get(container, key, type).isPresent();
+    }
+    /**
+     * Remove a key from the {@link PersistentDataContainer} if it is set.
+     *
      * @param holder holder of the {@link PersistentDataContainer}
      * @param key    key to check
      * @param type   type of key
@@ -337,12 +480,7 @@ public final class DataContainerUtil {
      */
     public static <T, Z> boolean remove(@Nullable PersistentDataHolder holder, NamespacedKey key, PersistentDataType<T, Z> type) {
         if (holder == null) return false;
-        var container = holder.getPersistentDataContainer();
-        if (container.has(key, type)) {
-            container.remove(key);
-            return true;
-        }
-        return get(holder, key, type).isPresent();
+        return remove(holder.getPersistentDataContainer(), key, type);
     }
 
     /**

@@ -7,7 +7,7 @@
 package de.eldoria.eldoutilities.inventory;
 
 import de.eldoria.eldoutilities.builder.ItemStackBuilder;
-import de.eldoria.eldoutilities.utils.DataContainerUtil;
+import de.eldoria.eldoutilities.pdc.DataContainerUtil;
 import de.eldoria.eldoutilities.utils.EMath;
 import org.bukkit.NamespacedKey;
 import org.bukkit.event.inventory.InventoryClickEvent;

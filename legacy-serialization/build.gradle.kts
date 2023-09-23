@@ -3,4 +3,5 @@ description = "Legacy serialization for type resolving in spigot configuration f
 dependencies {
     api(project(":core"))
     api(project(":entities"))
+    compileOnly(libs.spigot)
 }

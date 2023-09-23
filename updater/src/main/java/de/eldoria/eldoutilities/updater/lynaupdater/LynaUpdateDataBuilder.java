@@ -20,7 +20,7 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
         updateMessage = """
                 New version of <gold>{plugin_name}<default> available.
                 New Version: <gold>{new_version}<default>. Published <gold>{new_time}<default> ago! {new_date_time}
-                Current version: <gold>{current_version}<default> Published §c{current_time}<default> ago! {current_date_time}<default>
+                Current version: <gold>{current_version}<default> Published <red>{current_time}<default> ago! {current_date_time}<default>
                 Download the new version via Discord: <gold>{website}""".stripIndent();
     }
 

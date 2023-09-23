@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.updater;
 
+import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateChecker;
 import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
@@ -15,6 +16,7 @@ import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -98,7 +100,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         if (updateAvailable) return;
 
         if (!silent) {
-            plugin.getLogger().info("§2Checking for new Version...");
+            plugin.getLogger().info("Checking for new Version...");
         }
 
         var optLatest = checkUpdate(data);
@@ -122,7 +124,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
             }
         } else {
             if (!silent) {
-                plugin.getLogger().info("§2Plugin is up to date.");
+                plugin.getLogger().info("Plugin is up to date.");
             }
         }
     }
@@ -161,7 +163,11 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
     private void logUpdateMessage() {
         data.updateMessage(lastCheck).lines().forEach(line -> {
-            plugin.getLogger().info(line.replaceAll("§[0-9a-fklmnor]", ""));
+            try {
+                plugin.getLogger().info(MessageSender.getPluginMessageSender(plugin).translatePlain(line));
+            } catch (Throwable e) {
+                plugin.getLogger().info(line.replaceAll("(§[0-9a-fklmnor])|(<+.?>)", ""));
+            }
         });
     }
 
