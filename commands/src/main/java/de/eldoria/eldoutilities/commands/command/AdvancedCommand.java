@@ -106,7 +106,7 @@ public abstract class AdvancedCommand implements CommandRoute {
             }
             if (!access) {
                 var permissions = String.join(", ", meta().permissions());
-                return Collections.singletonList(messageSender.translatePlain("error.permission",
+                return Collections.singletonList(messageSender().translatePlain("error.permission",
                         Replacement.create("PERMISSION", permissions)));
             }
         }
