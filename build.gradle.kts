@@ -64,7 +64,7 @@ allprojects {
             testWith(17)
         }
 
-        github("eldoriarpg", "jackson-bukkit") {
+        github("eldoriarpg", "eldo-util") {
             ci(true)
         }
 
@@ -156,7 +156,7 @@ tasks {
         dependsOn(javadocJar)
         applyJavaDocOptions(options)
 
-        destinationDir = file("${buildDir}/docs/javadoc")
+        destinationDir = file("${layout.buildDirectory}/docs/javadoc")
         val projects = project.rootProject.allprojects
         setSource(projects.map { p -> p.sourceSets.main.get().allJava })
         classpath = files(projects.map { p -> p.sourceSets.main.get().compileClasspath })
