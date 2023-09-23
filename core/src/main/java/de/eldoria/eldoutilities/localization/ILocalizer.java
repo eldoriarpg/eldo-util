@@ -36,7 +36,7 @@ public interface ILocalizer {
     }
 
     static String escape(String propertyKey) {
-        return String.format("<l18n:%s>", propertyKey);
+        return String.format("<i18n:%s>", propertyKey);
     }
 
     static boolean isLocaleCode(String message) {

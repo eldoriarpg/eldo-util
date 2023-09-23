@@ -65,4 +65,9 @@ public record ConfigKey<T>(String name, Path path, Class<T> configClazz, Supplie
     public int hashCode() {
         return path.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return "%s (%s | %s)".formatted(name, path.toString(), configClazz.getSimpleName());
+    }
 }

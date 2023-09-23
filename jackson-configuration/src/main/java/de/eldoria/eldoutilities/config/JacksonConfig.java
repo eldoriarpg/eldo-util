@@ -8,6 +8,7 @@ package de.eldoria.eldoutilities.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.Module;
@@ -19,6 +20,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import de.eldoria.eldoutilities.config.exceptions.ConfigurationException;
 import de.eldoria.eldoutilities.config.template.PluginBaseConfiguration;
+import de.eldoria.eldoutilities.debug.DebugDataProvider;
+import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import org.bukkit.plugin.Plugin;
@@ -31,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -47,7 +51,7 @@ import java.util.logging.Level;
  * @param <T> type of main configuration
  */
 @SuppressWarnings("unused")
-public class JacksonConfig<T> {
+public class JacksonConfig<T> implements DebugDataProvider {
     private final Plugin plugin;
     private final ConfigKey<T> mainKey;
     private final Map<ConfigKey<?>, Object> files = new ConcurrentHashMap<>();
@@ -433,5 +437,18 @@ public class JacksonConfig<T> {
 
     private Path resolvePath(ConfigKey<?> key) {
         return key.path().isAbsolute() ? key.path() : plugin.getDataFolder().toPath().resolve(key.path());
+    }
+
+    @Override
+    public @NotNull EntryData[] getDebugInformations() {
+        List<EntryData> configs = new LinkedList<>();
+        for (var key : files.keySet()) {
+            try {
+                configs.add(new EntryData(key.toString(), writer().writeValueAsString(secondary(key))));
+            } catch (JsonProcessingException e) {
+                plugin.getLogger().log(Level.SEVERE, "Could not dump config", e);
+            }
+        }
+        return configs.toArray(EntryData[]::new);
     }
 }
