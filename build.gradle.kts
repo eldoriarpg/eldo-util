@@ -18,7 +18,7 @@ plugins {
 publishData {
     addRepo(Repo.main("","", false))
     addRepo(Repo.snapshot("SNAPSHOT","", false))
-    publishingVersion = "2.0.3"
+    publishingVersion = "2.0.4"
 }
 version = publishData.getVersion()
 
