@@ -133,8 +133,13 @@ public class Arguments implements Iterable<Input> {
 
     public Input get(int index) {
         if (index < 0) {
-            return args.get(size() + index);
+            return getOrThrow(size() + index);
         }
+        return getOrThrow(index);
+    }
+
+    private Input getOrThrow(int index) {
+        CommandAssertions.missingArgument(args, index);
         return args.get(index);
     }
 
@@ -143,9 +148,8 @@ public class Arguments implements Iterable<Input> {
      *
      * @param index index of argument
      * @return argument as string
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public @NotNull String asString(int index) throws IndexOutOfBoundsException {
+    public @NotNull String asString(int index) {
         return get(index).asString();
     }
 
@@ -178,10 +182,9 @@ public class Arguments implements Iterable<Input> {
      *
      * @param index index of argument
      * @return index as integer
-     * @throws CommandException          when the argument is not an integer
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when the argument is not an integer
      */
-    public int asInt(int index) throws CommandException, IndexOutOfBoundsException {
+    public int asInt(int index) throws CommandException {
         return get(index).asInt();
     }
 
@@ -214,10 +217,9 @@ public class Arguments implements Iterable<Input> {
     /**
      * @param index index of argument
      * @return index as long
-     * @throws CommandException          when the argument is not a long
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when the argument is not a long
      */
-    public long asLong(int index) throws CommandException, IndexOutOfBoundsException {
+    public long asLong(int index) throws CommandException {
         return get(index).asLong();
     }
 
@@ -246,10 +248,9 @@ public class Arguments implements Iterable<Input> {
     /**
      * @param index index of argument
      * @return index as double
-     * @throws CommandException          when the argument is not a double
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when the argument is not a double
      */
-    public double asDouble(int index) throws CommandException, IndexOutOfBoundsException {
+    public double asDouble(int index) throws CommandException {
         return get(index).asDouble();
     }
 
@@ -280,10 +281,9 @@ public class Arguments implements Iterable<Input> {
      *
      * @param index index of argument
      * @return index as boolean
-     * @throws CommandException          when the argument is not a boolean
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when the argument is not a boolean
      */
-    public boolean asBoolean(int index) throws CommandException, IndexOutOfBoundsException {
+    public boolean asBoolean(int index) throws CommandException {
         return get(index).asBoolean();
     }
 
@@ -349,7 +349,7 @@ public class Arguments implements Iterable<Input> {
      * @throws CommandException          when the argument is not a boolean
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
-    public boolean asBoolean(int index, String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
+    public boolean asBoolean(int index, String aTrue, String aFalse) throws CommandException {
         return get(index).asBoolean(aTrue, aFalse);
     }
 
@@ -364,7 +364,7 @@ public class Arguments implements Iterable<Input> {
      * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     @NotNull
-    public Material asMaterial(int index) throws CommandException, IndexOutOfBoundsException {
+    public Material asMaterial(int index) throws CommandException {
         return asMaterial(index, false);
     }
 
@@ -408,11 +408,10 @@ public class Arguments implements Iterable<Input> {
      * @param index        index of argument
      * @param stripStrings if true underscores will be removed before checking
      * @return index as material
-     * @throws CommandException          when the argument is not a material
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when the argument is not a material
      */
     @NotNull
-    public Material asMaterial(int index, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
+    public Material asMaterial(int index, boolean stripStrings) throws CommandException {
         return get(index).asMaterial(stripStrings);
     }
 
@@ -457,11 +456,10 @@ public class Arguments implements Iterable<Input> {
      * @param clazz enum clazz to parse
      * @param <T>   type of enum
      * @return index as enum value
-     * @throws CommandException          When the string could not be parsed to an enum
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException When the string could not be parsed to an enum
      */
     @NotNull
-    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz) throws CommandException, IndexOutOfBoundsException {
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz) throws CommandException {
         return get(index).asEnum(clazz, false);
     }
 
@@ -505,11 +503,10 @@ public class Arguments implements Iterable<Input> {
      * @param stripStrings if true underscores will be removed before checking
      * @param <T>          type of enum
      * @return index as enum value
-     * @throws CommandException          When the string could not be parsed to an enum
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException When the string could not be parsed to an enum
      */
     @NotNull
-    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings) throws CommandException {
         return get(index).asEnum(clazz, stripStrings);
     }
 
@@ -552,11 +549,10 @@ public class Arguments implements Iterable<Input> {
      *
      * @param index index of argument
      * @return index as player
-     * @throws CommandException          when no player with this name is online
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
+     * @throws CommandException when no player with this name is online
      */
     @NotNull
-    public Player asPlayer(int index) throws CommandException, IndexOutOfBoundsException {
+    public Player asPlayer(int index) throws CommandException {
         return get(index).asPlayer();
     }
 
@@ -594,10 +590,9 @@ public class Arguments implements Iterable<Input> {
      * @param index index of argument
      * @return index as offline player
      * @throws CommandException          when no player with this name was on this server previously
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     @NotNull
-    public OfflinePlayer asOfflinePlayer(int index) throws CommandException, IndexOutOfBoundsException {
+    public OfflinePlayer asOfflinePlayer(int index) throws CommandException {
         return get(index).asOfflinePlayer();
     }
 
@@ -635,10 +630,9 @@ public class Arguments implements Iterable<Input> {
      * @param index index of argument
      * @return index as world
      * @throws CommandException          When the string is not the name of a world
-     * @throws IndexOutOfBoundsException when the index is equal or larger than {@link #size()}
      */
     @NotNull
-    public World asWorld(int index) throws CommandException, IndexOutOfBoundsException {
+    public World asWorld(int index) throws CommandException {
         return get(index).asWorld();
     }
 
