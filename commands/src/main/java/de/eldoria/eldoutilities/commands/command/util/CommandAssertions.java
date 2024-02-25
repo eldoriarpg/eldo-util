@@ -297,7 +297,7 @@ public final class CommandAssertions {
      * @param replacements replacements
      * @throws CommandException when eval is true
      */
-    public static void isFalse(boolean eval, String message, TagResolver replacements) throws CommandException {
+    public static void isFalse(boolean eval, String message, TagResolver... replacements) throws CommandException {
         isTrue(!eval, message, replacements);
     }
 
