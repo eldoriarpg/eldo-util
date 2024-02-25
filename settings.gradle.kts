@@ -51,3 +51,4 @@ dependencyResolutionManagement {
         }
     }
 }
+include("conversation")
