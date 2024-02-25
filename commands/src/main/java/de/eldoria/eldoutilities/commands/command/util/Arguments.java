@@ -138,6 +138,11 @@ public class Arguments implements Iterable<Input> {
         return getOrThrow(index);
     }
 
+    public Input get(int index, Input def) {
+        if (hasArg(index)) return get(index);
+        return def;
+    }
+
     private Input getOrThrow(int index) {
         CommandAssertions.missingArgument(args, index);
         return args.get(index);
