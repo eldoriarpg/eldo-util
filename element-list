@@ -14,6 +14,7 @@ de.eldoria.eldoutilities.config.template
 de.eldoria.eldoutilities.configuration
 de.eldoria.eldoutilities.consumer
 de.eldoria.eldoutilities.container
+de.eldoria.eldoutilities.conversation
 de.eldoria.eldoutilities.crossversion
 de.eldoria.eldoutilities.crossversion.builder
 de.eldoria.eldoutilities.crossversion.function
@@ -29,6 +30,7 @@ de.eldoria.eldoutilities.logging
 de.eldoria.eldoutilities.messages
 de.eldoria.eldoutilities.messages.impl
 de.eldoria.eldoutilities.metrics
+de.eldoria.eldoutilities.pdc
 de.eldoria.eldoutilities.plugin
 de.eldoria.eldoutilities.scheduling
 de.eldoria.eldoutilities.serialization
