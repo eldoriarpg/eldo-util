@@ -7,7 +7,9 @@
 package de.eldoria.eldoutilities.localization;
 
 import org.bukkit.plugin.Plugin;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.PropertyKey;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +25,7 @@ import java.util.regex.Pattern;
 public interface ILocalizer {
     Map<Class<? extends Plugin>, ILocalizer> LOCALIZER = new HashMap<>();
     ILocalizer DEFAULT = new DummyLocalizer();
-    Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-]+?)\\.([a-zA-Z0-9_.\\-]+?)");
+    Pattern LOCALIZATION_CODE = Pattern.compile("([a-zA-Z0-9_\\-.]+?)\\.([a-zA-Z0-9_\\-.]+)");
 
     static ILocalizer getPluginLocalizer(Plugin plugin) {
         if (plugin == null) return DEFAULT;

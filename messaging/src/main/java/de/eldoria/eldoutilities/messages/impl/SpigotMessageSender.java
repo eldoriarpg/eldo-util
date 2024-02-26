@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.messages.impl;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
@@ -78,4 +79,8 @@ public final class SpigotMessageSender extends MessageSender {
         audiences.player(player).hideBossBar(bossBar);
     }
 
+    @Override
+    public Audience asAudience(Player player) {
+        return audiences.player(player);
+    }
 }

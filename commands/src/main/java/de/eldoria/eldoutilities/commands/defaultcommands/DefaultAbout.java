@@ -22,11 +22,11 @@ public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
     private final String discord;
 
     public DefaultAbout(Plugin plugin) {
-        this(plugin, "https://discord.eldoria.de");
+        this(plugin, "https://discord.eldoria.de", "commands.about");
     }
 
-    public DefaultAbout(Plugin plugin, String discord) {
-        super(plugin, CommandMeta.builder("about").build());
+    public DefaultAbout(Plugin plugin, String discord, String localeTag) {
+        super(plugin, CommandMeta.builder(localeTag).build());
         this.discord = discord;
     }
 

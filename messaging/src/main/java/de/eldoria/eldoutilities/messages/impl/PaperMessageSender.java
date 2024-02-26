@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.messages.impl;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.Audiences;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
@@ -74,5 +75,10 @@ public final class PaperMessageSender extends MessageSender {
 
     public void hideBossBar(Player player, BossBar bossBar) {
         player.hideBossBar(bossBar);
+    }
+
+    @Override
+    public Audience asAudience(Player player) {
+        return player;
     }
 }

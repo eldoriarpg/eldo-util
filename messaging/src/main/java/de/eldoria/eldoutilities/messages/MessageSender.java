@@ -8,11 +8,11 @@ package de.eldoria.eldoutilities.messages;
 
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.localization.IMessageComposer;
+import de.eldoria.eldoutilities.messages.conversion.MiniMessageConversion;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -58,7 +58,7 @@ public abstract class MessageSender {
     }
 
     public static void register(MessageSender messageSender) {
-        if(messageSender.ownerPlugin == null) return;
+        if (messageSender.ownerPlugin == null) return;
         PLUGIN_SENDER.put(messageSender.ownerPlugin, messageSender);
     }
 
@@ -208,7 +208,7 @@ public abstract class MessageSender {
      */
     public abstract void sendErrorActionBar(Player player, String message, TagResolver... placeholder);
 
-    public abstract void sendBossBar(Player player, BossBar bossBar) ;
+    public abstract void sendBossBar(Player player, BossBar bossBar);
 
     public abstract BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags);
 
@@ -219,6 +219,12 @@ public abstract class MessageSender {
     }
 
     protected Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
+        var converted = MiniMessageConversion.convertLegacyColorCodes(message);
+        if (!converted.equals(message)) {
+            plugin.getLogger().warning("Found legacy color codes in message.");
+            plugin.getLogger().warning(message);
+            message = converted;
+        }
         if (ILocalizer.isLocaleCode(message)) {
             message = ILocalizer.escape(message);
         }
@@ -239,7 +245,6 @@ public abstract class MessageSender {
             return component;
         }
         return resolveTags(newMessage, resolver);
-
     }
 
     public Component prefix() {
@@ -281,4 +286,6 @@ public abstract class MessageSender {
     protected Plugin plugin() {
         return plugin;
     }
+
+    public abstract Audience asAudience(Player player);
 }
