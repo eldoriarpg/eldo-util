@@ -28,6 +28,7 @@ de.eldoria.eldoutilities.inventory
 de.eldoria.eldoutilities.localization
 de.eldoria.eldoutilities.logging
 de.eldoria.eldoutilities.messages
+de.eldoria.eldoutilities.messages.conversion
 de.eldoria.eldoutilities.messages.impl
 de.eldoria.eldoutilities.metrics
 de.eldoria.eldoutilities.pdc
