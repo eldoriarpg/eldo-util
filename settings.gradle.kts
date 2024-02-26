@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // plugins
-            plugin("spotless", "com.diffplug.spotless").version("6.21.0")
+            plugin("spotless", "com.diffplug.spotless").version("6.23.3")
             plugin("publishdata", "de.chojo.publishdata").version("1.2.5")
 
             library("paper", "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
@@ -43,7 +43,7 @@ dependencyResolutionManagement {
             plugin("indra-publishing", "net.kyori.indra.publishing").versionRef("indra")
             plugin("indra-sonatype", "net.kyori.indra.publishing.sonatype").versionRef("indra")
 
-            version("jackson", "2.15.2")
+            version("jackson", "2.16.0")
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
             bundle("jackson", listOf("jackson-core", "jackson-databind"))
@@ -51,3 +51,4 @@ dependencyResolutionManagement {
         }
     }
 }
+include("conversation")
