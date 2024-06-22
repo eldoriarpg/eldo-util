@@ -197,8 +197,9 @@ public abstract class AdvancedCommand implements CommandRoute {
 
     public void handleCommandError(CommandSender sender, Throwable e) {
         if (e instanceof CommandException cmd) {
+            if (cmd.isSilent()) return;
             messageSender().sendError(sender, e.getMessage(), cmd.replacements());
-            plugin().getLogger().log(Level.CONFIG, "Command exception occured.", e);
+            plugin().getLogger().log(Level.CONFIG, "Command exception occurred.", e);
             return;
         }
 
@@ -208,6 +209,6 @@ public abstract class AdvancedCommand implements CommandRoute {
                 return;
             }
         }
-        plugin().getLogger().log(Level.SEVERE, "Unhandled exception occured", e);
+        plugin().getLogger().log(Level.SEVERE, "Unhandled exception occurred", e);
     }
 }

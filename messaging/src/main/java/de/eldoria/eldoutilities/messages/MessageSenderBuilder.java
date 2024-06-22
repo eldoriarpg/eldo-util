@@ -26,6 +26,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
+import static de.eldoria.eldoutilities.utils.ReflectionUtil.isPaper;
+
 public class MessageSenderBuilder {
     private final MiniMessage.Builder miniMessage = MiniMessage.builder();
     private final TagResolver.Builder messageTagResolver = TagResolver.builder()
@@ -118,15 +120,8 @@ public class MessageSenderBuilder {
         var defaultResolver = defaultTagResolver
                 .resolver(StandardTags.defaults())
                 .build();
-        var legacy = false;
-        try {
-            Class.forName(BukkitAudiences.class.getName());
-            legacy = true;
-        } catch (ClassNotFoundException e) {
-            // ignore
-        }
         MessageSender messageSender;
-        if (legacy) {
+        if (!isPaper()) {
             messageSender = new SpigotMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
                             .preProcessor(in -> preProcessor.apply(localizer.localize(in)))

@@ -42,4 +42,16 @@ public final class ReflectionUtil {
         return fields;
     }
 
+    public static boolean isPaper() {
+        return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("io.papermc.paper.configuration.Configuration");
+    }
+
+    public static boolean hasClass(String clazz) {
+        try {
+            Class.forName(clazz);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
 }
