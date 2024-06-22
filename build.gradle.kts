@@ -1,7 +1,6 @@
 import com.diffplug.gradle.spotless.SpotlessPlugin
 import de.chojo.PublishData
 import de.chojo.Repo
-import net.kyori.indra.IndraExtension
 import net.kyori.indra.IndraPlugin
 import net.kyori.indra.IndraPublishingPlugin
 
@@ -16,9 +15,9 @@ plugins {
     alias(libs.plugins.indra.sonatype)
 }
 publishData {
-    addRepo(Repo.main("","", false))
-    addRepo(Repo.snapshot("SNAPSHOT","", false))
-    publishingVersion = "2.0.8"
+    addRepo(Repo.main("", "", false))
+    addRepo(Repo.snapshot("SNAPSHOT", "", false))
+    publishingVersion = "2.0.9"
 }
 version = publishData.getVersion()
 
@@ -142,13 +141,13 @@ dependencies {
 fun applyJavaDocOptions(options: MinimalJavadocOptions) {
     val javaDocOptions = options as StandardJavadocDocletOptions
     javaDocOptions.links(
-            "https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/",
-            "https://javadoc.io/doc/org.jetbrains/annotations/latest/",
-            "https://docs.oracle.com/en/java/javase/${java.toolchain.languageVersion.get().asInt()}/docs/api/",
-            "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/latest/",
-            "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest",
-            "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/latest",
-            "https://jd.papermc.io/paper/1.19/"
+        "https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/",
+        "https://javadoc.io/doc/org.jetbrains/annotations/latest/",
+        "https://docs.oracle.com/en/java/javase/${java.toolchain.languageVersion.get().asInt()}/docs/api/",
+        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/latest/",
+        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest",
+        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/latest",
+        "https://jd.papermc.io/paper/1.19/"
     )
 }
 
@@ -158,7 +157,7 @@ tasks {
 
         setDestinationDir(file("${layout.buildDirectory.get()}/docs/javadoc"))
         val projects = project.rootProject.allprojects.filter { p -> !p.name.contains("example") }
-        setSource(projects.map { p -> p.sourceSets.main.get().allJava.filter{ p -> p.name != "module-info.java"} })
+        setSource(projects.map { p -> p.sourceSets.main.get().allJava.filter { p -> p.name != "module-info.java" } })
         classpath = files(projects.map { p -> p.sourceSets.main.get().compileClasspath })
     }
 }
