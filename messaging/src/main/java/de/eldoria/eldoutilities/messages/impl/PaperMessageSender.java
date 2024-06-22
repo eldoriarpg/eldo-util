@@ -26,7 +26,7 @@ public final class PaperMessageSender extends MessageSender {
     }
 
     public void sendMessage(CommandSender sender, Component component) {
-        sender.sendActionBar(applyPrefix(component));
+        sender.sendMessage(applyPrefix(component));
     }
 
     public void broadcast(String message) {
