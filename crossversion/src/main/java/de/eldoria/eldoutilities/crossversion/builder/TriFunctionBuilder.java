@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TriFunctionBuilder<A, B, C, R> extends VersionFunctionBuilder<TriVersionFunction<A, B, C, R>, TriFunction<A, B, C, R>> {
-    private final Map<VersionRange, TriFunction<A, B, C, R>> functions = new HashMap<>();
-
     protected TriFunctionBuilder() {
     }
 

@@ -20,8 +20,6 @@ import java.util.function.Function;
  * @param <R> result Type
  */
 public class FunctionBuilder<A, R> extends VersionFunctionBuilder<VersionFunction<A, R>, Function<A, R>> {
-    private final Map<VersionRange, Function<A, R>> functions = new HashMap<>();
-
     protected FunctionBuilder() {
     }
 

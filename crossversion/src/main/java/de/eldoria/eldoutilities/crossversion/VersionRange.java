@@ -9,7 +9,11 @@ package de.eldoria.eldoutilities.crossversion;
 import de.eldoria.eldoutilities.utils.Version;
 
 public interface VersionRange {
-    boolean isBetween(Version version);
+    @Deprecated(forRemoval = true)
+    default boolean isBetween(Version version){
+        return contains(version);
+    }
+    boolean contains(Version version);
 
     Version lower();
 

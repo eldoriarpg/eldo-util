@@ -21,8 +21,6 @@ import java.util.function.BiFunction;
  * @param <R> result Type
  */
 public class BiFunctionBuilder<A, B, R> extends VersionFunctionBuilder<BiVersionFunction<A, B, R>, BiFunction<A, B, R>> {
-    private final Map<VersionRange, BiFunction<A, B, R>> functions = new HashMap<>();
-
     protected BiFunctionBuilder() {
     }
 

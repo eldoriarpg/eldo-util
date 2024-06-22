@@ -23,8 +23,6 @@ import java.util.Map;
  * @param <R> result Type
  */
 public class QuadFunctionBuilder<A, B, C, D, R> extends VersionFunctionBuilder<QuadVersionFunction<A, B, C, D, R>, QuadFunction<A, B, C, D, R>> {
-    private final Map<VersionRange, QuadFunction<A, B, C, D, R>> functions = new HashMap<>();
-
     protected QuadFunctionBuilder() {
     }
 

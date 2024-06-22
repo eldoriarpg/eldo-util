@@ -9,7 +9,7 @@ package de.eldoria.eldoutilities.crossversion;
 import de.eldoria.eldoutilities.utils.Version;
 
 public record InclusiveVersionRange(Version lower, Version upper) implements VersionRange {
-    public boolean isBetween(Version version) {
+    public boolean contains(Version version) {
         return version.isBetweenInclusive(lower, upper);
     }
 }

@@ -10,7 +10,7 @@ import de.eldoria.eldoutilities.utils.Version;
 
 public record ExclusiveVersionRange(Version lower, Version upper) implements VersionRange {
     @Override
-    public boolean isBetween(Version version) {
+    public boolean contains(Version version) {
         return version.isBetween(lower, upper);
     }
 }

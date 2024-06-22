@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.crossversion.builder;
 
 import de.eldoria.eldoutilities.crossversion.ExclusiveVersionRange;
+import de.eldoria.eldoutilities.crossversion.InclusiveVersionRange;
 import de.eldoria.eldoutilities.crossversion.VersionRange;
 import de.eldoria.eldoutilities.utils.Version;
 
@@ -91,7 +92,19 @@ public abstract class VersionFunctionBuilder<T, V> {
      * @param version  versions which should use this function
      * @return builder instance with function applied for versions
      */
+    @Deprecated(forRemoval = true)
     public VersionFunctionBuilder<T, V> addVersionFunction(V function, VersionRange version) {
+        functions.put(version, function);
+        return this;
+    }
+    /**
+     * Add a version function which should be used on one or more versions.
+     *
+     * @param function function to execute
+     * @param version  versions which should use this function
+     * @return builder instance with function applied for versions
+     */
+    public VersionFunctionBuilder<T, V> addVersion(VersionRange version, V function) {
         functions.put(version, function);
         return this;
     }
@@ -104,8 +117,34 @@ public abstract class VersionFunctionBuilder<T, V> {
      * @param function function to execute
      * @return builder instance with function applied for versions
      */
+    @Deprecated(forRemoval = true)
     public VersionFunctionBuilder<T, V> addVersionFunctionBetween(Version oldest, Version newest, V function) {
         addVersionFunction(function, new ExclusiveVersionRange(oldest, newest));
+        return this;
+    }
+    /**
+     * Add a version functions for all versions between two versions.
+     *
+     * @param oldest   oldest version (inclusive)
+     * @param newest   newest version (exclusive)
+     * @param function function to execute
+     * @return builder instance with function applied for versions
+     */
+    public VersionFunctionBuilder<T, V> addExclusiveVersion(Version oldest, Version newest, V function) {
+        addVersionFunction(function, new ExclusiveVersionRange(oldest, newest));
+        return this;
+    }
+
+    /**
+     * Add a version functions for all versions between two versions.
+     *
+     * @param oldest   oldest version (inclusive)
+     * @param newest   newest version (inclusive)
+     * @param function function to execute
+     * @return builder instance with function applied for versions
+     */
+    public VersionFunctionBuilder<T, V> addInclusiveVersion(Version oldest, Version newest, V function) {
+        addVersionFunction(function, new InclusiveVersionRange(oldest, newest));
         return this;
     }
 
