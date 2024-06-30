@@ -380,7 +380,7 @@ public abstract class EldoConfig {
     /**
      * Called after constructor and before reload.
      * <p>
-     * Intialize everything here.
+     * Initialize everything here.
      */
     protected void init() {
     }

@@ -10,7 +10,6 @@ import de.eldoria.EldoUtilities;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommand;
 import de.eldoria.eldoutilities.commands.command.AdvancedCommandAdapter;
 import de.eldoria.eldoutilities.commands.defaultcommands.FailsaveCommand;
-import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.logging.DebugLogger;
@@ -78,9 +77,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                 var annotation = clazz.getAnnotation(PluginSerializationName.class);
                 ConfigurationSerialization.registerClass(clazz,
                         annotation.value().replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
-            } else {
-                ConfigurationSerialization.registerClass(clazz);
             }
+            ConfigurationSerialization.registerClass(clazz);
         }
 
         EldoUtilities.preWarm(eldoPlugin);
