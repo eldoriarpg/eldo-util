@@ -92,15 +92,16 @@ public class Localizer implements ILocalizer {
         this.userLocale = userLocale;
         this.includedLocales = includedLocales;
         defaultLanguage = fallbackLocale;
+        bootstrap();
         loadLanguage(fallbackLocale);
         if (languages.containsKey(fallbackLocale)) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default locale");
         }
         LOCALIZER.put(plugin.getClass(), this);
-        createDefaults();
         for (String locale : includedLocales) {
             loadLanguage(locale);
         }
+        createDefaults();
     }
 
     /**
@@ -159,37 +160,34 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaults() {
-        Map<String, String> locales = new HashMap<>();
-        locales.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
-        locales.put("error.invalidCommand", "Invalid Command");
-        locales.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
-        locales.put("error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
-        locales.put("error.invalidRange", "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
-        locales.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
-        locales.put("error.invalidMaterial", "Invalid material.");
-        locales.put("error.invalidNumber", "Invalid number");
-        locales.put("error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
-        locales.put("error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
-        locales.put("error.notOnline", "Invalid player. This player is not online.");
-        locales.put("error.unkownPlayer", "Invalid player. This player has never played on this server.");
-        locales.put("error.unkownWorld", "Invalid player. This player has never played on this server.");
-        locales.put("error.notAsConsole", "This command can not be executed from console.");
-        locales.put("error.onlyPlayer", "This command can only be used by players.");
-        locales.put("error.onlyConsole", "This command can only be used by console.");
-        locales.put("error.invalidSender", "This command can not be executed from here.");
-        locales.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
-        locales.put("error.notAsPlayer", "This command can not be executed as player");
-        locales.put("error.tooSmall", "The number is too small. Min: <gold><min>");
-        locales.put("error.tooLarge", "The number is too Large. Max: <gold><max>");
-        locales.put("commands.about", "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
-        locales.put("dialog.accept", "accept");
-        locales.put("dialog.deny", "deny");
-        locales.put("dialog.add", "add");
-        locales.put("dialog.remove", "remove");
-        locales.put("dialog.leftClickChange", "Left click to change");
-        locales.put("dialog.rightClickRemove", "Right click to remove");
-
-        addLocaleCodes(locales);
+        runtimeLocaleCodes.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
+        runtimeLocaleCodes.put("error.invalidCommand", "Invalid Command");
+        runtimeLocaleCodes.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
+        runtimeLocaleCodes.put("error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
+        runtimeLocaleCodes.put("error.invalidRange", "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
+        runtimeLocaleCodes.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
+        runtimeLocaleCodes.put("error.invalidMaterial", "Invalid material.");
+        runtimeLocaleCodes.put("error.invalidNumber", "Invalid number");
+        runtimeLocaleCodes.put("error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
+        runtimeLocaleCodes.put("error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
+        runtimeLocaleCodes.put("error.notOnline", "Invalid player. This player is not online.");
+        runtimeLocaleCodes.put("error.unknownPlayer", "Invalid player. This player has never played on this server.");
+        runtimeLocaleCodes.put("error.unknownWorld", "Invalid world.");
+        runtimeLocaleCodes.put("error.notAsConsole", "This command can not be executed from console.");
+        runtimeLocaleCodes.put("error.onlyPlayer", "This command can only be used by players.");
+        runtimeLocaleCodes.put("error.onlyConsole", "This command can only be used by console.");
+        runtimeLocaleCodes.put("error.invalidSender", "This command can not be executed from here.");
+        runtimeLocaleCodes.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
+        runtimeLocaleCodes.put("error.notAsPlayer", "This command can not be executed as player");
+        runtimeLocaleCodes.put("error.tooSmall", "The number is too small. Min: <gold><min>");
+        runtimeLocaleCodes.put("error.tooLarge", "The number is too Large. Max: <gold><max>");
+        runtimeLocaleCodes.put("commands.about", "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
+        runtimeLocaleCodes.put("dialog.accept", "accept");
+        runtimeLocaleCodes.put("dialog.deny", "deny");
+        runtimeLocaleCodes.put("dialog.add", "add");
+        runtimeLocaleCodes.put("dialog.remove", "remove");
+        runtimeLocaleCodes.put("dialog.leftClickChange", "Left click to change");
+        runtimeLocaleCodes.put("dialog.rightClickRemove", "Right click to remove");
     }
 
     /**
@@ -201,11 +199,7 @@ public class Localizer implements ILocalizer {
     @Override
     @Deprecated(forRemoval = true)
     public void setLocale(String language) {
-        if (!checked) {
-            createOrUpdateLocaleFiles();
-            checked = true;
-        }
-
+        bootstrap();
         setDefaultLocale(language);
     }
 
@@ -214,13 +208,15 @@ public class Localizer implements ILocalizer {
         return getMessage(key, (CommandSender) null);
     }
 
-
-    public void setDefaultLocale(String language) {
+    private void bootstrap() {
         if (!checked) {
             createOrUpdateLocaleFiles();
             checked = true;
         }
+    }
 
+    public void setDefaultLocale(String language) {
+        bootstrap();
         if (!languages.containsKey(language)) {
             plugin.getLogger().log(Level.WARNING, "Language %s does not exist".formatted(language));
             return;
@@ -471,7 +467,7 @@ public class Localizer implements ILocalizer {
             // check if ref key is in locale
             for (var currKey : updateKeys) {
                 var value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
-                // Add the property with the value if it exists in a internal file.
+                // Add the property with the value if it exists in an internal file.
                 bundleMap.put(currKey, value);
                 plugin.getLogger().info("Added: " + currKey + "=" + value.replace("\n", "\\n"));
             }
