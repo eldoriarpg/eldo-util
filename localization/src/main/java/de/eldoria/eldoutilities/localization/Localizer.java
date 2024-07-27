@@ -266,7 +266,7 @@ public class Localizer implements ILocalizer {
         String result = null;
         if (localeBundle(language).containsKey(key)) {
             try {
-                result = localeBundle(key).getString(key);
+                result = localeBundle(language).getString(key);
             } catch (MissingResourceException e) {
                 // ignore
             }
