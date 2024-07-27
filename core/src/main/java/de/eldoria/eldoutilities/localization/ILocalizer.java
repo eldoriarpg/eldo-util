@@ -6,13 +6,13 @@
 
 package de.eldoria.eldoutilities.localization;
 
+import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.PropertyKey;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.regex.Pattern;
 
 /**
@@ -78,8 +78,22 @@ public interface ILocalizer {
      */
     void addLocaleCodes(Map<String, String> runtimeLocaleCodes);
 
+    String getMessage(String key, CommandSender sender);
+
     @Nullable
     String getValue(String key);
+
+    String getMessage(String key, String language);
+
+    @Nullable
+    String getValue(String key, CommandSender sender);
+
+    @Nullable
+    String getValue(String key, String language);
+
+    ResourceBundle localeBundle(String language);
+
+    ResourceBundle defaultBundle();
 
     /**
      * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
@@ -89,7 +103,19 @@ public interface ILocalizer {
      * @return Replaced Messages
      * @since 1.2.3
      */
-    String localize(String message);
+    default String localize(String message) {
+        return localize(null, message);
+    }
+
+    /**
+     * Translates a String with Placeholders. Can handle multiple messages with replacements. Add replacements in the
+     * right order.
+     *
+     * @param message Message to translate
+     * @return Replaced Messages
+     * @since 1.2.3
+     */
+    String localize(CommandSender sender, String message);
 
     void registerChild(ILocalizer localizer);
 
@@ -113,12 +139,42 @@ public interface ILocalizer {
         }
 
         @Override
+        public String getMessage(String key, CommandSender sender) {
+            return key;
+        }
+
+        @Override
         public @Nullable String getValue(String key) {
+            return key;
+        }
+
+        @Override
+        public String getMessage(String key, String language) {
+            return key;
+        }
+
+        @Override
+        public @Nullable String getValue(String key, CommandSender sender) {
+            return key;
+        }
+
+        @Override
+        public @Nullable String getValue(String key, String language) {
+            return key;
+        }
+
+        @Override
+        public ResourceBundle localeBundle(String language) {
             return null;
         }
 
         @Override
-        public String localize(String message) {
+        public ResourceBundle defaultBundle() {
+            return null;
+        }
+
+        @Override
+        public String localize(CommandSender sender, String message) {
             return message;
         }
 

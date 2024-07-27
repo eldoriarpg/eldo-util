@@ -6,6 +6,8 @@
 
 package de.eldoria.eldoutilities.localization;
 
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,6 +32,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
@@ -41,7 +44,7 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  * Easy to use and fully automatic setup and updating of locales.
  * <p>
  * Requires to have at least one default locale and one fallback locale in the resources. Use the {@link
- * #Localizer(Plugin, String, String, Locale, String...)} constructor for initial setup. This will create missing files
+ * #create(Plugin, String...) constructor for initial setup. This will create missing files
  * and updates existing files.
  * <p>
  * You can change the currently used locale every time via {@link #setLocale(String)}.
@@ -53,26 +56,27 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
 @SuppressWarnings("unused")
 public class Localizer implements ILocalizer {
 
-    private final ResourceBundle fallbackBundle;
+    private String defaultLanguage;
     private final Plugin plugin;
     private final String localesPath;
     private final String localesPrefix;
     private final String[] includedLocales;
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
     private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
-    List<ILocalizer> childs = new ArrayList<>();
-    private ResourceBundle bundle;
+    private final Map<String, ResourceBundle> languages = new HashMap<>();
+    private final Function<Player, String> userLocale;
+    private final List<ILocalizer> childs = new ArrayList<>();
     private boolean checked;
 
     /**
      * Create a new localizer instance.
      * <p>
-     * This instance will create locale files, which are provided in the resources directory.
+     * This instance will create locale files, which are provided in the "resources" directory.
      * <p>
      * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
      * <p>
-     * After a update check and a update if needed it will load the provided language or the fallback language if the
+     * After an update check and a update if needed it will load the provided language or the fallback language if the
      * provided language does not exist.
      *
      * @param plugin          instance of plugin
@@ -82,20 +86,22 @@ public class Localizer implements ILocalizer {
      * @param includedLocales internal provided locales
      */
     Localizer(Plugin plugin, String localesPath,
-              String localesPrefix, Locale fallbackLocale, String... includedLocales) {
+              String localesPrefix, String fallbackLocale, Function<Player, String> userLocale, String... includedLocales) {
         this.plugin = plugin;
         this.localesPath = localesPath;
         this.localesPrefix = localesPrefix;
+        this.userLocale = userLocale;
         this.includedLocales = includedLocales;
-        ResourceBundle fallbackBundle = new DummyResourceBundle();
-        try {
-            fallbackBundle = getBundle(fallbackLocale);
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.SEVERE, "Could not read fallback file", e);
+        defaultLanguage = fallbackLocale;
+        loadLanguage(fallbackLocale);
+        if (languages.containsKey(fallbackLocale)) {
+            plugin.getLogger().log(Level.SEVERE, "Could not load default locale");
         }
-        this.fallbackBundle = fallbackBundle;
         LOCALIZER.put(plugin.getClass(), this);
         createDefaults();
+        for (String locale : includedLocales) {
+            loadLanguage(locale);
+        }
     }
 
     /**
@@ -103,7 +109,7 @@ public class Localizer implements ILocalizer {
      * <p>
      * The message path and prefix will be "messages" and the fallback language the "en_US" locale.
      * <p>
-     * This instance will create locale files, which are provided in the resources directory.
+     * This instance will create locale files, which are provided in the "resources" directory.
      * <p>
      * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
@@ -114,7 +120,9 @@ public class Localizer implements ILocalizer {
      * @param plugin          instance of plugin
      * @param includedLocales internal provided locales
      * @return the created localizer instance
+     * @deprecated Use the builder provided by {@link #builder(Plugin, String)}
      */
+    @Deprecated(forRemoval = true)
     public static ILocalizer create(Plugin plugin,
                                     String... includedLocales) {
         return create(plugin, "messages", "messages", Locale.US, includedLocales);
@@ -123,7 +131,7 @@ public class Localizer implements ILocalizer {
     /**
      * Create a new localizer instance.
      * <p>
-     * This instance will create locale files, which are provided in the resources directory.
+     * This instance will create locale files, which are provided in the "resources" directory.
      * <p>
      * After this it will update all locale files inside the locales directory. For this the ref keys from the internal
      * default locale file will be used.
@@ -137,12 +145,18 @@ public class Localizer implements ILocalizer {
      * @param fallbackLocale  fallbackLocale
      * @param includedLocales internal provided locales
      * @return the created localizer instance
+     * @deprecated Use the builder provided by {@link #builder(Plugin, String)}
      */
+    @Deprecated(forRemoval = true)
     public static ILocalizer create(Plugin plugin, String localesPath,
                                     String localesPrefix, Locale fallbackLocale, String... includedLocales) {
-        ILocalizer localizer = new Localizer(plugin, localesPath, localesPrefix, fallbackLocale, includedLocales);
+        ILocalizer localizer = new LocalizerBuilder(plugin, fallbackLocale.toLanguageTag()).setLocalesPath(localesPath).setLocalesPrefix(localesPrefix).setUserLocale(e -> fallbackLocale.toLanguageTag()).setIncludedLocales(includedLocales).build();
         LOCALIZER.put(plugin.getClass(), localizer);
         return localizer;
+    }
+
+    public static LocalizerBuilder builder(Plugin plugin, String defaultLocale) {
+        return new LocalizerBuilder(plugin, defaultLocale);
     }
 
     private void createDefaults() {
@@ -183,30 +197,54 @@ public class Localizer implements ILocalizer {
      * Change the locale to the language. If the locale is not present the fallback locale will be used.
      *
      * @param language language to be used
+     * @deprecated Use
      */
     @Override
+    @Deprecated(forRemoval = true)
     public void setLocale(String language) {
         if (!checked) {
             createOrUpdateLocaleFiles();
             checked = true;
         }
 
-        try {
-            this.bundle = getBundle(getLocaleFile(language));
-        } catch (IOException e) {
-            plugin.getLogger().log(Level.WARNING, "Could not load locale file " + getLocaleFile(language), e);
-            this.bundle = fallbackBundle;
-        }
+        setDefaultLocale(language);
     }
 
-    /**
-     * Translates a String with Placeholders. Can handle multiple messages with replacements.
-     *
-     * @param key Key of message
-     * @return Replaced Messages
-     */
     @Override
     public String getMessage(String key) {
+        return getMessage(key, (CommandSender) null);
+    }
+
+
+    public void setDefaultLocale(String language) {
+        if (!checked) {
+            createOrUpdateLocaleFiles();
+            checked = true;
+        }
+
+        if (!languages.containsKey(language)) {
+            plugin.getLogger().log(Level.WARNING, "Language %s does not exist".formatted(language));
+            return;
+        }
+        this.defaultLanguage = language;
+    }
+
+
+    @Override
+    public String getMessage(String key, @Nullable CommandSender sender) {
+        if (sender instanceof Player player) {
+            return getMessage(key, userLocale.apply(player));
+        }
+        return getMessage(key, defaultLanguage);
+    }
+
+    @Override
+    public @Nullable String getValue(String key) {
+        return getValue(key, (CommandSender) null);
+    }
+
+    @Override
+    public String getMessage(String key, String language) {
         var result = getValue(key);
 
         if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
@@ -220,18 +258,27 @@ public class Localizer implements ILocalizer {
 
     @Override
     @Nullable
-    public String getValue(String key) {
+    public String getValue(String key, CommandSender sender) {
+        if (sender instanceof Player player) {
+            return getValue(key, userLocale.apply(player));
+        }
+        return getValue(key, defaultLanguage);
+    }
+
+    @Override
+    @Nullable
+    public String getValue(String key, String language) {
         String result = null;
-        if (bundle.containsKey(key)) {
+        if (localeBundle(language).containsKey(key)) {
             try {
-                result = bundle.getString(key);
+                result = localeBundle(key).getString(key);
             } catch (MissingResourceException e) {
                 // ignore
             }
         }
-        if (result == null && fallbackBundle.containsKey(key)) {
+        if (result == null && localeBundle(defaultLanguage).containsKey(key)) {
             try {
-                result = fallbackBundle.getString(key);
+                result = localeBundle(defaultLanguage).getString(key);
             } catch (MissingResourceException e) {
                 // ignore
             }
@@ -239,11 +286,37 @@ public class Localizer implements ILocalizer {
 
         if (result == null) {
             for (var child : childs) {
-                result = child.getValue(key);
+                result = child.getValue(key, language);
                 if (result != null) break;
             }
         }
         return result;
+    }
+
+    @Override
+    public ResourceBundle localeBundle(String language) {
+        ResourceBundle resourceBundle = languages.get(language);
+        if (resourceBundle == null) {
+            plugin.getLogger().severe("Language %s not found".formatted(language));
+            if (language.equals(defaultLanguage)) {
+                throw new RuntimeException("Fallback language is not registered.");
+            }
+            return localeBundle(defaultLanguage);
+        }
+        return resourceBundle;
+    }
+
+    @Override
+    public ResourceBundle defaultBundle() {
+        return localeBundle(defaultLanguage);
+    }
+
+    private void loadLanguage(String language) {
+        try {
+            languages.put(language, getBundle(getLocaleFile(language)));
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Failed to load language %s.".formatted(language), e);
+        }
     }
 
     private Path getLocalePath() {
@@ -286,7 +359,7 @@ public class Localizer implements ILocalizer {
         return false;
     }
 
-    private ResourceBundle getDefaultBundle() throws IOException {
+    private ResourceBundle getDefaultLanguage() throws IOException {
         try (var input = plugin.getResource(localesPrefix + ".properties")) {
             if (input == null) {
                 plugin.getLogger().severe("Could not load locale file " + localesPrefix + ".properties. Does it exist?");
@@ -301,7 +374,7 @@ public class Localizer implements ILocalizer {
         try (var input = plugin.getResource(getLocaleFileName(locale))) {
             if (input == null) {
                 plugin.getLogger().severe("Could not load locale file " + getLocaleFileName(locale) + ".properties. Does it exist?");
-                return getDefaultBundle();
+                return getDefaultLanguage();
             }
             return new PropertyResourceBundle(input);
         }
@@ -309,7 +382,7 @@ public class Localizer implements ILocalizer {
 
     private ResourceBundle getBundle(Locale locale) throws IOException {
         if (locale == null) {
-            return getDefaultBundle();
+            return getDefaultLanguage();
         }
         return getBundle(locale.toString());
     }
@@ -329,7 +402,7 @@ public class Localizer implements ILocalizer {
     }
 
     private Set<String> getDefaultKeys() throws IOException {
-        Set<String> defaultKeys = new HashSet<>(Collections.list(getDefaultBundle().getKeys()));
+        Set<String> defaultKeys = new HashSet<>(Collections.list(getDefaultLanguage().getKeys()));
         defaultKeys.addAll(runtimeLocaleCodes.keySet());
         return defaultKeys;
     }
@@ -449,6 +522,20 @@ public class Localizer implements ILocalizer {
         // Check if input is a locale key.
         if (isLocaleCode(message)) {
             message = getMessage(message);
+        }
+
+        return message;
+    }
+
+    @Override
+    public String localize(CommandSender sender, String message) {
+        if (message == null) {
+            return null;
+        }
+
+        // Check if input is a locale key.
+        if (isLocaleCode(message)) {
+            message = getMessage(message, sender);
         }
 
         return message;

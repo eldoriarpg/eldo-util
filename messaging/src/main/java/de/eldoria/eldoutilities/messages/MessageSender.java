@@ -12,7 +12,10 @@ import de.eldoria.eldoutilities.messages.conversion.MiniMessageConversion;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
@@ -113,7 +116,7 @@ public abstract class MessageSender {
      * @param message message with optional color codes
      */
     public void sendMessage(CommandSender sender, String message, TagResolver... placeholder) {
-        sendMessage(sender, serialize(message, messageTagResolver, placeholder));
+        sendMessage(sender, serialize(sender, message, messageTagResolver, placeholder));
     }
 
 
@@ -131,7 +134,7 @@ public abstract class MessageSender {
      * @param composer message composer
      */
     public void sendMessage(CommandSender sender, IMessageComposer composer) {
-        sendMessage(sender, serialize(composer.build(), messageTagResolver,
+        sendMessage(sender, serialize(sender, composer.build(), messageTagResolver,
                 composer.replacements().toArray(new TagResolver[0])));
     }
 
@@ -149,7 +152,7 @@ public abstract class MessageSender {
      * @param message message with optinal color codes
      */
     public void sendError(CommandSender sender, String message, TagResolver... placeholder) {
-        sendMessage(sender, serialize(message, errorTagResolver, placeholder));
+        sendMessage(sender, serialize(sender, message, errorTagResolver, placeholder));
     }
 
     /**
@@ -166,7 +169,7 @@ public abstract class MessageSender {
      * @param composer message composer
      */
     public void sendError(CommandSender sender, IMessageComposer composer) {
-        sendMessage(sender, serialize(composer.build(), errorTagResolver,
+        sendMessage(sender, serialize(sender, composer.build(), errorTagResolver,
                 composer.replacements().toArray(new TagResolver[0])));
     }
 
@@ -181,7 +184,7 @@ public abstract class MessageSender {
      * @param title  title to send
      */
     public void sendTitle(Player player, String title, String subtitle, Title.Times times, TagResolver... placeholder) {
-        sendTitle(player, Title.title(serialize(title, messageTagResolver, placeholder), serialize(subtitle, messageTagResolver, placeholder), times));
+        sendTitle(player, Title.title(serialize(player, title, messageTagResolver, placeholder), serialize(player, subtitle, messageTagResolver, placeholder), times));
     }
 
     /**
@@ -218,7 +221,7 @@ public abstract class MessageSender {
         return ILocalizer.getPluginLocalizer(ownerPlugin);
     }
 
-    protected Component serialize(String message, TagResolver resolver, TagResolver... placeholder) {
+    protected Component serialize(CommandSender sender, String message, TagResolver resolver, TagResolver... placeholder) {
         var converted = MiniMessageConversion.convertLegacyColorCodes(message);
         if (!converted.equals(message)) {
             plugin.getLogger().warning("Found legacy color codes in message.");
@@ -235,7 +238,7 @@ public abstract class MessageSender {
             tags[tags.length - 1] = resolver;
             finalResolver = tags;
         }
-        return resolveTags(message, finalResolver);
+        return resolveTags(message, addI18nTag(sender, TagResolver.resolver(finalResolver)));
     }
 
     private Component resolveTags(String message, TagResolver... resolver) {
@@ -255,21 +258,46 @@ public abstract class MessageSender {
         return prefix.appendSpace().append(component);
     }
 
+
     public String translatePlain(String message, TagResolver... replacements) {
-        return PlainTextComponentSerializer.plainText().serialize(serialize(message, messageTagResolver, replacements));
+        return translatePlain(null, message, replacements);
+    }
+
+    public String translatePlain(@Nullable CommandSender sender, String message, TagResolver... replacements) {
+        return PlainTextComponentSerializer.plainText().serialize(serialize(sender, message, messageTagResolver, replacements));
     }
 
     public Component serializeMessage(String message, TagResolver... placeholder) {
-        return serialize(message, messageTagResolver, placeholder);
+        return serializeMessage(null, message, placeholder);
+    }
+    public Component serializeMessage(@Nullable CommandSender sender, String message, TagResolver... placeholder) {
+        return serialize(sender, message, messageTagResolver, placeholder);
     }
 
     public Component serializeError(String message, TagResolver... placeholder) {
-        return serialize(message, errorTagResolver, placeholder);
+        return serializeError(null, message, placeholder);
+    }
+
+    public Component serializeError(@Nullable CommandSender sender, String message, TagResolver... placeholder) {
+        return serialize(sender, message, errorTagResolver, placeholder);
     }
 
     public MiniMessage miniMessage() {
         return miniMessage;
     }
+
+    private TagResolver addI18nTag(CommandSender sender, TagResolver resolvers) {
+        if (loc() != ILocalizer.DEFAULT) {
+            return TagResolver.resolver(resolvers, TagResolver.builder()
+                    .tag("i18n", (argumentQueue, context) -> localizeTag(sender, argumentQueue, context)).build());
+        }
+        return resolvers;
+    }
+
+    private net.kyori.adventure.text.minimessage.tag.Tag localizeTag(CommandSender sender, ArgumentQueue args, Context ctx) {
+        return Tag.selfClosingInserting(ctx.deserialize(loc().localize(sender, args.popOr("locale tag required").value())));
+    }
+
 
     public boolean isAnonymous() {
         return ownerPlugin == null;

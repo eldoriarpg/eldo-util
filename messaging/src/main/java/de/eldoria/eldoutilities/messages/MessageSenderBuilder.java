@@ -116,7 +116,6 @@ public class MessageSenderBuilder {
      * @return registered message sender
      */
     public MessageSender register() {
-        addI18nTag();
         var defaultResolver = defaultTagResolver
                 .resolver(StandardTags.defaults())
                 .build();
@@ -140,15 +139,5 @@ public class MessageSenderBuilder {
         }
         MessageSender.register(messageSender);
         return messageSender;
-    }
-
-    private void addI18nTag() {
-        if (localizer != ILocalizer.DEFAULT) {
-            defaultTagResolver.tag("i18n", this::localizeTag);
-        }
-    }
-
-    private Tag localizeTag(ArgumentQueue args, Context ctx) {
-        return Tag.selfClosingInserting(ctx.deserialize(localizer.localize(args.popOr("locale tag required").value())));
     }
 }

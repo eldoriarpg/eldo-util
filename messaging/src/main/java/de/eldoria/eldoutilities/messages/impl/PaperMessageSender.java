@@ -30,7 +30,7 @@ public final class PaperMessageSender extends MessageSender {
     }
 
     public void broadcast(String message) {
-        plugin().getServer().broadcast(serialize(message, messageTagResolver()));
+        plugin().getServer().broadcast(serialize(null, message, messageTagResolver()));
     }
 
     /**
@@ -50,7 +50,7 @@ public final class PaperMessageSender extends MessageSender {
      * @param message message to send
      */
     public void sendActionBar(Player player, String message, TagResolver... placeholder) {
-        player.sendActionBar(serialize(message, messageTagResolver(), placeholder));
+        player.sendActionBar(serialize(player, message, messageTagResolver(), placeholder));
     }
 
     /**
@@ -60,7 +60,7 @@ public final class PaperMessageSender extends MessageSender {
      * @param message message to send
      */
     public void sendErrorActionBar(Player player, String message, TagResolver... placeholder) {
-        player.sendActionBar(serialize(message, errorTagResolver(), placeholder));
+        player.sendActionBar(serialize(player, message, errorTagResolver(), placeholder));
     }
 
     public void sendBossBar(Player player, BossBar bossBar) {
@@ -68,7 +68,7 @@ public final class PaperMessageSender extends MessageSender {
     }
 
     public BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags) {
-        var bossBar = BossBar.bossBar(serialize(message, messageTagResolver()), progress, color, overlay, flags);
+        var bossBar = BossBar.bossBar(serialize(player, message, messageTagResolver()), progress, color, overlay, flags);
         player.showBossBar(bossBar);
         return bossBar;
     }
