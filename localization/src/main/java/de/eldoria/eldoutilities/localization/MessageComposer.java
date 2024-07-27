@@ -8,6 +8,7 @@ package de.eldoria.eldoutilities.localization;
 
 import de.eldoria.eldoutilities.utils.TextUtil;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.intellij.lang.annotations.Language;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,10 +36,14 @@ public class MessageComposer implements IMessageComposer {
         return ILocalizer.escape(text);
     }
 
-    public MessageComposer localeCode(String propertyKey, TagResolver... replacements) {
+    public MessageComposer localeCode(@Language("properties") String propertyKey, TagResolver... replacements) {
         stringBuilder.append(ILocalizer.escape(propertyKey));
         this.replacements.addAll(Arrays.asList(replacements));
         return this;
+    }
+
+    public MessageComposer tag(String text) {
+        return text("<%s>", text);
     }
 
     /**
