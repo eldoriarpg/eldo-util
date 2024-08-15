@@ -12,10 +12,10 @@ import org.bukkit.plugin.Plugin;
 import java.util.function.Function;
 
 public class LocalizerBuilder {
-    private Plugin plugin;
+    private final Plugin plugin;
+    private final String fallbackLocale;
     private String localesPath = "messages";
     private String localesPrefix = "messages";
-    private String fallbackLocale;
     private Function<Player, String> userLocale;
     private String[] includedLocales = new String[0];
 

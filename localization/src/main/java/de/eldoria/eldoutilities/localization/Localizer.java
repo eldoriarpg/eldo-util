@@ -92,6 +92,7 @@ public class Localizer implements ILocalizer {
         this.userLocale = userLocale;
         this.includedLocales = includedLocales;
         defaultLanguage = fallbackLocale;
+        createDefaults();
         bootstrap();
         loadLanguage(fallbackLocale);
         if (languages.containsKey(fallbackLocale)) {
@@ -101,7 +102,6 @@ public class Localizer implements ILocalizer {
         for (String locale : includedLocales) {
             loadLanguage(locale);
         }
-        createDefaults();
     }
 
     /**
