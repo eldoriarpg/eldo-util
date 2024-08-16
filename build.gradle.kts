@@ -1,3 +1,5 @@
+import de.chojo.Repo
+
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
     java
@@ -9,14 +11,14 @@ plugins {
 group = "de.eldoria"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
-version = "1.14.4"
+version = "1.14.5"
 description = "Utility Library for spigot plugins used by the eldoria team."
 
 javaToolchains {
     java {
         sourceCompatibility = JavaVersion.VERSION_17
     }
-    testing{
+    testing {
 
     }
 }
@@ -48,18 +50,18 @@ java {
 }
 
 publishData {
-    useEldoNexusRepos()
+    addRepo(Repo.snapshot("", "https://eldonexus.de/repository/maven-releases/", false))
     publishTask("shadowJar")
     publishTask("sourcesJar")
     publishTask("javadocJar")
 }
 
-    spotless {
-        java {
-            licenseHeaderFile(rootProject.file("HEADER.txt"))
-            target("**/*.java")
-        }
+spotless {
+    java {
+        licenseHeaderFile(rootProject.file("HEADER.txt"))
+        target("**/*.java")
     }
+}
 
 publishing {
     publications.create<MavenPublication>("maven") {
