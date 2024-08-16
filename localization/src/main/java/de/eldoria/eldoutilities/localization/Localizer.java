@@ -48,7 +48,7 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  * <p>
  * You can change the currently used locale every time via {@link #setLocale(String)}.
  * <p>
- * The localizer also allows to use locales which are not included in the ressources folder.
+ * The localizer also allows to use locales which are not included in the resources folder.
  *
  * @since 1.0.0
  */
@@ -64,7 +64,7 @@ public class Localizer implements ILocalizer {
     private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
     private final Map<String, ResourceBundle> languages = new HashMap<>();
     private final Function<Player, String> userLocale;
-    private final List<ILocalizer> childs = new ArrayList<>();
+    private final List<ILocalizer> children = new ArrayList<>();
     private boolean checked;
 
     /**
@@ -190,6 +190,11 @@ public class Localizer implements ILocalizer {
         runtimeLocaleCodes.put("dialog.rightClickRemove", "Right click to remove");
     }
 
+    @Override
+    public Plugin plugin() {
+        return plugin;
+    }
+
     /**
      * Change the locale to the language. If the locale is not present the fallback locale will be used.
      *
@@ -280,7 +285,7 @@ public class Localizer implements ILocalizer {
         }
 
         if (result == null) {
-            for (var child : childs) {
+            for (var child : children) {
                 result = child.getValue(key, language);
                 if (result != null) break;
             }
@@ -553,7 +558,8 @@ public class Localizer implements ILocalizer {
 
     @Override
     public void registerChild(ILocalizer localizer) {
-        childs.add(localizer);
+        plugin.getLogger().info("Localizer from " + localizer.plugin().getName() + " registered as child.");
+        children.add(localizer);
     }
 
     private static class DummyResourceBundle extends ResourceBundle {

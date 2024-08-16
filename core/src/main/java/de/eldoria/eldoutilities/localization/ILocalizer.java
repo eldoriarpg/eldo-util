@@ -37,6 +37,8 @@ public interface ILocalizer {
         return LOCALIZER.getOrDefault(plugin, DEFAULT);
     }
 
+    Plugin plugin();
+
     static String escape(String propertyKey) {
         return String.format("<i18n:%s>", propertyKey);
     }
@@ -120,6 +122,11 @@ public interface ILocalizer {
     void registerChild(ILocalizer localizer);
 
     public class DummyLocalizer implements ILocalizer {
+        @Override
+        public Plugin plugin() {
+            return null;
+        }
+
         @Override
         public void setLocale(String language) {
         }
