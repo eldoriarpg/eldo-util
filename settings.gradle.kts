@@ -32,7 +32,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             // plugins
-            plugin("spotless", "com.diffplug.spotless").version("6.23.3")
+            plugin("spotless", "com.diffplug.spotless").version("6.25.0")
             plugin("publishdata", "de.chojo.publishdata").version("1.2.5")
 
             library("paper", "io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
