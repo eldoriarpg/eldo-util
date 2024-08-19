@@ -9,19 +9,23 @@ package de.eldoria.eldoutilities.localization;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Function;
 
 public class LocalizerBuilder {
     private final Plugin plugin;
     private final String fallbackLocale;
+    private final Set<String> includedLocales = new HashSet<>();
     private String localesPath = "messages";
     private String localesPrefix = "messages";
     private Function<Player, String> userLocale;
-    private String[] includedLocales = new String[0];
 
     LocalizerBuilder(Plugin plugin, String fallbackLocale) {
         this.plugin = plugin;
         this.fallbackLocale = fallbackLocale;
+        includedLocales.add(fallbackLocale);
         userLocale = p -> fallbackLocale;
     }
 
@@ -41,7 +45,7 @@ public class LocalizerBuilder {
     }
 
     public LocalizerBuilder setIncludedLocales(String... includedLocales) {
-        this.includedLocales = includedLocales;
+        this.includedLocales.addAll(Arrays.stream(includedLocales).toList());
         return this;
     }
 

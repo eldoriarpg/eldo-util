@@ -10,9 +10,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -68,6 +70,13 @@ public interface ILocalizer {
      * @return array of registered locales.
      */
     String[] getIncludedLocales();
+
+    /**
+     * Returns all available locales.
+     *
+     * @return set of registered locales.
+     */
+    Set<String> includedLocales();
 
     /**
      * Add requested locale codes in runtime.
@@ -139,6 +148,11 @@ public interface ILocalizer {
         @Override
         public String[] getIncludedLocales() {
             return new String[0];
+        }
+
+        @Override
+        public Set<String> includedLocales() {
+            return Collections.emptySet();
         }
 
         @Override
