@@ -61,7 +61,7 @@ public class Localizer implements ILocalizer {
     private final String localesPrefix;
     private final Set<String> includedLocales;
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
-    private final Map<String, String> runtimeLocaleCodes = new HashMap<>();
+    private final Map<String, String> runtimeLocaleCodes;
     private final Map<String, ResourceBundle> languages = new HashMap<>();
     private final Function<Player, String> userLocale;
     private final List<ILocalizer> children = new ArrayList<>();
@@ -85,13 +85,14 @@ public class Localizer implements ILocalizer {
      * @param includedLocales internal provided locales
      */
     Localizer(Plugin plugin, String localesPath,
-              String localesPrefix, String fallbackLocale, Function<Player, String> userLocale, Set<String> includedLocales) {
+              String localesPrefix, String fallbackLocale, Function<Player, String> userLocale, Set<String> includedLocales, Map<String, String> runtimeLocaleCodes) {
         this.plugin = plugin;
         this.localesPath = localesPath;
         this.localesPrefix = localesPrefix;
         this.userLocale = userLocale;
         this.includedLocales = includedLocales;
         defaultLanguage = fallbackLocale;
+        this.runtimeLocaleCodes = runtimeLocaleCodes;
         createDefaults();
         bootstrap();
         loadLanguage(fallbackLocale);
