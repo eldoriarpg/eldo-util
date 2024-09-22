@@ -1,6 +1,6 @@
 description = "Wrapper for bstats"
 
 dependencies {
-    api("org.bstats", "bstats-bukkit", "3.0.2")
+    api("org.bstats", "bstats-bukkit", "3.1.0")
     compileOnly(libs.spigot)
 }
