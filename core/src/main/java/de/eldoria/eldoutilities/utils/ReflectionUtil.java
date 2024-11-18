@@ -46,6 +46,11 @@ public final class ReflectionUtil {
         return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("io.papermc.paper.configuration.Configuration");
     }
 
+    public static boolean isRelocated() {
+        String packageName = ReflectionUtil.class.getPackageName();
+        return packageName.startsWith(String.join("de", "eldoria", "eldoutilities"));
+    }
+
     public static boolean hasClass(String clazz) {
         try {
             Class.forName(clazz);

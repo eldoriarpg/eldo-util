@@ -9,14 +9,11 @@ package de.eldoria.eldoutilities.messages;
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.impl.PaperMessageSender;
 import de.eldoria.eldoutilities.messages.impl.SpigotMessageSender;
-import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
-import net.kyori.adventure.text.minimessage.Context;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.ArgumentQueue;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import net.kyori.adventure.text.minimessage.tag.standard.StandardTags;
 import org.bukkit.plugin.Plugin;
@@ -31,9 +28,9 @@ import static de.eldoria.eldoutilities.utils.ReflectionUtil.isPaper;
 public class MessageSenderBuilder {
     private final MiniMessage.Builder miniMessage = MiniMessage.builder();
     private final TagResolver.Builder messageTagResolver = TagResolver.builder()
-            .tag("default", Tag.styling(NamedTextColor.GREEN));
+                                                                      .tag("default", Tag.styling(NamedTextColor.GREEN));
     private final TagResolver.Builder errorTagResolver = TagResolver.builder()
-            .tag("default", Tag.styling(NamedTextColor.RED));
+                                                                    .tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
 
     @Nullable
@@ -65,7 +62,7 @@ public class MessageSenderBuilder {
 
     public MessageSenderBuilder prefix(String prefix) {
         return prefix(MiniMessage.miniMessage()
-                .deserialize(prefix));
+                                 .deserialize(prefix));
     }
 
     public MessageSenderBuilder messageColor(TextColor color) {
@@ -120,24 +117,28 @@ public class MessageSenderBuilder {
                 .resolver(StandardTags.defaults())
                 .build();
         MessageSender messageSender;
-        if (!isPaper()) {
+        if (!isPaper() || hasRelocatedAdventure()) {
             messageSender = new SpigotMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
-                            .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                            .build(),
+                               .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                               .build(),
                     TagResolver.resolver(defaultResolver, messageTagResolver.build()),
                     TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                     prefix);
         } else {
             messageSender = new PaperMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
-                            .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                            .build(),
+                               .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                               .build(),
                     TagResolver.resolver(defaultResolver, messageTagResolver.build()),
                     TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                     prefix);
         }
         MessageSender.register(messageSender);
         return messageSender;
+    }
+
+    public static boolean hasRelocatedAdventure() {
+        return !Component.class.getPackageName().startsWith(String.join("net", "kyori", "adventure", "text"));
     }
 }
