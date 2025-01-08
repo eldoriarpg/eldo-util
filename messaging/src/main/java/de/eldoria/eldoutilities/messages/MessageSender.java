@@ -43,7 +43,7 @@ import java.util.Set;
  */
 public abstract class MessageSender {
     private static final Map<Class<? extends Plugin>, MessageSender> PLUGIN_SENDER = new HashMap<>();
-    @Nullable
+    @NotNull
     private final Class<? extends Plugin> ownerPlugin;
     private final Plugin plugin;
     private MiniMessage miniMessage;
@@ -107,10 +107,7 @@ public abstract class MessageSender {
      * <p>
      * The message will be localized if a localizer is available and a locale code is detected.
      * <p>
-     * The message can be a simple locale code in the format "code" or "code.code....".
-     * <p>
-     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
-     * and $code.more.code$}. You can write what you want between locale codes.
+     * The message can be a simple locale code in the format "code.code....".
      *
      * @param sender  receiver of the message
      * @param message message with optional color codes
@@ -125,10 +122,7 @@ public abstract class MessageSender {
      * <p>
      * The message will be localized if a localizer is available and a locale code is detected.
      * <p>
-     * The message can be a simple locale code in the format "code" or "code.code....".
-     * <p>
-     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
-     * and $code.more.code$}. You can write what you want between locale codes.
+     * The message can be a simple locale code in the format "code.code....".
      *
      * @param sender   receiver of the message
      * @param composer message composer
@@ -143,13 +137,10 @@ public abstract class MessageSender {
      * <p>
      * The message will be localized if a localizer is available and a locale code is detected.
      * <p>
-     * The message can be a simple locale code in the format "code" or "code.code....".
-     * <p>
-     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
-     * and $code.more.code$}. You can write what you want between locale codes.
+     * The message can be a simple locale code in the format "code.code....".
      *
      * @param sender  receiver of the message
-     * @param message message with optinal color codes
+     * @param message message with optional color codes
      */
     public void sendError(CommandSender sender, String message, TagResolver... placeholder) {
         sendMessage(sender, serialize(sender, message, errorTagResolver, placeholder));
@@ -160,10 +151,7 @@ public abstract class MessageSender {
      * <p>
      * The message will be localized if a localizer is available and a locale code is detected.
      * <p>
-     * The message can be a simple locale code in the format "code" or "code.code....".
-     * <p>
-     * If multiple code should be used every code musst be surrounded by a {@code $} mark. Example {@code "$code.code$
-     * and $code.more.code$}. You can write what you want between locale codes.
+     * The message can be a simple locale code in the format "code.code....".
      *
      * @param sender   receiver of the message
      * @param composer message composer

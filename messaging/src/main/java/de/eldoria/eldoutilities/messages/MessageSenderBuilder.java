@@ -33,13 +33,13 @@ public class MessageSenderBuilder {
                                                                     .tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
 
-    @Nullable
+    @NotNull
     private final Plugin plugin;
     private Component prefix = Component.empty();
     private ILocalizer localizer = ILocalizer.DEFAULT;
     private UnaryOperator<String> preProcessor = s -> s;
 
-    public MessageSenderBuilder(@Nullable Plugin plugin) {
+    public MessageSenderBuilder(@NotNull Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -118,6 +118,7 @@ public class MessageSenderBuilder {
                 .build();
         MessageSender messageSender;
         if (!isPaper() || hasRelocatedAdventure()) {
+            plugin.getLogger().info("Using Spigot Message Sender");
             messageSender = new SpigotMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
                                .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
@@ -126,6 +127,7 @@ public class MessageSenderBuilder {
                     TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                     prefix);
         } else {
+            plugin.getLogger().info("Using Paper Message Sender");
             messageSender = new PaperMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
                                .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
