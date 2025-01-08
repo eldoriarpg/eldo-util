@@ -32,6 +32,7 @@ public class MessageSenderBuilder {
     private final TagResolver.Builder errorTagResolver = TagResolver.builder()
                                                                     .tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
+    private static final String ADVENTURE_PATH = String.join(".","net", "kyori", "adventure", "text");
 
     @NotNull
     private final Plugin plugin;
@@ -117,8 +118,13 @@ public class MessageSenderBuilder {
                 .resolver(StandardTags.defaults())
                 .build();
         MessageSender messageSender;
-        if (!isPaper() || hasRelocatedAdventure()) {
-            plugin.getLogger().info("Using Spigot Message Sender");
+        plugin.getLogger().info("Determining message sender type");
+        boolean paper = isPaper();
+        if (!paper) {
+            plugin.getLogger().info("Detected non paper based server");
+        }
+        if (!paper || hasRelocatedAdventure()) {
+            plugin.getLogger().info("Using legacy message sender");
             messageSender = new SpigotMessageSender(plugin,
                     miniMessage.tags(defaultResolver)
                                .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
@@ -140,7 +146,11 @@ public class MessageSenderBuilder {
         return messageSender;
     }
 
-    public static boolean hasRelocatedAdventure() {
-        return !Component.class.getPackageName().startsWith(String.join("net", "kyori", "adventure", "text"));
+    boolean hasRelocatedAdventure() {
+        boolean relocated = !Component.class.getPackageName().startsWith(ADVENTURE_PATH);
+        if (relocated) {
+            plugin.getLogger().info("Found relocated adventure at %s instead of net.kyori.adventure.text.".formatted(Component.class.getPackageName()));
+        }
+        return relocated;
     }
 }
