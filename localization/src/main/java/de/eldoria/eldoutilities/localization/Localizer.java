@@ -96,7 +96,7 @@ public class Localizer implements ILocalizer {
         createDefaults();
         bootstrap();
         loadLanguage(fallbackLocale);
-        if (languages.containsKey(fallbackLocale)) {
+        if (!languages.containsKey(fallbackLocale)) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default locale");
         }
         LOCALIZER.put(plugin.getClass(), this);
