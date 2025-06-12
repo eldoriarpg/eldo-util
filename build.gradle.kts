@@ -13,13 +13,6 @@ plugins {
     id("com.vanniktech.maven.publish") version "0.30.0"
 }
 
-publishData {
-    addRepo(Repo.main("", "", false))
-    addRepo(Repo.snapshot("SNAPSHOT", "", false))
-    publishingVersion = "2.1.11"
-}
-version = publishData.getVersion()
-
 group = "de.eldoria.util"
 var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
@@ -39,7 +32,8 @@ allprojects {
     publishData {
         addRepo(Repo.main("", "", false))
         addRepo(Repo.snapshot("SNAPSHOT", "", false))
-        publishingVersion = "2.1.10"
+        publishingVersion = "2.1.11"
+        project.version = getVersion()
     }
 
     repositories {
