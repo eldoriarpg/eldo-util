@@ -16,7 +16,7 @@ plugins {
 publishData {
     addRepo(Repo.main("", "", false))
     addRepo(Repo.snapshot("SNAPSHOT", "", false))
-    publishingVersion = "2.1.10"
+    publishingVersion = "2.1.11"
 }
 version = publishData.getVersion()
 
@@ -34,6 +34,12 @@ allprojects {
         plugin<JavaLibraryPlugin>()
         plugin<SigningPlugin>()
         plugin(com.vanniktech.maven.publish.MavenPublishPlugin::class)
+    }
+
+    publishData {
+        addRepo(Repo.main("", "", false))
+        addRepo(Repo.snapshot("SNAPSHOT", "", false))
+        publishingVersion = "2.1.10"
     }
 
     repositories {

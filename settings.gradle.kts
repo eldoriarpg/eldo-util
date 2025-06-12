@@ -46,6 +46,7 @@ dependencyResolutionManagement {
             version("jackson", "2.16.0")
             library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
             library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
+            library("jackson-dataformat-yaml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml").versionRef("jackson")
             bundle("jackson", listOf("jackson-core", "jackson-databind"))
 
         }
