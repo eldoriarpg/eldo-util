@@ -18,6 +18,12 @@ var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
 description = "Utility Library for spigot plugins."
 
+java {
+    toolchain{
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
 allprojects {
     apply {
         // We want to apply several plugins to subprojects
