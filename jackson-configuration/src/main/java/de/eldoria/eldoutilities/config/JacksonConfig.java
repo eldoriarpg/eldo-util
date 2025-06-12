@@ -200,7 +200,7 @@ public class JacksonConfig<T> implements DebugDataProvider {
     }
 
     /**
-     * Relaods all files loaded via this instance including the main configuration.
+     * Reloads all files loaded via this instance including the main configuration.
      */
     public void reload() {
         // We will modify the collection. Therefore, we need to copy first.
