@@ -60,7 +60,7 @@ allprojects {
         signAllPublications()
 
 
-        coordinates(groupId = "de.chojo.sadu", artifactId = project.name, version = publishData.getVersion())
+        coordinates(groupId = "de.eldoria.util", artifactId = project.name, version = publishData.getVersion())
 
         pom {
             name.set("eldo-util")
