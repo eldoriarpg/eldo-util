@@ -1,19 +1,18 @@
 import com.diffplug.gradle.spotless.SpotlessPlugin
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
 import de.chojo.PublishData
 import de.chojo.Repo
-import net.kyori.indra.IndraPlugin
-import net.kyori.indra.IndraPublishingPlugin
 
 plugins {
     java
-    `maven-publish`
     `java-library`
     alias(libs.plugins.spotless)
     alias(libs.plugins.publishdata)
-    alias(libs.plugins.indra.core)
-    alias(libs.plugins.indra.publishing)
-    alias(libs.plugins.indra.sonatype)
+    id("com.vanniktech.maven.publish") version "0.30.0"
 }
+
 publishData {
     addRepo(Repo.main("", "", false))
     addRepo(Repo.snapshot("SNAPSHOT", "", false))
@@ -33,10 +32,8 @@ allprojects {
         plugin<SpotlessPlugin>()
         plugin<PublishData>()
         plugin<JavaLibraryPlugin>()
-        plugin<MavenPublishPlugin>()
-        plugin<IndraPlugin>()
-        plugin<IndraPublishingPlugin>()
         plugin<SigningPlugin>()
+        plugin(com.vanniktech.maven.publish.MavenPublishPlugin::class)
     }
 
     repositories {
@@ -58,32 +55,47 @@ allprojects {
         testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
     }
 
-    indra {
-        javaVersions {
-            target(17)
-            testWith(17)
-        }
+    mavenPublishing {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        signAllPublications()
 
-        github("eldoriarpg", "eldo-util") {
-            ci(true)
-        }
 
-        lgpl3OrLaterLicense()
+        coordinates(groupId = "de.chojo.sadu", artifactId = project.name, version = publishData.getVersion())
 
-        signWithKeyFromPrefixedProperties("rainbowdashlabs")
-
-        configurePublications {
-            pom {
-                developers {
-                    developer {
-                        id.set("rainbowdashlabs")
-                        name.set("Florian Fülling")
-                        email.set("mail@chojo.dev")
-                        url.set("https://github.com/rainbowdashlabs")
-                    }
+        pom {
+            name.set("eldo-util")
+            description.set(project.description)
+            inceptionYear.set("2025")
+            url.set("https://github.com/eldoriarpg/eldo-util")
+            licenses {
+                license {
+                    name.set("LGPL-3.0")
+                    url.set("https://opensource.org/license/lgpl-3-0")
                 }
             }
+
+            developers {
+                developer {
+                    id.set("rainbowdashlabs")
+                    name.set("Lilly Fülling")
+                    email.set("mail@chojo.dev")
+                    url.set("https://github.com/rainbowdashlabs")
+                }
+            }
+
+            scm {
+                url.set("https://github.com/eldoriarpg/eldo-util")
+                connection.set("scm:git:git://github.com/eldoriarpg/eldo-util.git")
+                developerConnection.set("scm:git:ssh://github.com/eldoriarpg/eldo-util.git")
+            }
         }
+
+        configure(
+            JavaLibrary(
+                javadocJar = JavadocJar.Javadoc(),
+                sourcesJar = true
+            )
+        )
     }
 
     spotless {
@@ -113,10 +125,6 @@ allprojects {
             }
         }
     }
-}
-
-indraSonatype {
-    useAlternateSonatypeOSSHost("s01")
 }
 
 
