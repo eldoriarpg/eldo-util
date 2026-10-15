@@ -12,10 +12,10 @@ package de.eldoria.eldoutilities.debug.data;
 public class LogData {
     private final String log;
     private final String pluginLog;
-    private final String[] internalExceptions;
-    private final String[] externalExceptions;
+    private final ExceptionData[] internalExceptions;
+    private final ExceptionData[] externalExceptions;
 
-    public LogData(String log, String pluginLog, String[] internalExceptions, String[] externalExceptions) {
+    public LogData(String log, String pluginLog, ExceptionData[] internalExceptions, ExceptionData[] externalExceptions) {
         this.log = log;
         this.pluginLog = pluginLog;
         this.internalExceptions = internalExceptions;
@@ -30,11 +30,11 @@ public class LogData {
         return pluginLog;
     }
 
-    public String[] getInternalExceptions() {
+    public ExceptionData[] getInternalExceptions() {
         return internalExceptions;
     }
 
-    public String[] getExternalExceptions() {
+    public ExceptionData[] getExternalExceptions() {
         return externalExceptions;
     }
 }

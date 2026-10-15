@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.debug.payload;
 
 import de.eldoria.eldoutilities.debug.DebugSettings;
+import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -60,6 +62,43 @@ class LogMetaTest {
     }
 
     @Test
+    void repeatedExceptionsAreCountedWithTheirFirstAndLastTime() throws IOException {
+        Path log = folder.resolve("latest.log");
+        Files.writeString(log, """
+                [12:00:00] [Server thread/ERROR]: boom
+                \tat de.eldoria.bloodnight.Main.run(Main.java:1)
+                [12:05:00] [Server thread/ERROR]: boom
+                \tat de.eldoria.bloodnight.Main.run(Main.java:1)
+                [12:10:00] [Server thread/ERROR]: boom
+                \tat de.eldoria.bloodnight.Main.run(Main.java:1)
+                [12:10:01] [Server thread/INFO]: Done
+                """);
+
+        var exceptions = LogMeta.fromFile(log, plugin, DebugSettings.DEFAULT).getInternalExceptions();
+
+        assertEquals(1, exceptions.length);
+        assertEquals(new ExceptionData("[Server thread/ERROR]: boom\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
+                3, "12:00:00", "12:10:00"), exceptions[0]);
+    }
+
+    @Test
+    void anOverlappingScanCountsEachOccurrenceOnce() {
+        var counter = new ExceptionCounter("de.eldoria.bloodnight.Main");
+        var lines = List.of(
+                "[12:00:00] [Server thread/WARN]: slow",
+                "[12:00:01] [Server thread/INFO]: ok",
+                "[12:00:02] [Server thread/WARN]: slow",
+                "[12:00:03] [Server thread/INFO]: ok");
+
+        counter.scan(lines, 0);
+        counter.scan(lines.subList(2, 4), 2);
+
+        var external = counter.external(DebugSettings.DEFAULT);
+        assertEquals(1, external.length);
+        assertEquals(2, external[0].count());
+    }
+
+    @Test
     void exceptionsAreSortedByOriginAndKeepTheirOrder() throws IOException {
         Path log = folder.resolve("latest.log");
         Files.writeString(log, """
@@ -76,7 +115,8 @@ class LogMetaTest {
 
         assertArrayEquals(new String[]{
                 "[Server thread/ERROR]: first\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
-                "[Server thread/ERROR]: second\n\tat de.eldoria.bloodnight.Mob.tick(Mob.java:1)\n"}, data.getInternalExceptions());
+                "[Server thread/ERROR]: second\n\tat de.eldoria.bloodnight.Mob.tick(Mob.java:1)\n"},
+                Arrays.stream(data.getInternalExceptions()).map(ExceptionData::text).toArray(String[]::new));
         assertEquals(1, data.getExternalExceptions().length);
     }
 

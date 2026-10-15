@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.debug.payload;
 
 import de.eldoria.eldoutilities.debug.DebugSettings;
+import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import org.bukkit.plugin.Plugin;
 
@@ -32,12 +33,9 @@ public class LogMeta extends LogData {
     public static final int MAX_LOG_PART_SIZE = 2500;
     public static final int MAX_LOG_MB = 50;
     private static final int SCAN_OVERLAP = 250;
-    private static final Pattern EXCEPTION = Pattern.compile(
-            "[0-9]{2}:[0-9]{2}:[0-9]{2}] (\\[[^\\]]*?(?:ERROR|WARN)]:.*?)^\\[",
-            Pattern.DOTALL + Pattern.MULTILINE);
     private static final String PLUGIN_LOG = "([0-9]{2}:[0-9]{2}:[0-9]{2}] \\[[^\\]]*?]: \\[[^\\]]*?name].*?)^\\[";
 
-    public LogMeta(String log, String pluginLog, String[] internalExceptions, String[] exceptions) {
+    public LogMeta(String log, String pluginLog, ExceptionData[] internalExceptions, ExceptionData[] exceptions) {
         super(log, pluginLog, internalExceptions, exceptions);
     }
 
@@ -67,45 +65,45 @@ public class LogMeta extends LogData {
     static LogData fromFile(Path logPath, Plugin plugin, DebugSettings settings) {
         var latestLog = "Could not read latest log.";
         Set<String> pluginLog = new LinkedHashSet<>();
-        var exceptionPair = new ExceptionPair();
+        var exceptions = new ExceptionCounter(plugin.getDescription().getMain());
 
         if (Files.isRegularFile(logPath)) {
             try {
                 latestLog = Files.size(logPath) / (1024 * 1024) > MAX_LOG_MB
-                        ? readLarge(logPath, plugin, pluginLog, exceptionPair)
-                        : readWhole(logPath, plugin, pluginLog, exceptionPair);
+                        ? readLarge(logPath, plugin, pluginLog, exceptions)
+                        : readWhole(logPath, plugin, pluginLog, exceptions);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not read the log.", e);
             }
         }
         latestLog = settings.applyFilter(latestLog);
         var pluginlogs = settings.applyFilter(String.join("", pluginLog));
-        exceptionPair.applyFilter(settings);
-
-        return new LogMeta(latestLog, pluginlogs, exceptionPair.getInternalArray(), exceptionPair.getExternalArray());
+        return new LogMeta(latestLog, pluginlogs, exceptions.internal(settings), exceptions.external(settings));
     }
 
-    private static String readWhole(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionPair exceptions)
+    private static String readWhole(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionCounter exceptions)
             throws IOException {
         List<String> lines = Files.readAllLines(logPath, StandardCharsets.UTF_8);
-        exceptions.combine(extractExceptions(lines, plugin));
+        exceptions.scan(lines, 0);
         pluginLog.addAll(extractPluginLog(lines, plugin));
         if (lines.size() <= MAX_LOG_PART_SIZE * 2) return String.join("\n", lines);
         return cut(lines.subList(0, MAX_LOG_PART_SIZE), lines.subList(lines.size() - MAX_LOG_PART_SIZE, lines.size()));
     }
 
-    private static String readLarge(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionPair exceptions)
+    private static String readLarge(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionCounter exceptions)
             throws IOException {
         List<String> start = new ArrayList<>();
         var end = new FixedStack<String>(MAX_LOG_PART_SIZE);
         var linesReadSinceScan = 0;
+        long linesRead = 0;
         try (var reader = Files.newBufferedReader(logPath, StandardCharsets.UTF_8)) {
             String line;
             while ((line = reader.readLine()) != null) {
+                linesRead++;
                 if (start.size() < MAX_LOG_PART_SIZE) {
                     start.add(line);
                     if (start.size() == MAX_LOG_PART_SIZE) {
-                        exceptions.combine(extractExceptions(start, plugin));
+                        exceptions.scan(start, 0);
                         pluginLog.addAll(extractPluginLog(start, plugin));
                     }
                     continue;
@@ -113,13 +111,13 @@ public class LogMeta extends LogData {
                 end.add(line);
                 linesReadSinceScan++;
                 if (linesReadSinceScan == MAX_LOG_PART_SIZE) {
-                    exceptions.combine(extractExceptions(end.getLinkedList(), plugin));
+                    exceptions.scan(end.getLinkedList(), linesRead - end.getLinkedList().size());
                     pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
                     linesReadSinceScan = SCAN_OVERLAP;
                 }
             }
         }
-        exceptions.combine(extractExceptions(end.getLinkedList(), plugin));
+        exceptions.scan(end.getLinkedList(), linesRead - end.getLinkedList().size());
         pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
         return cut(start, end.getLinkedList());
     }
@@ -141,69 +139,6 @@ public class LogMeta extends LogData {
             pluginLog.add("[" + match);
         }
         return pluginLog;
-    }
-
-    private static ExceptionPair extractExceptions(String log, Plugin plugin) {
-        var packages = plugin.getDescription().getMain().split("\\.");
-        var project = String.join(".", Arrays.copyOfRange(packages, 0, Math.min(packages.length, 3)));
-
-        Set<String> external = new LinkedHashSet<>();
-        Set<String> internal = new LinkedHashSet<>();
-        var matcher = EXCEPTION.matcher(log);
-        while (matcher.find()) {
-            var match = matcher.group(1);
-            if (match.contains(project)) {
-                internal.add(match);
-            } else {
-                external.add(match);
-            }
-        }
-        return new ExceptionPair(external, internal);
-    }
-
-    private static ExceptionPair extractExceptions(List<String> lines, Plugin plugin) {
-        return extractExceptions(String.join("\n", lines), plugin);
-    }
-
-    private static class ExceptionPair {
-        private Set<String> external;
-        private Set<String> internal;
-
-        public ExceptionPair() {
-            external = new LinkedHashSet<>();
-            internal = new LinkedHashSet<>();
-        }
-
-        public ExceptionPair(Set<String> external, Set<String> internal) {
-            this.external = new LinkedHashSet<>(external);
-            this.internal = new LinkedHashSet<>(internal);
-        }
-
-        public Set<String> getExternal() {
-            return external;
-        }
-
-        public Set<String> getInternal() {
-            return internal;
-        }
-
-        public void combine(ExceptionPair pair) {
-            external.addAll(pair.external);
-            internal.addAll(pair.internal);
-        }
-
-        public String[] getExternalArray() {
-            return external.toArray(new String[0]);
-        }
-
-        public String[] getInternalArray() {
-            return internal.toArray(new String[0]);
-        }
-
-        public void applyFilter(DebugSettings settings) {
-            external = external.stream().map(settings::applyFilter).collect(Collectors.toCollection(LinkedHashSet::new));
-            internal = internal.stream().map(settings::applyFilter).collect(Collectors.toCollection(LinkedHashSet::new));
-        }
     }
 
     static class FixedStack<E> {

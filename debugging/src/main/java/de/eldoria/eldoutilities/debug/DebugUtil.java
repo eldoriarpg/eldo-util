@@ -7,7 +7,6 @@
 package de.eldoria.eldoutilities.debug;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import de.eldoria.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugUpload.Failed;
 import de.eldoria.eldoutilities.debug.DebugUpload.Result;
@@ -30,6 +29,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,7 +49,7 @@ import java.util.logging.Level;
  */
 public final class DebugUtil {
     static final String CONSENT = "debugConsent";
-    private static final Gson GSON = new GsonBuilder().serializeNulls().create();
+    private static final Gson GSON = new Gson();
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
     private static final DateTimeFormatter DATE = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
             .withZone(ZoneId.systemDefault());
@@ -147,35 +147,52 @@ public final class DebugUtil {
      */
     public static @NotNull EntryData[] getAdditionalPluginMeta(Plugin plugin) {
         List<EntryData> meta = new LinkedList<>();
-
-        UserData userData = UserData.get(plugin);
-
-        meta.add(new EntryData("User Data", userData.asString()));
-
-        if (plugin instanceof DebugDataProvider) {
-            Set<DebugDataProvider> debuged = new HashSet<>();
-            Queue<DebugDataProvider> providers = new ArrayDeque<>();
-            providers.add((DebugDataProvider) plugin);
-            debuged.add((DebugDataProvider) plugin);
-            while (!providers.isEmpty()) {
-                var provider = providers.poll();
-                for (var nextProvider : provider.getDebugProviders()) {
-                    if (debuged.contains(nextProvider)) {
-                        plugin.getLogger()
-                                .warning("Loop in debug data detected. Instance of class "
-                                         + nextProvider.getClass().getSimpleName()
-                                         + " returns a reference to already debugged instance of "
-                                         + provider.getClass().getSimpleName());
-                        continue;
-                    }
-                    providers.add(nextProvider);
-                    debuged.add(nextProvider);
-                }
-                meta.addAll(Arrays.asList(provider.getDebugInformations()));
-            }
+        meta.add(new EntryData("User Data", UserData.get(plugin).asString()));
+        for (var provider : providers(plugin)) {
+            meta.addAll(Arrays.asList(provider.getDebugInformations()));
         }
-
         return meta.toArray(new EntryData[0]);
     }
 
+    /**
+     * Runs the health checks of every {@link DebugDataProvider} the plugin reaches.
+     *
+     * @param plugin plugin to check
+     * @return the outcomes, in the order the providers were found
+     */
+    public static @NotNull List<HealthCheck> getHealthChecks(Plugin plugin) {
+        List<HealthCheck> checks = new ArrayList<>();
+        for (var provider : providers(plugin)) {
+            checks.addAll(provider.getHealthChecks());
+        }
+        return checks;
+    }
+
+    /**
+     * The plugin, when it is a {@link DebugDataProvider}, and every provider it leads to, each once.
+     */
+    private static List<DebugDataProvider> providers(Plugin plugin) {
+        if (!(plugin instanceof DebugDataProvider root)) return List.of();
+        List<DebugDataProvider> found = new ArrayList<>();
+        Set<DebugDataProvider> debugged = new HashSet<>();
+        Queue<DebugDataProvider> providers = new ArrayDeque<>();
+        providers.add(root);
+        debugged.add(root);
+        while (!providers.isEmpty()) {
+            var provider = providers.poll();
+            found.add(provider);
+            for (var nextProvider : provider.getDebugProviders()) {
+                if (!debugged.add(nextProvider)) {
+                    plugin.getLogger()
+                            .warning("Loop in debug data detected. Instance of class "
+                                     + nextProvider.getClass().getSimpleName()
+                                     + " returns a reference to already debugged instance of "
+                                     + provider.getClass().getSimpleName());
+                    continue;
+                }
+                providers.add(nextProvider);
+            }
+        }
+        return found;
+    }
 }
