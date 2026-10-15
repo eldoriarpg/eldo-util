@@ -26,6 +26,14 @@ public class EntryData {
         this.content = content;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
     public void applyFilter(DebugSettings settings) {
         content = settings.applyFilter(content);
     }

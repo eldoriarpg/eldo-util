@@ -21,4 +21,20 @@ public class LogData {
         this.internalExceptions = internalExceptions;
         this.externalExceptions = externalExceptions;
     }
+
+    public String getLog() {
+        return log;
+    }
+
+    public String getPluginLog() {
+        return pluginLog;
+    }
+
+    public String[] getInternalExceptions() {
+        return internalExceptions;
+    }
+
+    public String[] getExternalExceptions() {
+        return externalExceptions;
+    }
 }

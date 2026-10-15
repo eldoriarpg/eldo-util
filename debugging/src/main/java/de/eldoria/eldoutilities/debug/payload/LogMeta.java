@@ -10,13 +10,12 @@ import de.eldoria.eldoutilities.debug.DebugSettings;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import org.bukkit.plugin.Plugin;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -24,17 +23,15 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LogMeta extends LogData {
-    // [time] [channel] [plugin]
-    //"^(\\[[0-9]{2}:[0-9]{2}:[0-9]{2}] \\[[^\\]]*?]: \\[[^\\]]*?{{name}}].*?)^\\[[0-9]{2}:[0-9]{2}:[0-9]{2}]";
     public static final int MAX_LOG_PART_SIZE = 2500;
     public static final int MAX_LOG_MB = 50;
+    private static final int SCAN_OVERLAP = 250;
     private static final Pattern EXCEPTION = Pattern.compile(
             "[0-9]{2}:[0-9]{2}:[0-9]{2}] (\\[[^\\]]*?(?:ERROR|WARN)]:.*?)^\\[",
             Pattern.DOTALL + Pattern.MULTILINE);
@@ -48,79 +45,37 @@ public class LogMeta extends LogData {
     private static Pattern getPluginLog(Plugin plugin) {
         var prefix = plugin.getDescription().getPrefix();
         var name = prefix != null ? prefix : plugin.getDescription().getName();
-        return Pattern.compile(PLUGIN_LOG.replace("name", name), Pattern.DOTALL + Pattern.MULTILINE);
+        return Pattern.compile(PLUGIN_LOG.replace("name", Pattern.quote(name)), Pattern.DOTALL + Pattern.MULTILINE);
     }
 
     /**
-     * Gets the latest log from the logs directory.
+     * Reads the server's {@code logs/latest.log}.
+     * <p>
+     * A log of up to {@value #MAX_LOG_PART_SIZE} times two lines is taken whole; a longer one is cut to its first and
+     * last {@value #MAX_LOG_PART_SIZE} lines. Exceptions and the plugin's own lines are collected from all of it. A log
+     * over {@value #MAX_LOG_MB} MB is never held in memory at once: it is scanned in parts as it is read.
      *
-     * @param plugin   plugin for pure lazyness and logging purposes
-     * @param settings settings for debug dispatching
-     * @return Log as string.
+     * @param plugin   the plugin the report is about
+     * @param settings the filters applied to everything taken from the log
+     * @return the log, filtered
      */
     public static LogData create(Plugin plugin, DebugSettings settings) {
         var root = plugin.getDataFolder().toPath().toAbsolutePath().getParent().getParent();
-        var logPath = Paths.get(root.toString(), "logs", "latest.log");
-        var logFile = logPath.toFile();
+        return fromFile(root.resolve(Paths.get("logs", "latest.log")), plugin, settings);
+    }
 
-        var fullLog = "";
+    static LogData fromFile(Path logPath, Plugin plugin, DebugSettings settings) {
         var latestLog = "Could not read latest log.";
         Set<String> pluginLog = new LinkedHashSet<>();
-
         var exceptionPair = new ExceptionPair();
 
-        if (logFile.exists()) {
-            if (logFile.length() / (1024 * 1024) > MAX_LOG_MB) {
-                List<String> start = new LinkedList<>();
-                var end = new FixedStack<String>(MAX_LOG_PART_SIZE);
-                // The log seems to be large we will read it partially.
-                var linesReadSinceScan = 0;
-                try (InputStream stream = new FileInputStream(logFile); var reader = new Scanner(stream)) {
-                    while (reader.hasNext()) {
-                        // first we grab the start
-                        if (start.size() < MAX_LOG_PART_SIZE) {
-                            start.add(reader.nextLine());
-                            if (start.size() == MAX_LOG_PART_SIZE) {
-                                pluginLog.addAll(extractPluginLog(start, plugin));
-                            }
-                            continue;
-                        }
-                        // Now we build chunks and use a fixed stack where we push the oldest size exceeding entry out.
-                        end.add(reader.nextLine());
-                        linesReadSinceScan++;
-                        if (linesReadSinceScan == MAX_LOG_PART_SIZE) {
-                            // When we reached the max log size which will be send we want to scan this part first.
-                            exceptionPair.combine(extractExceptions(end.getLinkedList(), plugin));
-                            pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
-                            // we want a slight overlap
-                            linesReadSinceScan = 250;
-                        }
-                    }
-                    exceptionPair.combine(extractExceptions(end.getLinkedList(), plugin));
-                } catch (IOException e) {
-                    plugin.getLogger().log(Level.WARNING, "Could not read log.", e);
-                }
-                var startLog = String.join("\n", start);
-                var endLog = String.join("\n", end.linkedList);
-                latestLog = startLog + "\n\n[...]\n\n" + endLog;
-            } else {
-                try (var reader = new BufferedReader(new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8))) {
-                    var logLines = reader.lines().collect(Collectors.toList());
-                    if (logLines.size() <= MAX_LOG_PART_SIZE * 2) {
-                        // We have a small log. We will send it in one part.
-                        latestLog = logLines.stream()
-                                .collect(Collectors.joining(System.lineSeparator()));
-                    } else {
-                        // We have a small log, we will only send start and end
-                        var start = String.join("\n", logLines.subList(0, MAX_LOG_PART_SIZE));
-                        var end = String.join("\n", logLines.subList(logLines.size() - MAX_LOG_PART_SIZE, logLines.size()));
-                        latestLog = start + "\n\n[...]\n\n" + end;
-                    }
-                    exceptionPair.combine(extractExceptions(logLines, plugin));
-                    pluginLog.addAll(extractPluginLog(logLines, plugin));
-                } catch (IOException e) {
-                    plugin.getLogger().log(Level.WARNING, "Could not read log file", e);
-                }
+        if (Files.isRegularFile(logPath)) {
+            try {
+                latestLog = Files.size(logPath) / (1024 * 1024) > MAX_LOG_MB
+                        ? readLarge(logPath, plugin, pluginLog, exceptionPair)
+                        : readWhole(logPath, plugin, pluginLog, exceptionPair);
+            } catch (IOException e) {
+                plugin.getLogger().log(Level.WARNING, "Could not read the log.", e);
             }
         }
         latestLog = settings.applyFilter(latestLog);
@@ -128,6 +83,49 @@ public class LogMeta extends LogData {
         exceptionPair.applyFilter(settings);
 
         return new LogMeta(latestLog, pluginlogs, exceptionPair.getInternalArray(), exceptionPair.getExternalArray());
+    }
+
+    private static String readWhole(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionPair exceptions)
+            throws IOException {
+        List<String> lines = Files.readAllLines(logPath, StandardCharsets.UTF_8);
+        exceptions.combine(extractExceptions(lines, plugin));
+        pluginLog.addAll(extractPluginLog(lines, plugin));
+        if (lines.size() <= MAX_LOG_PART_SIZE * 2) return String.join("\n", lines);
+        return cut(lines.subList(0, MAX_LOG_PART_SIZE), lines.subList(lines.size() - MAX_LOG_PART_SIZE, lines.size()));
+    }
+
+    private static String readLarge(Path logPath, Plugin plugin, Set<String> pluginLog, ExceptionPair exceptions)
+            throws IOException {
+        List<String> start = new ArrayList<>();
+        var end = new FixedStack<String>(MAX_LOG_PART_SIZE);
+        var linesReadSinceScan = 0;
+        try (var reader = Files.newBufferedReader(logPath, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (start.size() < MAX_LOG_PART_SIZE) {
+                    start.add(line);
+                    if (start.size() == MAX_LOG_PART_SIZE) {
+                        exceptions.combine(extractExceptions(start, plugin));
+                        pluginLog.addAll(extractPluginLog(start, plugin));
+                    }
+                    continue;
+                }
+                end.add(line);
+                linesReadSinceScan++;
+                if (linesReadSinceScan == MAX_LOG_PART_SIZE) {
+                    exceptions.combine(extractExceptions(end.getLinkedList(), plugin));
+                    pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
+                    linesReadSinceScan = SCAN_OVERLAP;
+                }
+            }
+        }
+        exceptions.combine(extractExceptions(end.getLinkedList(), plugin));
+        pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
+        return cut(start, end.getLinkedList());
+    }
+
+    private static String cut(List<String> start, List<String> end) {
+        return String.join("\n", start) + "\n\n[...]\n\n" + String.join("\n", end);
     }
 
     private static Set<String> extractPluginLog(Collection<String> log, Plugin plugin) {
@@ -203,12 +201,12 @@ public class LogMeta extends LogData {
         }
 
         public void applyFilter(DebugSettings settings) {
-            external = external.stream().map(settings::applyFilter).collect(Collectors.toSet());
-            internal = internal.stream().map(settings::applyFilter).collect(Collectors.toSet());
+            external = external.stream().map(settings::applyFilter).collect(Collectors.toCollection(LinkedHashSet::new));
+            internal = internal.stream().map(settings::applyFilter).collect(Collectors.toCollection(LinkedHashSet::new));
         }
     }
 
-    private static class FixedStack<E> {
+    static class FixedStack<E> {
         private final int size;
         private final LinkedList<E> linkedList = new LinkedList<>();
 
@@ -217,8 +215,8 @@ public class LogMeta extends LogData {
         }
 
         public boolean add(E e) {
-            if (linkedList.size() > size) {
-                linkedList.removeLast();
+            if (linkedList.size() >= size) {
+                linkedList.removeFirst();
             }
             return linkedList.add(e);
         }

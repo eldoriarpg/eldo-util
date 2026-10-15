@@ -1,6 +1,11 @@
 description = "Utilitites for debugging plugins"
 
+configurations.testImplementation {
+    exclude(group = "org.spigotmc")
+}
+
 dependencies {
     api(project(":core"))
-    compileOnly(libs.spigot)
+    compileOnly(libs.paper)
+    testImplementation(libs.paper)
 }
