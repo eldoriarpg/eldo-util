@@ -31,6 +31,7 @@ import java.util.MissingResourceException;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -246,7 +247,7 @@ public class Localizer implements ILocalizer {
 
     @Override
     public String getMessage(String key, String language) {
-        var result = getValue(key);
+        var result = getValue(key, language);
 
         if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
             plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
@@ -296,15 +297,34 @@ public class Localizer implements ILocalizer {
 
     @Override
     public ResourceBundle localeBundle(String language) {
-        ResourceBundle resourceBundle = languages.get(language);
+        ResourceBundle resourceBundle = languages.get(closestLanguage(languages.keySet(), language, defaultLanguage));
         if (resourceBundle == null) {
-            plugin.getLogger().severe("Language %s not found".formatted(language));
-            if (language.equals(defaultLanguage)) {
-                throw new RuntimeException("Fallback language is not registered.");
-            }
-            return localeBundle(defaultLanguage);
+            throw new RuntimeException("Fallback language is not registered.");
         }
         return resourceBundle;
+    }
+
+    /**
+     * Finds the loaded language closest to a requested one: the same locale, ignoring case and {@code -} or {@code _}
+     * ({@code en-us} finds {@code en_US}), else a locale of the same language ({@code de_AT} finds {@code de_DE}),
+     * else the fallback. A player's client language rarely has a file of its own, so a missing one is no error.
+     *
+     * @param loaded    the loaded languages
+     * @param requested the language asked for, e.g. a player's locale
+     * @param fallback  the fallback language
+     * @return the language to use
+     */
+    static String closestLanguage(Set<String> loaded, String requested, String fallback) {
+        if (requested == null) return fallback;
+        if (loaded.contains(requested)) return requested;
+        String normalized = requested.replace('-', '_');
+        String base = normalized.split("_", 2)[0];
+        String sameLanguage = null;
+        for (String candidate : new TreeSet<>(loaded)) {
+            if (candidate.equalsIgnoreCase(normalized)) return candidate;
+            if (sameLanguage == null && candidate.split("_", 2)[0].equalsIgnoreCase(base)) sameLanguage = candidate;
+        }
+        return sameLanguage != null ? sameLanguage : fallback;
     }
 
     @Override
