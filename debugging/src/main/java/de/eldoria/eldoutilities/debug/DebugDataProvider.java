@@ -19,6 +19,8 @@ import java.util.List;
  * <p>
  * Use {@link #getDebugProviders()} to provide other debug providers.
  * <p>
+ * Use {@link #getHealthChecks()} to report what the plugin checked about its own setup.
+ * <p>
  * Your plugin instance is the entry point for debugging. If you want to use this interface your plugin class has to implement it.
  * <p>
  * Instance of {@code EldoPlugin} are already a {@link DebugDataProvider}. Just override the method.
@@ -49,6 +51,17 @@ public interface DebugDataProvider {
      */
     @NotNull
     default List<DebugDataProvider> getDebugProviders() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Checks this part of the plugin's setup, e.g. whether its database answers or the worlds it is configured for
+     * exist. Runs on the thread the debug command runs on, so keep it quick.
+     *
+     * @return the outcomes, empty by default
+     */
+    @NotNull
+    default List<HealthCheck> getHealthChecks() {
         return Collections.emptyList();
     }
 }

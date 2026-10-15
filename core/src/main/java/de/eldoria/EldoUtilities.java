@@ -10,6 +10,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,6 +28,7 @@ public final class EldoUtilities {
     private static Plugin mainOwner;
     private static Map<Class<? extends Plugin>, Plugin> instanceOwners = new LinkedHashMap<>();
     private static YamlConfiguration configuration;
+    private static Path configurationFile;
 
     private EldoUtilities() {
     }
@@ -38,8 +42,8 @@ public final class EldoUtilities {
     }
 
     public static void ignite(Plugin plugin) {
-        var path = plugin.getDataFolder().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
-        configuration = YamlConfiguration.loadConfiguration(path.toFile());
+        configurationFile = plugin.getDataFolder().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        configuration = YamlConfiguration.loadConfiguration(configurationFile.toFile());
     }
 
     public static void shutdown() {
@@ -47,10 +51,21 @@ public final class EldoUtilities {
 
     public static YamlConfiguration getConfiguration() {
         if (configuration == null) {
-            var config = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
-            configuration = YamlConfiguration.loadConfiguration(config.toFile());
+            configurationFile = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+            configuration = YamlConfiguration.loadConfiguration(configurationFile.toFile());
         }
         return configuration;
+    }
+
+    /**
+     * Writes the shared configuration back to {@code plugins/EldoUtilities/config.yml}.
+     *
+     * @throws IOException when the file cannot be written
+     */
+    public static void saveConfiguration() throws IOException {
+        var config = getConfiguration();
+        Files.createDirectories(configurationFile.getParent());
+        config.save(configurationFile.toFile());
     }
 
     public static Plugin getInstanceOwner(Class<? extends Plugin> plugin) {

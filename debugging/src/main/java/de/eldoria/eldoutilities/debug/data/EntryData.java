@@ -8,12 +8,17 @@ package de.eldoria.eldoutilities.debug.data;
 
 import de.eldoria.eldoutilities.debug.DebugSettings;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
- * Represents a entry in a debug log
+ * Something a plugin adds about itself to a debug report: a block of text, or pairs of keys and values shown as a
+ * table, or both.
  */
 public class EntryData {
     protected String name;
     protected String content;
+    protected Map<String, String> entries = Map.of();
 
     /**
      * Create a new debug entry
@@ -26,7 +31,37 @@ public class EntryData {
         this.content = content;
     }
 
+    /**
+     * Create a new debug entry shown as a table.
+     *
+     * @param name    Name of debug entry. This is the name displayed on the web page
+     * @param entries the rows, in the order they are shown
+     */
+    public EntryData(String name, Map<String, String> entries) {
+        this.name = name;
+        this.content = "";
+        this.entries = new LinkedHashMap<>(entries);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * @return the rows of the table, empty when the entry is only text
+     */
+    public Map<String, String> getEntries() {
+        return entries;
+    }
+
     public void applyFilter(DebugSettings settings) {
         content = settings.applyFilter(content);
+        Map<String, String> filtered = new LinkedHashMap<>();
+        entries.forEach((key, value) -> filtered.put(key, settings.applyFilter(String.valueOf(value))));
+        entries = filtered;
     }
 }
