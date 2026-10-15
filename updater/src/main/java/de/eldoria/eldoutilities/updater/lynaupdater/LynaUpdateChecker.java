@@ -12,8 +12,11 @@ import de.eldoria.eldoutilities.updater.Updater;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -21,11 +24,13 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 /**
- * Updater implementation for butler application.
+ * Update checks against a <a href="https://github.com/rainbowdashlabs/lyna">Lyna</a> instance. Query values are URL
+ * encoded and a check gives up after {@value #TIMEOUT_SECONDS} seconds.
  *
  * @since 1.1.0
  */
 public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateData> {
+    private static final int TIMEOUT_SECONDS = 10;
 
     public LynaUpdateChecker(LynaUpdateData data) {
         super(data);
@@ -51,9 +56,11 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/api/v1/update/check?%s"
                         .formatted(data.host(),
-                                queryParams.entrySet().stream().map(e -> "%s=%s".formatted(e.getKey(), e.getValue())).collect(Collectors.joining("&")))))
+                                queryParams.entrySet().stream()
+                                        .map(e -> "%s=%s".formatted(e.getKey(), URLEncoder.encode(String.valueOf(e.getValue()), StandardCharsets.UTF_8)))
+                                        .collect(Collectors.joining("&")))))
                 .GET()
-                .header("Content-Type", "application/json; utf-8")
+                .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                 .header("Accept", "application/json")
                 .header("User-Agent", "EldoUtilities/LynaUpdater")
                 .build();
@@ -65,7 +72,10 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
                 return Optional.empty();
             }
             return Optional.of(new Gson().fromJson(response.body(), LynaUpdateResponse.class));
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            return Optional.empty();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             return Optional.empty();
         }
 

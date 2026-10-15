@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 /**
- * Web Response for butler application.
+ * A Lyna instance's answer to an update check.
  *
  * @since 1.1.0
  */

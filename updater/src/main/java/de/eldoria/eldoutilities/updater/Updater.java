@@ -7,8 +7,6 @@
 package de.eldoria.eldoutilities.updater;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
-import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateChecker;
-import de.eldoria.eldoutilities.updater.butlerupdater.ButlerUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateResponse;
@@ -59,18 +57,6 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     public static Updater<DefaultUpdateResponse, SpigotUpdateData> spigot(SpigotUpdateData data) {
         return new SpigotUpdateChecker(data);
-    }
-
-    /**
-     * Create a new update butler checker
-     *
-     * @param data butler plugin data
-     * @return Updater instance
-     * @deprecated Lyna is the prefered way to check for updates.
-     */
-    @Deprecated
-    public static Updater<DefaultUpdateResponse, ButlerUpdateData> butler(ButlerUpdateData data) {
-        return new ButlerUpdateChecker(data);
     }
 
     /**

@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 /**
- * Update Data implementation for butler application.
+ * What a Lyna update check needs: the product id and the Lyna host.
  *
  * @since 1.1.0
  */
