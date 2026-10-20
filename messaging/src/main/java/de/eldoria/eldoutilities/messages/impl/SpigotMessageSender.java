@@ -83,4 +83,9 @@ public final class SpigotMessageSender extends MessageSender {
     public Audience asAudience(Player player) {
         return audiences.player(player);
     }
+
+    @Override
+    public void close() {
+        audiences.close();
+    }
 }

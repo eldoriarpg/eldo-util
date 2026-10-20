@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Class to compose localized messages.
@@ -22,6 +24,7 @@ import java.util.List;
  */
 @SuppressWarnings("unused")
 public class MessageComposer implements IMessageComposer {
+    private static final Pattern LOCALE_TAG = Pattern.compile("<i18n:([^>]+)>");
     private final StringBuilder stringBuilder = new StringBuilder();
     private final List<TagResolver> replacements = new ArrayList<>();
 
@@ -138,7 +141,15 @@ public class MessageComposer implements IMessageComposer {
         return Collections.unmodifiableList(replacements);
     }
 
+    /**
+     * Builds the message with every locale code added through {@link #localeCode(String, TagResolver...)} replaced by
+     * its localized text.
+     *
+     * @param localizer localizer providing the texts
+     * @return localized message
+     */
     public String buildLocalized(ILocalizer localizer) {
-        return localizer.localize(stringBuilder.toString());
+        return LOCALE_TAG.matcher(stringBuilder.toString())
+                .replaceAll(match -> Matcher.quoteReplacement(localizer.localize(match.group(1))));
     }
 }

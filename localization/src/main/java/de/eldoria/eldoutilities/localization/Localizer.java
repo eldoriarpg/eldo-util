@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,11 +29,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.Properties;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
@@ -49,7 +51,11 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  * <p>
  * You can change the currently used locale every time via {@link #setLocale(String)}.
  * <p>
- * The localizer also allows to use locales which are not included in the resources folder.
+ * The localizer also allows to use locales which are not included in the resources folder: every locale file in the
+ * locales directory is loaded, and receives the keys it lacks from the default locale.
+ * <p>
+ * Missing keys are appended to a locale file, so comments, multi-line values and the order of the existing entries
+ * stay as they are. A key that is asked for but missing is reported once.
  *
  * @since 1.0.0
  */
@@ -66,6 +72,7 @@ public class Localizer implements ILocalizer {
     private final Map<String, ResourceBundle> languages = new HashMap<>();
     private final Function<Player, String> userLocale;
     private final List<ILocalizer> children = new ArrayList<>();
+    private final Set<String> reportedMissing = ConcurrentHashMap.newKeySet();
     private boolean checked;
 
     /**
@@ -103,6 +110,9 @@ public class Localizer implements ILocalizer {
         LOCALIZER.put(plugin.getClass(), this);
         for (String locale : includedLocales) {
             loadLanguage(locale);
+        }
+        for (String locale : localesInDirectory()) {
+            if (!languages.containsKey(locale)) loadLanguage(locale);
         }
     }
 
@@ -250,8 +260,10 @@ public class Localizer implements ILocalizer {
         var result = getValue(key, language);
 
         if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
-            plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
-            plugin.getLogger().log(Level.WARNING, "Message from", new RuntimeException());
+            if (reportedMissing.add(key)) {
+                plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
+                plugin.getLogger().log(Level.FINE, "Missing key " + key + " requested from", new RuntimeException());
+            }
             result = key;
         }
 
@@ -362,7 +374,7 @@ public class Localizer implements ILocalizer {
 
             try (var resource = plugin.getResource(getLocaleFileName(locale))) {
                 if (resource == null)
-                    throw new FileNotFoundException("No locale file for " + locale + "found in resources.");
+                    throw new FileNotFoundException("No locale file for " + locale + " found in resources.");
                 Files.copy(resource, getLocaleFile(locale));
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Could not create default message file for locale " + locale);
@@ -375,9 +387,27 @@ public class Localizer implements ILocalizer {
 
     private boolean isLocaleFile(Path path) {
         if (path.toFile().isDirectory()) return false;
-        if (path.toFile().getName().matches(localesPrefix + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties")) return true;
+        if (hasLocaleFileName(path)) return true;
         plugin.getLogger().info(path + " is not a valid message file. Skipped.");
         return false;
+    }
+
+    private boolean hasLocaleFileName(Path path) {
+        return path.toFile().getName().matches(Pattern.quote(localesPrefix) + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties");
+    }
+
+    private List<String> localesInDirectory() {
+        try (var files = Files.list(getLocalePath())) {
+            return files.filter(path -> !path.toFile().isDirectory() && hasLocaleFileName(path))
+                    .map(path -> {
+                        var name = path.getFileName().toString();
+                        return name.substring(localesPrefix.length() + 1, name.length() - ".properties".length());
+                    })
+                    .toList();
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.WARNING, "Could not list the locale files.", e);
+            return List.of();
+        }
     }
 
     private ResourceBundle getDefaultLanguage() throws IOException {
@@ -394,7 +424,7 @@ public class Localizer implements ILocalizer {
     private ResourceBundle getBundle(String locale) throws IOException {
         try (var input = plugin.getResource(getLocaleFileName(locale))) {
             if (input == null) {
-                plugin.getLogger().severe("Could not load locale file " + getLocaleFileName(locale) + ".properties. Does it exist?");
+                plugin.getLogger().fine("No bundled locale file " + getLocaleFileName(locale) + ". Using the default locale as reference.");
                 return getDefaultLanguage();
             }
             return new PropertyResourceBundle(input);
@@ -414,12 +444,17 @@ public class Localizer implements ILocalizer {
         }
     }
 
-    private Map<String, String> bundleMap(Path path) throws IOException {
-        var map = new TreeMap<String, String>(String::compareToIgnoreCase);
-        Files.readAllLines(path, StandardCharsets.UTF_8).stream()
-                .map(line -> line.split("=", 2)).filter(line -> line.length == 2)
-                .forEach(line -> map.put(line[0], line[1]));
-        return map;
+    private Set<String> existingKeys(Path path) throws IOException {
+        var properties = new Properties();
+        try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            properties.load(reader);
+        }
+        return properties.stringPropertyNames();
+    }
+
+    private static String escapeValue(String value) {
+        var escaped = value.replace("\\", "\\\\").replace("\n", "\\n").replace("\r", "\\r");
+        return escaped.startsWith(" ") ? "\\" + escaped : escaped;
     }
 
     private Set<String> getDefaultKeys() throws IOException {
@@ -474,15 +509,12 @@ public class Localizer implements ILocalizer {
             }
 
             // load the external property file.
-            Map<String, String> bundleMap;
             try {
-                bundleMap = bundleMap(path);
+                updateKeys.removeAll(existingKeys(path));
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;
             }
-
-            updateKeys.removeAll(bundleMap.keySet());
 
             if (updateKeys.isEmpty()) {
                 plugin.getLogger().info("Locale " + path + " is up to date.");
@@ -490,23 +522,18 @@ public class Localizer implements ILocalizer {
             }
             plugin.getLogger().info("Updating " + path + ".");
 
-            // check if ref key is in locale
-            for (var currKey : updateKeys) {
+            List<String> lines = new ArrayList<>();
+            lines.add("# Keys added automatically at " + timestamp());
+            for (var currKey : new TreeSet<>(updateKeys)) {
                 var value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
-                // Add the property with the value if it exists in an internal file.
-                bundleMap.put(currKey, value);
-                plugin.getLogger().info("Added: " + currKey + "=" + value.replace("\n", "\\n"));
+                lines.add(currKey + "=" + escapeValue(value));
+                plugin.getLogger().info("Added: " + currKey + "=" + escapeValue(value));
             }
 
-            List<String> lines = new ArrayList<>();
-            lines.add("# File automatically updated at " + timestamp());
-
-            bundleMap.entrySet().stream()
-                    .map(e -> String.format("%s=%s", e.getKey(), e.getValue().replace("\n", "\\n")))
-                    .forEach(lines::add);
-
             try {
-                Files.write(path, lines, StandardCharsets.UTF_8);
+                var content = Files.readString(path, StandardCharsets.UTF_8);
+                var separator = content.isEmpty() || content.endsWith("\n") ? "" : "\n";
+                Files.writeString(path, separator + String.join("\n", lines) + "\n", StandardCharsets.UTF_8, StandardOpenOption.APPEND);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;

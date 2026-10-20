@@ -66,6 +66,16 @@ public abstract class MessageSender {
     }
 
     /**
+     * Removes the message sender of a plugin and releases what it holds. Call this when the plugin is disabled.
+     *
+     * @param plugin plugin whose message sender is removed
+     */
+    public static void unregister(@NotNull Plugin plugin) {
+        var sender = PLUGIN_SENDER.remove(plugin.getClass());
+        if (sender != null) sender.close();
+    }
+
+    /**
      * Get the message sender created for this plugin.
      *
      * @param plugin plugin
@@ -87,10 +97,10 @@ public abstract class MessageSender {
      * @return message sender of plugin or default sender if plugin is null
      */
     public static MessageSender getPluginMessageSender(@NotNull Class<? extends Plugin> plugin) {
+        if (plugin == null) throw new IllegalArgumentException("Plugin can not be null");
         if (!PLUGIN_SENDER.containsKey(plugin)) {
             throw new IllegalStateException("No message sender was created for " + plugin.getName());
         }
-        if (plugin == null) throw new IllegalArgumentException("Plugin can not be null");
         return PLUGIN_SENDER.get(plugin);
     }
 
@@ -205,10 +215,23 @@ public abstract class MessageSender {
 
     public abstract void hideBossBar(Player player, BossBar bossBar);
 
+    /**
+     * Releases what the sender holds. The sender must not be used afterward.
+     */
+    public void close() {
+    }
+
     private ILocalizer loc() {
         return ILocalizer.getPluginLocalizer(ownerPlugin);
     }
 
+    /**
+     * Turns a message into a component.
+     * <p>
+     * A message that consists of a single locale code is localized, but only when the plugin has a localizer, so
+     * plain text such as {@code example.com} stays as it is otherwise. The {@code <i18n:key>} tag is always
+     * available and falls back to the key without a localizer.
+     */
     protected Component serialize(CommandSender sender, String message, TagResolver resolver, TagResolver... placeholder) {
         var converted = MiniMessageConversion.convertLegacyColorCodes(message);
         if (!converted.equals(message)) {
@@ -216,7 +239,7 @@ public abstract class MessageSender {
             plugin.getLogger().warning(message);
             message = converted;
         }
-        if (ILocalizer.isLocaleCode(message)) {
+        if (loc() != ILocalizer.DEFAULT && ILocalizer.isLocaleCode(message)) {
             message = ILocalizer.escape(message);
         }
         message = "<default>" + message;
@@ -243,6 +266,7 @@ public abstract class MessageSender {
     }
 
     protected Component applyPrefix(Component component) {
+        if (PlainTextComponentSerializer.plainText().serialize(prefix).isEmpty()) return component;
         return prefix.appendSpace().append(component);
     }
 
@@ -275,11 +299,8 @@ public abstract class MessageSender {
     }
 
     private TagResolver addI18nTag(CommandSender sender, TagResolver resolvers) {
-        if (loc() != ILocalizer.DEFAULT) {
-            return TagResolver.resolver(resolvers, TagResolver.builder()
-                    .tag("i18n", (argumentQueue, context) -> localizeTag(sender, argumentQueue, context)).build());
-        }
-        return resolvers;
+        return TagResolver.resolver(resolvers, TagResolver.builder()
+                .tag("i18n", (argumentQueue, context) -> localizeTag(sender, argumentQueue, context)).build());
     }
 
     private net.kyori.adventure.text.minimessage.tag.Tag localizeTag(CommandSender sender, ArgumentQueue args, Context ctx) {

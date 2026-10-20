@@ -91,16 +91,19 @@ public class MessageSenderBuilder {
         return this;
     }
 
-    public MiniMessage.@NotNull Builder strict(boolean strict) {
-        return miniMessage.strict(strict);
+    public MessageSenderBuilder strict(boolean strict) {
+        miniMessage.strict(strict);
+        return this;
     }
 
-    public MiniMessage.@NotNull Builder debug(@Nullable Consumer<String> debugOutput) {
-        return miniMessage.debug(debugOutput);
+    public MessageSenderBuilder debug(@Nullable Consumer<String> debugOutput) {
+        miniMessage.debug(debugOutput);
+        return this;
     }
 
-    public MiniMessage.@NotNull Builder postProcessor(@NotNull UnaryOperator<Component> postProcessor) {
-        return miniMessage.postProcessor(postProcessor);
+    public MessageSenderBuilder postProcessor(@NotNull UnaryOperator<Component> postProcessor) {
+        miniMessage.postProcessor(postProcessor);
+        return this;
     }
 
     public MessageSenderBuilder preProcessor(@NotNull UnaryOperator<String> preProcessor) {

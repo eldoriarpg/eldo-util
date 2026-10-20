@@ -15,6 +15,10 @@ import java.util.Locale;
 
 /**
  * A replacement represents a text placeholder and its replacement.
+ * <p>
+ * The {@code create} and {@code replacement} methods parse their value as MiniMessage, so a value may carry colors,
+ * links and other tags. Values that come from players or other untrusted sources must use {@link #unparsed(String,
+ * Object)} instead, which shows them as plain text, or they can add click actions and formatting to the message.
  */
 public final class Replacement {
     private Replacement() {
@@ -65,6 +69,17 @@ public final class Replacement {
         return create(key, value);
     }
 
+    /**
+     * Creates a new replacement whose value is shown as plain text, without parsing tags in it.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
+    public static TagResolver unparsed(String key, Object value) {
+        return Placeholder.unparsed(sanitizeKey(key), String.valueOf(value));
+    }
+
     public static TagResolver create(String key, Double value) {
         return create(key, String.format("%.2f", value));
     }
@@ -111,7 +126,7 @@ public final class Replacement {
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, Player player) {
-        return create(key, player.getName());
+        return unparsed(key, player.getName());
     }
 
     /**
@@ -126,18 +141,18 @@ public final class Replacement {
     }
 
     /**
-     * Creates a new replacement for a player.
+     * Creates a new replacement for a world. The name is shown as plain text.
      *
      * @param key   key of replacement
      * @param world world which provides the name of the world
      * @return replacement with registered replacement
      */
     public static TagResolver create(String key, World world) {
-        return create(key, world.getName());
+        return unparsed(key, world.getName());
     }
 
     /**
-     * Creates a new replacement for a player.
+     * Creates a new replacement for a world. The name is shown as plain text.
      *
      * @param key   key of replacement
      * @param world world which provides the name of the world

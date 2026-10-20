@@ -13,6 +13,7 @@ import de.eldoria.eldoutilities.commands.defaultcommands.FailsaveCommand;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.logging.DebugLogger;
+import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.serialization.util.PluginSerializationName;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -379,6 +380,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         } catch (Throwable e) {
             getLogger().log(Level.SEVERE, "Plugin failed to shutdown correctly.", e);
         }
+        MessageSender.unregister(this);
     }
 
     private Path getLockFile() {
