@@ -7,7 +7,6 @@ de.eldoria.eldoutilities.commands.defaultcommands
 de.eldoria.eldoutilities.commands.exceptions
 de.eldoria.eldoutilities.commands.executor
 de.eldoria.eldoutilities.config
-de.eldoria.eldoutilities.config.exceptions
 de.eldoria.eldoutilities.config.parsing.deserializer
 de.eldoria.eldoutilities.config.parsing.serializer
 de.eldoria.eldoutilities.config.template
@@ -34,9 +33,7 @@ de.eldoria.eldoutilities.metrics
 de.eldoria.eldoutilities.pdc
 de.eldoria.eldoutilities.plugin
 de.eldoria.eldoutilities.scheduling
-de.eldoria.eldoutilities.serialization
 de.eldoria.eldoutilities.serialization.util
-de.eldoria.eldoutilities.serialization.wrapper
 de.eldoria.eldoutilities.threading
 de.eldoria.eldoutilities.threading.futures
 de.eldoria.eldoutilities.updater
