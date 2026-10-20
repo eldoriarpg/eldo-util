@@ -623,7 +623,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="de/eldoria/eldoutilities/conversation/EldoConversation.Builder.html#%3Cinit%3E(org.bukkit.plugin.Plugin,org.bukkit.conversations.Conversable,org.bukkit.conversations.Prompt)" class="member-name-link">Builder(Plugin, Conversable, Prompt)</a> - Constructor for class de.eldoria.eldoutilities.conversation.<a href="de/eldoria/eldoutilities/conversation/EldoConversation.Builder.html" title="class in de.eldoria.eldoutilities.conversation">EldoConversation.Builder</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/localization/MessageComposer.html#buildLocalized(de.eldoria.eldoutilities.localization.ILocalizer)" class="member-name-link">buildLocalized(ILocalizer)</a> - Method in class de.eldoria.eldoutilities.localization.<a href="de/eldoria/eldoutilities/localization/MessageComposer.html" title="class in de.eldoria.eldoutilities.localization">MessageComposer</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Builds the message with every locale code added through <a href="de/eldoria/eldoutilities/localization/MessageComposer.html#localeCode(java.lang.String,net.kyori.adventure.text.minimessage.tag.resolver.TagResolver...)"><code>MessageComposer.localeCode(String, TagResolver...)</code></a> replaced by
+ its localized text.</div>
+</dd>
 <dt><a href="de/eldoria/eldoutilities/commands/command/util/CommandMetaBuilder.html#buildSubCommands(java.util.function.BiConsumer)" class="member-name-link">buildSubCommands(BiConsumer&lt;List&lt;AdvancedCommand&gt;, CommandMetaBuilder&gt;)</a> - Method in class de.eldoria.eldoutilities.commands.command.util.<a href="de/eldoria/eldoutilities/commands/command/util/CommandMetaBuilder.html" title="class in de.eldoria.eldoutilities.commands.command.util">CommandMetaBuilder</a></dt>
 <dd>
 <div class="block">Use this consumer when you need more complex command setup.</div>
@@ -683,6 +686,12 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/conversation/ConversationRequester.html#clone()" class="member-name-link">clone()</a> - Method in class de.eldoria.eldoutilities.conversation.<a href="de/eldoria/eldoutilities/conversation/ConversationRequester.html" title="class in de.eldoria.eldoutilities.conversation">ConversationRequester</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="de/eldoria/eldoutilities/messages/impl/SpigotMessageSender.html#close()" class="member-name-link">close()</a> - Method in class de.eldoria.eldoutilities.messages.impl.<a href="de/eldoria/eldoutilities/messages/impl/SpigotMessageSender.html" title="class in de.eldoria.eldoutilities.messages.impl">SpigotMessageSender</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#close()" class="member-name-link">close()</a> - Method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
+<dd>
+<div class="block">Releases what the sender holds.</div>
+</dd>
 <dt><a href="de/eldoria/eldoutilities/debug/DebugReport.html#collect(org.bukkit.plugin.Plugin)" class="member-name-link">collect(Plugin)</a> - Static method in class de.eldoria.eldoutilities.debug.<a href="de/eldoria/eldoutilities/debug/DebugReport.html" title="class in de.eldoria.eldoutilities.debug">DebugReport</a></dt>
 <dd>
 <div class="block">Asks the server and the plugin about themselves.</div>
@@ -970,7 +979,7 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/Replacement.html#create(java.lang.String,org.bukkit.World)" class="member-name-link">create(String, World)</a> - Static method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/Replacement.html" title="class in de.eldoria.eldoutilities.messages">Replacement</a></dt>
 <dd>
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement for a world.</div>
 </dd>
 <dt><a href="de/eldoria/eldoutilities/pdc/PersistentDataWrapper.html#create(org.bukkit.persistence.PersistentDataHolder)" class="member-name-link">create(PersistentDataHolder)</a> - Static method in class de.eldoria.eldoutilities.pdc.<a href="de/eldoria/eldoutilities/pdc/PersistentDataWrapper.html" title="class in de.eldoria.eldoutilities.pdc">PersistentDataWrapper</a></dt>
 <dd>&nbsp;</dd>
@@ -2640,7 +2649,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#miniMessage()" class="member-name-link">miniMessage()</a> - Method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/conversion/MiniMessageConversion.html" class="type-name-link" title="class in de.eldoria.eldoutilities.messages.conversion">MiniMessageConversion</a> - Class in <a href="de/eldoria/eldoutilities/messages/conversion/package-summary.html">de.eldoria.eldoutilities.messages.conversion</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Converts legacy color codes into MiniMessage tags.</div>
+</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/conversion/MiniMessageConversion.html#%3Cinit%3E()" class="member-name-link">MiniMessageConversion()</a> - Constructor for class de.eldoria.eldoutilities.messages.conversion.<a href="de/eldoria/eldoutilities/messages/conversion/MiniMessageConversion.html" title="class in de.eldoria.eldoutilities.messages.conversion">MiniMessageConversion</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/utils/Version.html#MINOR" class="member-name-link">MINOR</a> - Static variable in record class de.eldoria.eldoutilities.utils.<a href="de/eldoria/eldoutilities/utils/Version.html" title="class in de.eldoria.eldoutilities.utils">Version</a></dt>
@@ -3463,7 +3474,9 @@ loadScripts(document, 'script');</script>
 <dt><a href="de/eldoria/eldoutilities/config/parsing/serializer/LevelSerializer.html#serialize(java.util.logging.Level,tools.jackson.core.JsonGenerator,tools.jackson.databind.SerializationContext)" class="member-name-link">serialize(Level, JsonGenerator, SerializationContext)</a> - Method in class de.eldoria.eldoutilities.config.parsing.serializer.<a href="de/eldoria/eldoutilities/config/parsing/serializer/LevelSerializer.html" title="class in de.eldoria.eldoutilities.config.parsing.serializer">LevelSerializer</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#serialize(org.bukkit.command.CommandSender,java.lang.String,net.kyori.adventure.text.minimessage.tag.resolver.TagResolver,net.kyori.adventure.text.minimessage.tag.resolver.TagResolver...)" class="member-name-link">serialize(CommandSender, String, TagResolver, TagResolver...)</a> - Method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
-<dd>&nbsp;</dd>
+<dd>
+<div class="block">Turns a message into a component.</div>
+</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#serializeError(java.lang.String,net.kyori.adventure.text.minimessage.tag.resolver.TagResolver...)" class="member-name-link">serializeError(String, TagResolver...)</a> - Method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#serializeError(org.bukkit.command.CommandSender,java.lang.String,net.kyori.adventure.text.minimessage.tag.resolver.TagResolver...)" class="member-name-link">serializeError(CommandSender, String, TagResolver...)</a> - Method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
@@ -3874,9 +3887,17 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="de/eldoria/eldoutilities/commands/command/util/Argument.html#unlocalizedInput(java.lang.String,boolean)" class="member-name-link">unlocalizedInput(String, boolean)</a> - Static method in class de.eldoria.eldoutilities.commands.command.util.<a href="de/eldoria/eldoutilities/commands/command/util/Argument.html" title="class in de.eldoria.eldoutilities.commands.command.util">Argument</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="de/eldoria/eldoutilities/messages/Replacement.html#unparsed(java.lang.String,java.lang.Object)" class="member-name-link">unparsed(String, Object)</a> - Static method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/Replacement.html" title="class in de.eldoria.eldoutilities.messages">Replacement</a></dt>
+<dd>
+<div class="block">Creates a new replacement whose value is shown as plain text, without parsing tags in it.</div>
+</dd>
 <dt><a href="de/eldoria/eldoutilities/debug/DebugUpload.Reason.html#UNREACHABLE" class="member-name-link">UNREACHABLE</a> - Enum constant in enum class de.eldoria.eldoutilities.debug.<a href="de/eldoria/eldoutilities/debug/DebugUpload.Reason.html" title="enum class in de.eldoria.eldoutilities.debug">DebugUpload.Reason</a></dt>
 <dd>
 <div class="block">Lyna could not be reached or answered something unexpected.</div>
+</dd>
+<dt><a href="de/eldoria/eldoutilities/messages/MessageSender.html#unregister(org.bukkit.plugin.Plugin)" class="member-name-link">unregister(Plugin)</a> - Static method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/MessageSender.html" title="class in de.eldoria.eldoutilities.messages">MessageSender</a></dt>
+<dd>
+<div class="block">Removes the message sender of a plugin and releases what it holds.</div>
 </dd>
 <dt><a href="de/eldoria/eldoutilities/scheduling/SelfSchedulingWorker.html#unregister(V)" class="member-name-link">unregister(V)</a> - Method in class de.eldoria.eldoutilities.scheduling.<a href="de/eldoria/eldoutilities/scheduling/SelfSchedulingWorker.html" title="class in de.eldoria.eldoutilities.scheduling">SelfSchedulingWorker</a></dt>
 <dd>&nbsp;</dd>
@@ -4257,7 +4278,7 @@ the order they are declared.</div>
 </dd>
 <dt><a href="de/eldoria/eldoutilities/messages/Replacement.html#world(java.lang.String,org.bukkit.World)" class="member-name-link">world(String, World)</a> - Static method in class de.eldoria.eldoutilities.messages.<a href="de/eldoria/eldoutilities/messages/Replacement.html" title="class in de.eldoria.eldoutilities.messages">Replacement</a></dt>
 <dd>
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement for a world.</div>
 </dd>
 <dt><a href="de/eldoria/eldoutilities/inventory/InventoryActionHandler.html#wrap(org.bukkit.entity.Player,org.bukkit.inventory.Inventory)" class="member-name-link">wrap(Player, Inventory)</a> - Method in class de.eldoria.eldoutilities.inventory.<a href="de/eldoria/eldoutilities/inventory/InventoryActionHandler.html" title="class in de.eldoria.eldoutilities.inventory">InventoryActionHandler</a></dt>
 <dd>

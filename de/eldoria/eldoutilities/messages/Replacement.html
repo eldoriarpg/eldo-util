@@ -92,7 +92,10 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public final class </span><span class="element-name type-name-label">Replacement</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
-<div class="block">A replacement represents a text placeholder and its replacement.</div>
+<div class="block">A replacement represents a text placeholder and its replacement.
+ <p>
+ The <code>create</code> and <code>replacement</code> methods parse their value as MiniMessage, so a value may carry colors,
+ links and other tags. Values that come from players or other untrusted sources must use <a href="#unparsed(java.lang.String,java.lang.Object)"><code>unparsed(String, Object)</code></a> instead, which shows them as plain text, or they can add click actions and formatting to the message.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -143,7 +146,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#create(java.lang.String,org.bukkit.World)" class="member-name-link">create</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  org.bukkit.World&nbsp;world)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement for a world.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#name(java.lang.String,java.lang.Enum)" class="member-name-link">name</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
@@ -178,10 +181,16 @@ loadScripts(document, 'script');</script>
 <div class="block">Creates a new replacement.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#world(java.lang.String,org.bukkit.World)" class="member-name-link">world</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
- org.bukkit.World&nbsp;world)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#unparsed(java.lang.String,java.lang.Object)" class="member-name-link">unparsed</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement whose value is shown as plain text, without parsing tags in it.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code>static net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4"><code><a href="#world(java.lang.String,org.bukkit.World)" class="member-name-link">world</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ org.bukkit.World&nbsp;world)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab1 method-summary-table-tab4">
+<div class="block">Creates a new replacement for a world.</div>
 </div>
 </div>
 </div>
@@ -251,6 +260,21 @@ loadScripts(document, 'script');</script>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</span>&nbsp;<span class="element-name">replacement</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</span></div>
 <div class="block">Creates a new replacement.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>key</code> - key of replacement</dd>
+<dd><code>value</code> - value for replacement</dd>
+<dt>Returns:</dt>
+<dd>replacement with registered replacement</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="unparsed(java.lang.String,java.lang.Object)">
+<h3>unparsed</h3>
+<div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</span>&nbsp;<span class="element-name">unparsed</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;value)</span></div>
+<div class="block">Creates a new replacement whose value is shown as plain text, without parsing tags in it.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>key</code> - key of replacement</dd>
@@ -353,7 +377,7 @@ loadScripts(document, 'script');</script>
 <h3>create</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</span>&nbsp;<span class="element-name">create</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  org.bukkit.World&nbsp;world)</span></div>
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement for a world. The name is shown as plain text.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>key</code> - key of replacement</dd>
@@ -368,7 +392,7 @@ loadScripts(document, 'script');</script>
 <h3>world</h3>
 <div class="member-signature"><span class="modifiers">public static</span>&nbsp;<span class="return-type">net.kyori.adventure.text.minimessage.tag.resolver.TagResolver</span>&nbsp;<span class="element-name">world</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;key,
  org.bukkit.World&nbsp;world)</span></div>
-<div class="block">Creates a new replacement for a player.</div>
+<div class="block">Creates a new replacement for a world. The name is shown as plain text.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>key</code> - key of replacement</dd>

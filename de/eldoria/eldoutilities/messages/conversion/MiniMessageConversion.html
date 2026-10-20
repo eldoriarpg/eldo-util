@@ -92,6 +92,12 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">MiniMessageConversion</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">Converts legacy color codes into MiniMessage tags.
+ <p>
+ A <code>§</code> code is always converted. A <code>&amp;</code> code is only converted where a color code can sensibly begin: at
+ the start of the message, after a character that is neither letter nor digit, or directly after another code, as
+ in <code>&amp;l&amp;a</code>. This keeps an ampersand inside a word or a URL, such as <code>rock&amp;roll</code> or <code>?a=1&amp;b=2</code>,
+ as it is. Codes are recognised in either case.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">

@@ -106,7 +106,11 @@ implements <a href="ILocalizer.html" title="interface in de.eldoria.eldoutilitie
  <p>
  You can change the currently used locale every time via <a href="#setLocale(java.lang.String)"><code>setLocale(String)</code></a>.
  <p>
- The localizer also allows to use locales which are not included in the resources folder.</div>
+ The localizer also allows to use locales which are not included in the resources folder: every locale file in the
+ locales directory is loaded, and receives the keys it lacks from the default locale.
+ <p>
+ Missing keys are appended to a locale file, so comments, multi-line values and the order of the existing entries
+ stay as they are. A key that is asked for but missing is reported once.</div>
 <dl class="notes">
 <dt>Since:</dt>
 <dd>1.0.0</dd>
