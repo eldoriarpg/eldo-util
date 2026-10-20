@@ -21,7 +21,7 @@ publishData {
     eldoNexus()
     channels {
         clear()
-        release()
+        release("https://eldonexus.de/repository/maven-releases/")
         dev("https://eldonexus.de/repository/maven-dev/")
         snapshot("https://eldonexus.de/repository/maven-snapshots/")
     }

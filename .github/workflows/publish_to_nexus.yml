@@ -25,19 +25,18 @@ jobs:
           java-version: 21
       - name: Build with Gradle
         run: ./gradlew --build-cache build
+      - name: Publish to EldoNexus
+        run: ./gradlew publishAllPublicationsToEldoNexusRepository
+        env:
+          ORG_GRADLE_PROJECT_EldoNexusUsername: "${{ secrets.NEXUS_USERNAME }}"
+          ORG_GRADLE_PROJECT_EldoNexusPassword: "${{ secrets.NEXUS_PASSWORD }}"
+          ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.RAINBOWDASHLABS_SIGN_KEY }}"
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.RAINBOWDASHLABS_GPG_PASSWORD }}"
       - name: Publish to Maven Central
         if: startsWith(github.ref, 'refs/tags/')
         run: ./gradlew publishToMavenCentral
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: "${{ secrets.SONATYPE_USERNAME }}"
           ORG_GRADLE_PROJECT_mavenCentralPassword: "${{ secrets.SONATYPE_PASSWORD }}"
-          ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.RAINBOWDASHLABS_SIGN_KEY }}"
-          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.RAINBOWDASHLABS_GPG_PASSWORD }}"
-      - name: Publish to EldoNexus
-        if: startsWith(github.ref, 'refs/heads/')
-        run: ./gradlew publishAllPublicationsToEldoNexusRepository
-        env:
-          ORG_GRADLE_PROJECT_EldoNexusUsername: "${{ secrets.NEXUS_USERNAME }}"
-          ORG_GRADLE_PROJECT_EldoNexusPassword: "${{ secrets.NEXUS_PASSWORD }}"
           ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.RAINBOWDASHLABS_SIGN_KEY }}"
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.RAINBOWDASHLABS_GPG_PASSWORD }}"
