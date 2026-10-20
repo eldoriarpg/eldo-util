@@ -6,14 +6,13 @@
 
 package de.eldoria.eldoutilities.config.parsing.deserializer;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
-public class LevelDeserializer extends JsonDeserializer<Level> {
+public class LevelDeserializer extends ValueDeserializer<Level> {
     private static Level parseLevel(String level) {
         return switch (level.toUpperCase()) {
             case "OFF" -> Level.OFF;
@@ -29,7 +28,7 @@ public class LevelDeserializer extends JsonDeserializer<Level> {
     }
 
     @Override
-    public Level deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-        return parseLevel(p.getText());
+    public Level deserialize(JsonParser p, DeserializationContext ctxt) {
+        return parseLevel(p.getString());
     }
 }

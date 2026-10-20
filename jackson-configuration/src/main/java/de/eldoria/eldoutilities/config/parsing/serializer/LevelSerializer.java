@@ -6,16 +6,15 @@
 
 package de.eldoria.eldoutilities.config.parsing.serializer;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-import java.io.IOException;
 import java.util.logging.Level;
 
-public class LevelSerializer extends JsonSerializer<Level> {
+public class LevelSerializer extends ValueSerializer<Level> {
     @Override
-    public void serialize(Level value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+    public void serialize(Level value, JsonGenerator gen, SerializationContext serializers) {
         gen.writeString(value.getName());
     }
 }

@@ -6,6 +6,8 @@
 
 package de.eldoria.eldoutilities.config;
 
+import dev.chojo.ocular.components.Wrapper;
+import dev.chojo.ocular.key.Key;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;
@@ -14,27 +16,18 @@ class JacksonConfigTest extends JavaPlugin {
 
     @Override
     public void onEnable(){
-        // Defining the key for the config.yml
-        ConfigKey<ConfigFile> defKey = ConfigKey.defaultConfig(ConfigFile.class, ConfigFile::new);
+        Key<ConfigFile> defKey = Key.builder(Path.of("config.yml"), ConfigFile::new).build();
         var config = new JacksonConfig<>(this, defKey);
-        // Getting the config.yml data
         ConfigFile general = config.main();
 
-        // Defining a second config key for database.yml
-        ConfigKey<Database> databaseConfig = ConfigKey.of("Database Config", Path.of("database.yml"), Database.class, Database::new);
-        // Loading the file and creating it, if it doesn't exist yet
+        Key<Database> databaseConfig = Key.builder(Path.of("database.yml"), Database::new).name("Database Config").build();
         Database database = config.secondary(databaseConfig);
-        // Retrieving a wrapped instance which will be updated during config reloads
         Wrapper<Database> databaseWrapped = config.secondaryWrapped(databaseConfig);
 
-        // Reloading the config with the key
         config.reload(databaseConfig);
-        // Reloading all configuration files
         config.reload();
 
-        // Saving a specific file
         config.save(databaseConfig);
-        // Saving all files
         config.save();
     }
 

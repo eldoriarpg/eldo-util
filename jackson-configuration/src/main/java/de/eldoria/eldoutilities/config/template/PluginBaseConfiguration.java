@@ -7,18 +7,18 @@
 package de.eldoria.eldoutilities.config.template;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import de.eldoria.eldoutilities.config.ConfigKey;
 import de.eldoria.eldoutilities.config.parsing.deserializer.LevelDeserializer;
 import de.eldoria.eldoutilities.config.parsing.serializer.LevelSerializer;
+import dev.chojo.ocular.key.Key;
 import org.bukkit.plugin.Plugin;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import java.nio.file.Path;
 import java.util.logging.Level;
 
 public final class PluginBaseConfiguration {
-    public static final ConfigKey<PluginBaseConfiguration> KEY = ConfigKey.of(
+    public static final Key<PluginBaseConfiguration> KEY = new Key<>(
             "Base configuration",
             Path.of("base_configuration.yml"),
             PluginBaseConfiguration.class,

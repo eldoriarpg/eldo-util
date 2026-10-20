@@ -18,12 +18,6 @@ var mainPackage = "eldoutilities"
 val shadebase = group as String? + "." + mainPackage + "."
 description = "Utility Library for spigot plugins."
 
-java {
-    toolchain{
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
-
 allprojects {
     apply {
         // We want to apply several plugins to subprojects
@@ -35,10 +29,16 @@ allprojects {
         plugin(com.vanniktech.maven.publish.MavenPublishPlugin::class)
     }
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(21))
+        }
+    }
+
     publishData {
         addRepo(Repo.main("", "", false))
         addRepo(Repo.snapshot("SNAPSHOT", "", false))
-        publishingVersion = "2.2.0"
+        publishingVersion = "3.0.0"
         project.version = getVersion()
     }
 
@@ -143,7 +143,6 @@ dependencies {
     api(project(":entities"))
     api(project(":inventory"))
     api(project(":items"))
-    api(project(":legacy-serialization"))
     api(project(":localization"))
     api(project(":messaging"))
     api(project(":metrics"))
@@ -158,9 +157,9 @@ fun applyJavaDocOptions(options: MinimalJavadocOptions) {
         "https://javadoc.io/doc/com.google.code.findbugs/jsr305/latest/",
         "https://javadoc.io/doc/org.jetbrains/annotations/latest/",
         "https://docs.oracle.com/en/java/javase/${java.toolchain.languageVersion.get().asInt()}/docs/api/",
-        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-core/latest/",
+        "https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/",
         "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest",
-        "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-databind/latest",
+        "https://javadoc.io/doc/tools.jackson.core/jackson-databind/latest",
         "https://jd.papermc.io/paper/1.19/"
     )
 }

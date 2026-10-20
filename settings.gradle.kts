@@ -16,7 +16,6 @@ include("messaging")
 include("plugin")
 include("debugging")
 include("updater")
-include("legacy-serialization")
 include("commands")
 include("localization")
 include("threading")
@@ -43,12 +42,9 @@ dependencyResolutionManagement {
             plugin("indra-publishing", "net.kyori.indra.publishing").versionRef("indra")
             plugin("indra-sonatype", "net.kyori.indra.publishing.sonatype").versionRef("indra")
 
-            version("jackson", "2.16.0")
-            library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
-            library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
-            library("jackson-dataformat-yaml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml").versionRef("jackson")
-            bundle("jackson", listOf("jackson-core", "jackson-databind"))
-
+            library("jackson-dataformat-yaml", "tools.jackson.dataformat", "jackson-dataformat-yaml").version("3.2.4")
+            library("jackson-bukkit", "de.eldoria.jacksonbukkit", "jackson-bukkit").version("2.0.0")
+            library("ocular", "dev.chojo", "ocular").version("2.3.0")
         }
     }
 }
