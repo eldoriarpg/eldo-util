@@ -2,8 +2,8 @@ description = "Utilities for message dispatching"
 
 dependencies {
     api("net.kyori", "adventure-platform-bukkit", "4.3.4")
-    api("net.kyori", "adventure-text-minimessage", "4.17.0")
-    api("net.kyori", "adventure-text-serializer-plain", "4.17.0")
+    api("net.kyori", "adventure-text-minimessage", "5.2.0")
+    api("net.kyori", "adventure-text-serializer-plain", "5.2.0")
     compileOnly("com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT")
     api(project(":core")){
         exclude("org.spigot")
