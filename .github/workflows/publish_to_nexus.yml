@@ -5,26 +5,39 @@ on:
   push:
     branches:
       - main
+    tags:
+      - v*
 
 jobs:
-  publish-central:
+  publish:
     environment: build
     runs-on: ubuntu-latest
-    name: Publish to Maven Central
+    name: Publish
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
       - name: Build with Gradle
         run: ./gradlew --build-cache build
       - name: Publish to Maven Central
-        run: ./gradlew publish -PforceSign=true
+        if: startsWith(github.ref, 'refs/tags/')
+        run: ./gradlew publishToMavenCentral
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: "${{ secrets.SONATYPE_USERNAME }}"
           ORG_GRADLE_PROJECT_mavenCentralPassword: "${{ secrets.SONATYPE_PASSWORD }}"
+          ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.RAINBOWDASHLABS_SIGN_KEY }}"
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.RAINBOWDASHLABS_GPG_PASSWORD }}"
+      - name: Publish to EldoNexus
+        if: startsWith(github.ref, 'refs/heads/')
+        run: ./gradlew publishAllPublicationsToEldoNexusRepository
+        env:
+          ORG_GRADLE_PROJECT_EldoNexusUsername: "${{ secrets.NEXUS_USERNAME }}"
+          ORG_GRADLE_PROJECT_EldoNexusPassword: "${{ secrets.NEXUS_PASSWORD }}"
           ORG_GRADLE_PROJECT_signingInMemoryKey: "${{ secrets.RAINBOWDASHLABS_SIGN_KEY }}"
           ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: "${{ secrets.RAINBOWDASHLABS_GPG_PASSWORD }}"

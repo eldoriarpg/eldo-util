@@ -1,3 +1,7 @@
+plugins {
+    id("eldo-util.java-conventions")
+}
+
 description = "Configuration file wrapper for the jackson-bukkit framework, based on ocular"
 
 dependencies {

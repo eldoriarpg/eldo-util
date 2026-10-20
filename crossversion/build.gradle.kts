@@ -1,3 +1,7 @@
+plugins {
+    id("eldo-util.java-conventions")
+}
+
 description = "Functions to execute code based on the server version"
 
 dependencies {

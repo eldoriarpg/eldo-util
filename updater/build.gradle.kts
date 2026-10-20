@@ -1,3 +1,7 @@
+plugins {
+    id("eldo-util.java-conventions")
+}
+
 description = "Utilitites for plugin auto updating and update checks"
 
 dependencies {

@@ -1,3 +1,7 @@
+plugins {
+    id("eldo-util.java-conventions")
+}
+
 description = "Legacy ported module for conversations. Deprecated."
 
 dependencies{

@@ -1,3 +1,7 @@
+plugins {
+    id("eldo-util.java-conventions")
+}
+
 description = "Utilitites for threading and scheduling"
 
 dependencies{
