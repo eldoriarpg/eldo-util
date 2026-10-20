@@ -1,7 +1,8 @@
 dependencyResolutionManagement {
     repositories {
-        gradlePluginPortal()
+        maven("https://eldonexus.de/repository/maven-proxies/")
         maven("https://eldonexus.de/repository/maven-public/")
+        gradlePluginPortal()
     }
     versionCatalogs {
         create("libs") {

@@ -2,8 +2,9 @@ rootProject.name = "eldo-util"
 
 pluginManagement {
     repositories {
-        gradlePluginPortal()
+        maven("https://eldonexus.de/repository/maven-proxies/")
         maven("https://eldonexus.de/repository/maven-public/")
+        gradlePluginPortal()
     }
 }
 
