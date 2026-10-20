@@ -9,17 +9,21 @@ package de.eldoria.eldoutilities.updater;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
+import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateDataBuilder;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateResponse;
+import de.eldoria.eldoutilities.updater.lynaupdater.UpgradeTokenStore;
 import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import java.net.http.HttpClient;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +36,10 @@ import java.util.concurrent.TimeUnit;
 public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>> implements Listener, Runnable {
     private final Plugin plugin;
     private final T data;
-    private final HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
+    private final HttpClient client = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(r -> {
         var thread = new Thread(r);
         thread.setName("EldoUtilititesUpdateChecker");
@@ -43,6 +50,8 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     private boolean updateAvailable;
     private boolean downloaded;
     private V lastCheck;
+    private Listener notifier;
+    private String downloadCommand;
 
     protected Updater(T data) {
         this.plugin = data.plugin();
@@ -65,6 +74,9 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      * A Lyna update check is made to work together with a <a href="https://github.com/rainbowdashlabs/lyna">Lyna instance</a>.
      * <p>
      * Additionally, a {@code build.data} file is required, which is created by the <a href="https://github.com/rainbowdashlabs/publishdata">publishdata plugin</a>.
+     * <p>
+     * With auto update enabled, new stable releases are downloaded: free products directly, premium products with an
+     * upgrade token from the account area of the lyna instance, see {@link LynaUpdateDataBuilder#tokenStore(UpgradeTokenStore)}.
      *
      * @param data lyna plugin data
      * @return Updater instance
@@ -100,13 +112,17 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
         if (updateAvailable) {
             logUpdateMessage();
-            if (data.isAutoUpdate()) {
+            if (data.isAutoUpdate() && updatesAutomatically()) {
                 if (!downloaded) {
                     downloaded = update();
                 }
                 registerListener(new DownloadedNotifier<>(plugin, data, lastCheck, downloaded));
             } else {
-                registerListener(new UpdateNotifier<>(plugin, data, lastCheck));
+                var command = offersDownload() ? downloadCommand() : null;
+                if (command != null) {
+                    plugin.getLogger().info("Run " + command + " to download it.");
+                }
+                registerListener(new UpdateNotifier<>(plugin, data, lastCheck, command));
             }
         } else {
             if (!silent) {
@@ -121,6 +137,46 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      * @return true if the update was succesful.
      */
     protected boolean update() {
+        return false;
+    }
+
+    /**
+     * Downloads the available update on request, as offered by the download button of the update message.
+     * <p>
+     * Runs on the update checker thread and does nothing unless {@link #offersDownload()} allows the last checked
+     * version.
+     *
+     * @return future completing with true once the update is downloaded
+     */
+    public final CompletableFuture<Boolean> download() {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!downloaded && lastCheck != null && offersDownload()) {
+                downloaded = update();
+                if (downloaded) {
+                    replaceListener(new DownloadedNotifier<>(plugin, data, lastCheck, true));
+                }
+            }
+            return downloaded;
+        }, executor);
+    }
+
+    /**
+     * Whether the last checked version may be installed without anybody asking for it, when auto update is enabled.
+     * Otherwise, the update is announced and, if {@link #offersDownload()} allows it, offered for download.
+     *
+     * @return true when the update may be installed automatically
+     */
+    protected boolean updatesAutomatically() {
+        return true;
+    }
+
+    /**
+     * Whether the last checked version can be downloaded on request through {@link #download()}. Updaters that
+     * implement {@link #update()} should allow it.
+     *
+     * @return true when a download button is offered
+     */
+    protected boolean offersDownload() {
         return false;
     }
 
@@ -157,12 +213,28 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         });
     }
 
+    private synchronized String downloadCommand() {
+        if (downloadCommand == null) {
+            downloadCommand = DownloadUpdateCommand.register(plugin, this);
+        }
+        return downloadCommand;
+    }
+
     private void registerListener(Listener listener) {
         if (data.isNotifyUpdate() && !notifyActive) {
             notifyActive = true;
+            notifier = listener;
             plugin.getServer().getPluginManager()
                     .registerEvents(listener, plugin);
         }
+    }
+
+    private void replaceListener(Listener listener) {
+        if (notifier != null) {
+            HandlerList.unregisterAll(notifier);
+            notifyActive = false;
+        }
+        registerListener(listener);
     }
 
     public T getData() {

@@ -11,6 +11,7 @@ import de.eldoria.eldoutilities.debug.UserData;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.utils.Durations;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,6 +21,9 @@ import java.util.Map;
 
 /**
  * What a Lyna update check needs: the product id and the Lyna host.
+ * <p>
+ * Free products are updated from the public download address the update check answers with. Premium products
+ * trade an upgrade token from the {@link #tokenStore()} for their download.
  *
  * @since 1.1.0
  */
@@ -33,6 +37,8 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
     private final int productId;
     private final String host;
     private final UserData userData;
+    private final UpgradeTokenStore tokenStore;
+    private final @Nullable Integer downloadType;
 
     /**
      * Create a new update data object to pass to lyna.
@@ -40,13 +46,20 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
      * @param plugin           plugin instance
      * @param notifyPermission permission which will be required for update notification
      * @param notifyUpdate     true if users with permission should be notified
+     * @param autoUpdate       true if new versions should be downloaded
      * @param productId        id of lyna product
      * @param host             host of lyna instance
+     * @param tokenStore       upgrade token of a premium product
+     * @param downloadType     download type to request for a premium product, or null for the first one available
      */
-    LynaUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, int productId, String host, String updateUrl, String updateMessage) {
-        super(plugin, notifyPermission, notifyUpdate, false, updateUrl, updateMessage);
+    LynaUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, int productId,
+                   String host, String updateUrl, String updateMessage, UpgradeTokenStore tokenStore,
+                   @Nullable Integer downloadType) {
+        super(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage);
         this.productId = productId;
         this.host = host;
+        this.tokenStore = tokenStore;
+        this.downloadType = downloadType;
         userData = UserData.get(plugin);
     }
 
@@ -84,5 +97,13 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
 
     public UserData userData() {
         return userData;
+    }
+
+    public UpgradeTokenStore tokenStore() {
+        return tokenStore;
+    }
+
+    public @Nullable Integer downloadType() {
+        return downloadType;
     }
 }

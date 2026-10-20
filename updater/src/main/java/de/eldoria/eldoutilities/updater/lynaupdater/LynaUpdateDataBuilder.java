@@ -8,15 +8,19 @@ package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import de.eldoria.eldoutilities.updater.UpdateDataBuilder;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuilder, LynaUpdateData> {
 
     private final int productId;
     private String host = LynaUpdateData.HOST;
+    private UpgradeTokenStore tokenStore;
+    private @Nullable Integer downloadType;
 
     public LynaUpdateDataBuilder(Plugin plugin, int productId) {
         super(plugin);
         this.productId = productId;
+        tokenStore = UpgradeTokenStore.file(plugin.getDataFolder().toPath().resolve("upgrade-token.txt"));
         updateMessage = """
                 New version of <gold>{plugin_name}<default> available.
                 New Version: <gold>{new_version}<default>. Published <gold>{new_time}<default> ago! {new_date_time}
@@ -26,6 +30,30 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
 
     public LynaUpdateDataBuilder host(String host) {
         this.host = host;
+        return this;
+    }
+
+    /**
+     * Where the upgrade token of a premium product is kept. Defaults to {@code upgrade-token.txt} in the plugin
+     * data folder.
+     *
+     * @param tokenStore token store
+     * @return builder instance
+     */
+    public LynaUpdateDataBuilder tokenStore(UpgradeTokenStore tokenStore) {
+        this.tokenStore = tokenStore;
+        return this;
+    }
+
+    /**
+     * The download type a premium product requests, needed when the product has more than one stable download.
+     * Without one, Lyna picks the first download the account may have, stable before dev before snapshot.
+     *
+     * @param downloadType id of the download type at lyna
+     * @return builder instance
+     */
+    public LynaUpdateDataBuilder downloadType(int downloadType) {
+        this.downloadType = downloadType;
         return this;
     }
 
@@ -54,6 +82,7 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
 
     @Override
     public LynaUpdateData build() {
-        return new LynaUpdateData(plugin, notifyPermission, notifyUpdate, productId, host, updateUrl, updateMessage);
+        return new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, updateUrl,
+                updateMessage, tokenStore, downloadType);
     }
 }
