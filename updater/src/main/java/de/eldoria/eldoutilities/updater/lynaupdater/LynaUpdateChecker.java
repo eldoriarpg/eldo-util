@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * Update checks against a <a href="https://github.com/rainbowdashlabs/lyna">Lyna</a> instance. Query values are URL
  * encoded and a check gives up after {@value #TIMEOUT_SECONDS} seconds.
  * <p>
- * Only stable releases are installed automatically. The download button offers stable releases, and dev or snapshot
+ * Only stable releases within the installed major version are installed automatically. The download button offers stable releases, and dev or snapshot
  * builds only to a server already running a dev or snapshot build.
  * <p>
  * A free product is downloaded from the public address the update check answers with. A premium product trades the
@@ -115,9 +115,13 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
         return install(build.get());
     }
 
+    /**
+     * Stable releases within the installed major version are installed automatically. A new major version may break
+     * compatibility, so it is only announced and offered for download.
+     */
     @Override
     protected boolean updatesAutomatically() {
-        return latest != null && latest.isStable();
+        return latest != null && latest.isStable() && LynaUpdateResponse.sameMajor(currentVersion(), latest.latestVersion());
     }
 
     @Override

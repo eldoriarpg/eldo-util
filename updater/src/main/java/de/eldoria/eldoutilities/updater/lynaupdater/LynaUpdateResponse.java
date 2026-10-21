@@ -106,6 +106,25 @@ public class LynaUpdateResponse implements UpdateResponse {
         return !lower.contains("snapshot") && !lower.contains("dev");
     }
 
+    /**
+     * Whether two versions share their major version, the number before the first dot. A version without a leading
+     * number shares it with none.
+     *
+     * @param current installed version
+     * @param latest  newer version
+     * @return true if both have the same major version
+     */
+    static boolean sameMajor(String current, String latest) {
+        var major = major(current);
+        return major != null && major.equals(major(latest));
+    }
+
+    private static String major(String version) {
+        var digits = 0;
+        while (digits < version.length() && Character.isDigit(version.charAt(digits))) digits++;
+        return digits == 0 ? null : version.substring(0, digits);
+    }
+
     public String publishedDuration() {
         return Durations.simpleDurationFormat(Duration.between(Instant.ofEpochSecond(published), Instant.now()));
     }
