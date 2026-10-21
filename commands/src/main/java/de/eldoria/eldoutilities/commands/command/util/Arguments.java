@@ -795,6 +795,18 @@ public class Arguments implements Iterable<Input> {
         return Arguments.create(plugin, sender, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
     }
 
+    /**
+     * The arguments as they were passed, including flags and everything after the first flag.
+     * <p>
+     * The parsed arguments end at the first word that looks like a flag; use this to read input that contains such
+     * words as plain text.
+     *
+     * @return copy of the raw arguments
+     */
+    public String[] raw() {
+        return rawArgs.clone();
+    }
+
     public FlagContainer flags() {
         return flags;
     }
