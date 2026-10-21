@@ -13,10 +13,12 @@ import de.eldoria.eldoutilities.debug.DebugReport.Section;
 import de.eldoria.eldoutilities.debug.DebugUpload.Failed;
 import de.eldoria.eldoutilities.debug.DebugUpload.Reason;
 import de.eldoria.eldoutilities.debug.DebugUpload.Uploaded;
-import de.eldoria.eldoutilities.debug.data.ChartData;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
+import de.eldoria.eldoutilities.debug.data.chart.CategoryChart;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
+import de.eldoria.eldoutilities.debug.data.chart.GaugeChart;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.junit.jupiter.api.Test;
 
@@ -42,7 +44,7 @@ class DebugReportTest {
         var sections = DebugReport.sections(
                 List.of(HealthCheck.error("Database", "password: hunter2 refused")),
                 new EntryData[]{new EntryData("Hooks", "token: abc"), new EntryData("Storage", Map.of("url", "jdbc:mysql://root:pw@db/mc"))},
-                List.of(ChartData.bar("Storage types", Map.of("yaml", 3))),
+                List.of(CategoryChart.bar("Storage types").value("yaml", 3)),
                 LOG,
                 List.of(new ConfigFiles.Read("config.yml", "password: hunter2"), new ConfigFiles.Read("mobs/a.json", "{}")),
                 DebugSettings.DEFAULT);
@@ -87,7 +89,7 @@ class DebugReportTest {
     void chartsKeepTheirLooseDataAndPassTheFilter() {
         var chart = ChartData.of("Pool", "line", Map.of("password: hunter2", List.of(1, "2.5", Map.of("x", 3))))
                              .unit("ms")
-                             .mark(25, "budget")
+                             .hint("marks", List.of(Map.of("y", 25, "label", "budget")))
                              .description("token: abc")
                              .toChart(DebugSettings.DEFAULT);
 
@@ -100,14 +102,15 @@ class DebugReportTest {
 
     @Test
     void chartsSerialiseAsLynaReadsThem() {
-        var gauge = ChartData.gauge("Usage", 42, 0, 100).yLabel("percent").toChart(DebugSettings.DEFAULT);
+        var gauge = GaugeChart.gauge("Usage", 42).unit("percent").toChart(DebugSettings.DEFAULT);
         JsonObject section = new Gson().toJsonTree(Section.chart("Usage", "", gauge)).getAsJsonObject();
 
         assertEquals("CHART", section.get("kind").getAsString());
         JsonObject chart = section.getAsJsonObject("chart");
         assertEquals("gauge", chart.get("type").getAsString());
         assertEquals(42, chart.getAsJsonObject("data").get("value").getAsInt());
-        assertEquals("percent", chart.getAsJsonObject("y").get("label").getAsString());
+        assertEquals(100, chart.getAsJsonObject("data").get("max").getAsInt());
+        assertEquals("percent", chart.get("unit").getAsString());
         assertFalse(section.has("level"));
     }
 

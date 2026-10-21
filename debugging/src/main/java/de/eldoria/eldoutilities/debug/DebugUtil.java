@@ -11,8 +11,8 @@ import de.eldoria.EldoUtilities;
 import de.eldoria.eldoutilities.debug.DebugUpload.Failed;
 import de.eldoria.eldoutilities.debug.DebugUpload.Result;
 import de.eldoria.eldoutilities.debug.DebugUpload.Uploaded;
-import de.eldoria.eldoutilities.debug.data.ChartData;
 import de.eldoria.eldoutilities.debug.data.EntryData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -167,8 +167,8 @@ public final class DebugUtil {
      * @param plugin plugin
      * @return the charts in the order the providers were reached
      */
-    public static @NotNull List<ChartData> getCharts(Plugin plugin) {
-        List<ChartData> charts = new ArrayList<>();
+    public static @NotNull List<ChartData<?>> getCharts(Plugin plugin) {
+        List<ChartData<?>> charts = new ArrayList<>();
         for (var provider : providers(plugin)) {
             charts.addAll(provider.getCharts());
         }

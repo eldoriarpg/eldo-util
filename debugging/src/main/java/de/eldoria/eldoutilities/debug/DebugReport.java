@@ -6,12 +6,12 @@
 
 package de.eldoria.eldoutilities.debug;
 
-import de.eldoria.eldoutilities.debug.data.ChartData;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import de.eldoria.eldoutilities.debug.data.PluginMetaData;
 import de.eldoria.eldoutilities.debug.data.ServerMetaData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
 import de.eldoria.eldoutilities.debug.payload.LogMeta;
 import de.eldoria.eldoutilities.debug.payload.PluginMeta;
 import de.eldoria.eldoutilities.debug.payload.ServerMeta;
@@ -49,7 +49,7 @@ public final class DebugReport {
      * @param additional what the plugin's {@link DebugDataProvider}s add
      */
     public record Snapshot(Plugin plugin, PluginMetaData pluginMeta, ServerMetaData serverMeta,
-                           EntryData[] additional, List<HealthCheck> checks, List<ChartData> charts) {
+                           EntryData[] additional, List<HealthCheck> checks, List<ChartData<?>> charts) {
     }
 
     /**
@@ -72,7 +72,7 @@ public final class DebugReport {
                 sections(snapshot.checks(), snapshot.additional(), snapshot.charts(), log, configs, settings));
     }
 
-    static List<Section> sections(List<HealthCheck> checks, EntryData[] additional, List<ChartData> charts, LogData log,
+    static List<Section> sections(List<HealthCheck> checks, EntryData[] additional, List<ChartData<?>> charts, LogData log,
                                   List<ConfigFiles.Read> configs, DebugSettings settings) {
         List<Section> sections = new ArrayList<>();
         for (HealthCheck check : checks) {
@@ -82,7 +82,7 @@ public final class DebugReport {
             entry.applyFilter(settings);
             sections.add(Section.meta(entry.getName(), entry.getContent(), entry.getEntries()));
         }
-        for (ChartData chart : charts) {
+        for (ChartData<?> chart : charts) {
             sections.add(Section.chart(settings.applyFilter(chart.name()), settings.applyFilter(chart.description()),
                     chart.toChart(settings)));
         }

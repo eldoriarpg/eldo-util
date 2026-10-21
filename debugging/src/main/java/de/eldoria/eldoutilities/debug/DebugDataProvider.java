@@ -6,8 +6,8 @@
 
 package de.eldoria.eldoutilities.debug;
 
-import de.eldoria.eldoutilities.debug.data.ChartData;
 import de.eldoria.eldoutilities.debug.data.EntryData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -73,7 +73,7 @@ public interface DebugDataProvider {
      * @return the charts, empty by default
      */
     @NotNull
-    default List<ChartData> getCharts() {
+    default List<ChartData<?>> getCharts() {
         return Collections.emptyList();
     }
 }
