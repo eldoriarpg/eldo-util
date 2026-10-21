@@ -30,12 +30,15 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Base implementation for Updater.
+ * <p>
+ * Checks and downloads run on the updater's own thread, one after another. {@link #reconfigure(UpdateData)} hands
+ * the updater new settings, for example after a config reload, and {@link #stop()} ends it.
  *
  * @param <T> type of Updater
  */
 public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>> implements Listener, Runnable {
     private final Plugin plugin;
-    private final T data;
+    private volatile T data;
     private final HttpClient client = HttpClient.newBuilder()
             .version(HttpClient.Version.HTTP_2)
             .followRedirects(HttpClient.Redirect.NORMAL)
@@ -149,6 +152,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      * @return future completing with true once the update is downloaded
      */
     public final CompletableFuture<Boolean> download() {
+        if (executor.isShutdown()) return CompletableFuture.completedFuture(downloaded);
         return CompletableFuture.supplyAsync(() -> {
             if (!downloaded && lastCheck != null && offersDownload()) {
                 downloaded = update();
@@ -195,6 +199,35 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     protected abstract Optional<V> checkUpdate(T data);
 
     /**
+     * Replaces the settings of the updater, for example after the plugin reloaded its config.
+     * <p>
+     * The current notification is removed and a check with the new settings runs right away, so an update that the
+     * new settings allow to install automatically is installed then. An update that was already downloaded is not
+     * downloaded again.
+     *
+     * @param data new settings
+     * @return future completing once the check with the new settings is done
+     */
+    public final CompletableFuture<Void> reconfigure(T data) {
+        if (executor.isShutdown()) return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            this.data = data;
+            updateAvailable = false;
+            removeListener();
+            performCheck(true);
+        }, executor);
+    }
+
+    /**
+     * Stops the updater for good: no further checks run, and the notification is removed. Use it when the plugin is
+     * disabled or its config switches update checks off.
+     */
+    public final void stop() {
+        executor.shutdownNow();
+        removeListener();
+    }
+
+    /**
      * Start the update check thread.
      * <p>
      * This will check every 6 hours if an update is available.
@@ -229,13 +262,17 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     }
 
     private void replaceListener(Listener listener) {
+        removeListener();
+        registerListener(listener);
+    }
+
+    private void removeListener() {
         var previous = notifier;
         notifier = null;
         notifyActive = false;
         if (previous != null) {
             ServerTasks.runGlobal(plugin, () -> HandlerList.unregisterAll(previous));
         }
-        registerListener(listener);
     }
 
     public T getData() {
