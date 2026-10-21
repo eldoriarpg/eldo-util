@@ -45,6 +45,9 @@ public final class UpdaterMessages {
     public static final String AUTO_NOT_ASKED = "eldoutilities.updater.auto-not-asked";
     public static final String AUTO_UNAVAILABLE = "eldoutilities.updater.auto-unavailable";
     public static final String UNKNOWN_ACTION = "eldoutilities.updater.unknown-action";
+    public static final String MAJOR_NOTICE = "eldoutilities.updater.major-notice";
+    public static final String MAJOR_CONFIRM = "eldoutilities.updater.major-confirm";
+    public static final String MAJOR_CONFIRM_BUTTON = "eldoutilities.updater.major-confirm-button";
 
     private static final Map<String, String> DEFAULTS = Map.ofEntries(
             entry(NOTICE, """
@@ -76,7 +79,10 @@ public final class UpdaterMessages {
             entry(AUTO_ASK_LATER, "You will be asked again after the next manual update."),
             entry(AUTO_NOT_ASKED, "You will not be asked again. Automatic updates can still be enabled in the config of <plugin_name>."),
             entry(AUTO_UNAVAILABLE, "Automatic updates of <plugin_name> can only be enabled in its config."),
-            entry(UNKNOWN_ACTION, "Unknown action. Use download, enable-auto, later or never."));
+            entry(UNKNOWN_ACTION, "Unknown action. Use download, enable-auto, later or never."),
+            entry(MAJOR_NOTICE, "<red>This is a major update. It may not be compatible with your server or other plugins, so it is not installed automatically. Read the patch notes before updating."),
+            entry(MAJOR_CONFIRM, "<red>This is a major update of <plugin_name> and may not be compatible with your server or other plugins. Read the patch notes first."),
+            entry(MAJOR_CONFIRM_BUTTON, "<red>[Download anyway]</red>"));
 
     private UpdaterMessages() {
     }
