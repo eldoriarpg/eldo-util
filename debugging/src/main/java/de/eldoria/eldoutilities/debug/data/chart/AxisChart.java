@@ -21,7 +21,7 @@ public abstract class AxisChart<T extends AxisChart<T>> extends ChartData<T> {
     protected final Map<String, Object> y = new LinkedHashMap<>();
     private final List<Map<String, Object>> marks = new ArrayList<>();
 
-    protected AxisChart(String name, String type) {
+    protected AxisChart(String name, ChartType type) {
         super(name, type);
     }
 

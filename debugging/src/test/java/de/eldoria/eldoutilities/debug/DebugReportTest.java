@@ -18,6 +18,7 @@ import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import de.eldoria.eldoutilities.debug.data.chart.CategoryChart;
 import de.eldoria.eldoutilities.debug.data.chart.ChartData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartType;
 import de.eldoria.eldoutilities.debug.data.chart.GaugeChart;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,7 @@ class DebugReportTest {
 
     @Test
     void chartsKeepTheirLooseDataAndPassTheFilter() {
-        var chart = ChartData.of("Pool", "line", Map.of("password: hunter2", List.of(1, "2.5", Map.of("x", 3))))
+        var chart = ChartData.of("Pool", ChartType.LINE, Map.of("password: hunter2", List.of(1, "2.5", Map.of("x", 3))))
                              .unit("ms")
                              .hint("marks", List.of(Map.of("y", 25, "label", "budget")))
                              .description("token: abc")

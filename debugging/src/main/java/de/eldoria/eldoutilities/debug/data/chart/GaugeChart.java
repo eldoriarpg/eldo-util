@@ -17,7 +17,7 @@ public final class GaugeChart extends ChartData<GaugeChart> {
     private Number max = 100;
 
     private GaugeChart(String name, Number value) {
-        super(name, "gauge");
+        super(name, ChartType.GAUGE);
         this.value = value;
     }
 

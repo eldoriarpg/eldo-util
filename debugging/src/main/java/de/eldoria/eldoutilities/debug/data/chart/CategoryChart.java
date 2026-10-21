@@ -15,7 +15,7 @@ import java.util.Map;
 public final class CategoryChart extends ChartData<CategoryChart> {
     private final Map<String, Number> values = new LinkedHashMap<>();
 
-    private CategoryChart(String name, String type) {
+    private CategoryChart(String name, ChartType type) {
         super(name, type);
     }
 
@@ -26,7 +26,7 @@ public final class CategoryChart extends ChartData<CategoryChart> {
      * @return new chart
      */
     public static CategoryChart bar(String name) {
-        return new CategoryChart(name, "bar");
+        return new CategoryChart(name, ChartType.BAR);
     }
 
     /**
@@ -36,7 +36,7 @@ public final class CategoryChart extends ChartData<CategoryChart> {
      * @return new chart
      */
     public static CategoryChart pie(String name) {
-        return new CategoryChart(name, "pie");
+        return new CategoryChart(name, ChartType.PIE);
     }
 
     /**
@@ -46,7 +46,7 @@ public final class CategoryChart extends ChartData<CategoryChart> {
      * @return new chart
      */
     public static CategoryChart donut(String name) {
-        return new CategoryChart(name, "donut");
+        return new CategoryChart(name, ChartType.DONUT);
     }
 
     /**

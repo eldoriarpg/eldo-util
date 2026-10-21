@@ -10,13 +10,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A chart of any type with data of any shape. Created by {@link ChartData#of(String, String, Object)}.
+ * A chart with data of any shape. Created by {@link ChartData#of(String, ChartType, Object)}.
  */
 public final class CustomChart extends ChartData<CustomChart> {
     private final Object data;
     private final Map<String, Object> hints = new LinkedHashMap<>();
 
-    CustomChart(String name, String type, Object data) {
+    CustomChart(String name, ChartType type, Object data) {
         super(name, type);
         this.data = data;
     }

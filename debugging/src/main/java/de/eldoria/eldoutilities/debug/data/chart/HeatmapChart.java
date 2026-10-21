@@ -21,7 +21,7 @@ public final class HeatmapChart extends ChartData<HeatmapChart> {
     private final Map<String, Object> y = new LinkedHashMap<>();
 
     private HeatmapChart(String name) {
-        super(name, "heatmap");
+        super(name, ChartType.HEATMAP);
     }
 
     /**

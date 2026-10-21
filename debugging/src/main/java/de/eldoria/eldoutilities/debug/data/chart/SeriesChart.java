@@ -19,7 +19,7 @@ import java.util.Map;
 public final class SeriesChart extends AxisChart<SeriesChart> {
     private final Map<String, List<Number>> series = new LinkedHashMap<>();
 
-    private SeriesChart(String name, String type) {
+    private SeriesChart(String name, ChartType type) {
         super(name, type);
     }
 
@@ -30,7 +30,7 @@ public final class SeriesChart extends AxisChart<SeriesChart> {
      * @return new chart
      */
     public static SeriesChart line(String name) {
-        return new SeriesChart(name, "line");
+        return new SeriesChart(name, ChartType.LINE);
     }
 
     /**
@@ -40,7 +40,7 @@ public final class SeriesChart extends AxisChart<SeriesChart> {
      * @return new chart
      */
     public static SeriesChart area(String name) {
-        return new SeriesChart(name, "area");
+        return new SeriesChart(name, ChartType.AREA);
     }
 
     /**
@@ -50,7 +50,7 @@ public final class SeriesChart extends AxisChart<SeriesChart> {
      * @return new chart
      */
     public static SeriesChart bar(String name) {
-        return new SeriesChart(name, "bar");
+        return new SeriesChart(name, ChartType.BAR);
     }
 
     /**
@@ -60,7 +60,7 @@ public final class SeriesChart extends AxisChart<SeriesChart> {
      * @return new chart
      */
     public static SeriesChart stackedBar(String name) {
-        return new SeriesChart(name, "stacked-bar");
+        return new SeriesChart(name, ChartType.STACKED_BAR);
     }
 
     /**

@@ -18,7 +18,7 @@ public final class ScatterChart extends AxisChart<ScatterChart> {
     private final Map<String, List<List<Number>>> points = new LinkedHashMap<>();
 
     private ScatterChart(String name) {
-        super(name, "scatter");
+        super(name, ChartType.SCATTER);
     }
 
     /**

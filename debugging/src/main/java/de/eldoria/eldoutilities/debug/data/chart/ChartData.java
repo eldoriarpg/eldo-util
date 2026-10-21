@@ -18,33 +18,33 @@ import java.util.Map;
  * A chart in a debug report.
  * <p>
  * Each chart type has its own class with the options that apply to it: {@link SeriesChart}, {@link ScatterChart},
- * {@link CategoryChart}, {@link HeatmapChart} and {@link GaugeChart}. {@link #of(String, String, Object)} sends any
- * type with any data for charts the classes do not cover; the report viewer shows the data as sent when it cannot draw
- * it.
+ * {@link CategoryChart}, {@link HeatmapChart} and {@link GaugeChart}. {@link #of(String, ChartType, Object)} sends data
+ * of any shape for a {@link ChartType}, for charts the classes do not cover; the report viewer shows the data as sent
+ * when it cannot draw it.
  *
  * @param <T> the chart class, returned by the fluent setters
  */
 public abstract class ChartData<T extends ChartData<T>> {
     private final String name;
-    private final String type;
+    private final ChartType type;
     private String description = "";
     @Nullable
     private String unit;
 
-    protected ChartData(String name, String type) {
+    protected ChartData(String name, ChartType type) {
         this.name = name;
         this.type = type;
     }
 
     /**
-     * A chart of any type with data of any shape, sent as it is.
+     * A chart with data of any shape, sent as it is.
      *
      * @param name name shown above the chart
-     * @param type chart type the viewer knows, or any other
+     * @param type chart type
      * @param data maps, lists, numbers, strings, booleans and null
      * @return new chart
      */
-    public static CustomChart of(String name, String type, Object data) {
+    public static CustomChart of(String name, ChartType type, Object data) {
         return new CustomChart(name, type, data);
     }
 
@@ -86,7 +86,7 @@ public abstract class ChartData<T extends ChartData<T>> {
      */
     public Map<String, Object> toChart(DebugSettings settings) {
         var chart = new LinkedHashMap<String, Object>();
-        chart.put("type", type);
+        chart.put("type", type.wireName());
         chart.put("data", data());
         if (unit != null) chart.put("unit", unit);
         hints(chart);
