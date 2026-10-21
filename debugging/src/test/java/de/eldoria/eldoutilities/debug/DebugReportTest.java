@@ -13,6 +13,7 @@ import de.eldoria.eldoutilities.debug.DebugReport.Section;
 import de.eldoria.eldoutilities.debug.DebugUpload.Failed;
 import de.eldoria.eldoutilities.debug.DebugUpload.Reason;
 import de.eldoria.eldoutilities.debug.DebugUpload.Uploaded;
+import de.eldoria.eldoutilities.debug.data.ChartData;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
@@ -41,6 +42,7 @@ class DebugReportTest {
         var sections = DebugReport.sections(
                 List.of(HealthCheck.error("Database", "password: hunter2 refused")),
                 new EntryData[]{new EntryData("Hooks", "token: abc"), new EntryData("Storage", Map.of("url", "jdbc:mysql://root:pw@db/mc"))},
+                List.of(ChartData.bar("Storage types", Map.of("yaml", 3))),
                 LOG,
                 List.of(new ConfigFiles.Read("config.yml", "password: hunter2"), new ConfigFiles.Read("mobs/a.json", "{}")),
                 DebugSettings.DEFAULT);
@@ -49,6 +51,7 @@ class DebugReportTest {
                 Section.check("Database", HealthCheck.Level.ERROR, "password: *****"),
                 Section.meta("Hooks", "token: *****", Map.of()),
                 Section.meta("Storage", "", Map.of("url", "jdbc:mysql://*****:*****@db/mc")),
+                Section.chart("Storage types", "", Map.of("type", "bar", "data", Map.of("yaml", 3))),
                 Section.text(Kind.LOG, "latest.log", "the log", "log"),
                 Section.exception(Kind.INTERNAL_EXCEPTION, "Plugin exception 1", new ExceptionData("npe", 3, "12:00:01", "12:30:00")),
                 Section.exception(Kind.EXTERNAL_EXCEPTION, "Other exception 1", new ExceptionData("other", 1, "12:00:02", "12:00:02")),
@@ -78,6 +81,34 @@ class DebugReportTest {
         assertEquals(2, exception.get("count").getAsInt());
         assertEquals("12:00:00", exception.get("firstSeen").getAsString());
         assertEquals("12:01:00", exception.get("lastSeen").getAsString());
+    }
+
+    @Test
+    void chartsKeepTheirLooseDataAndPassTheFilter() {
+        var chart = ChartData.of("Pool", "line", Map.of("password: hunter2", List.of(1, "2.5", Map.of("x", 3))))
+                             .unit("ms")
+                             .mark(25, "budget")
+                             .description("token: abc")
+                             .toChart(DebugSettings.DEFAULT);
+
+        assertEquals("line", chart.get("type"));
+        assertEquals(Map.of("password: *****", List.of(1, "2.5", Map.of("x", 3))), chart.get("data"));
+        assertEquals("ms", chart.get("unit"));
+        assertEquals(List.of(Map.of("y", 25, "label", "budget")), chart.get("marks"));
+        assertFalse(chart.containsKey("x"));
+    }
+
+    @Test
+    void chartsSerialiseAsLynaReadsThem() {
+        var gauge = ChartData.gauge("Usage", 42, 0, 100).yLabel("percent").toChart(DebugSettings.DEFAULT);
+        JsonObject section = new Gson().toJsonTree(Section.chart("Usage", "", gauge)).getAsJsonObject();
+
+        assertEquals("CHART", section.get("kind").getAsString());
+        JsonObject chart = section.getAsJsonObject("chart");
+        assertEquals("gauge", chart.get("type").getAsString());
+        assertEquals(42, chart.getAsJsonObject("data").get("value").getAsInt());
+        assertEquals("percent", chart.getAsJsonObject("y").get("label").getAsString());
+        assertFalse(section.has("level"));
     }
 
     @Test
