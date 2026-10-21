@@ -58,7 +58,7 @@ public final class UpdaterMessages {
                     New version of <gold><plugin_name></gold> available.
                     New version: <gold><new_version></gold>, published <gold><new_time></gold> ago. <new_date_time>
                     Current version: <gold><current_version></gold>, published <red><current_time></red> ago. <current_date_time>
-                    Download the new version via Discord: <gold><website>"""),
+                    Download the new version: <gold><website>"""),
             entry(DOWNLOADED, """
                     New version of <aqua><plugin_name></aqua> downloaded.
                     Newest version: <green><new_version></green>! Current version: <red><current_version></red>!

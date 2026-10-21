@@ -17,6 +17,7 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
     private String host = LynaUpdateData.HOST;
     private UpgradeTokenStore tokenStore;
     private @Nullable Integer downloadType;
+    private boolean customUpdateUrl;
 
     public LynaUpdateDataBuilder(Plugin plugin, int productId) {
         super(plugin);
@@ -77,9 +78,27 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
         return super.updateMessage(updateMessage);
     }
 
+    /**
+     * The address the update message links to. Defaults to the product page of the Lyna instance, not the website of
+     * the plugin.
+     *
+     * @param updateUrl address of the download or patch notes
+     * @return builder instance
+     */
+    @Override
+    public LynaUpdateDataBuilder updateUrl(String updateUrl) {
+        customUpdateUrl = true;
+        return super.updateUrl(updateUrl);
+    }
+
     @Override
     public LynaUpdateData build() {
-        return applyCommon(new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, updateUrl,
+        var url = customUpdateUrl ? updateUrl : productPage(host, productId);
+        return applyCommon(new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, url,
                 updateMessage, tokenStore, downloadType, messageSender));
+    }
+
+    static String productPage(String host, int productId) {
+        return "%s/products/%d".formatted(host.replaceAll("/+$", ""), productId);
     }
 }
