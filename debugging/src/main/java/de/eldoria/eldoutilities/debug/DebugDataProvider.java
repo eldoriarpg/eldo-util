@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.debug;
 
 import de.eldoria.eldoutilities.debug.data.EntryData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -62,6 +63,17 @@ public interface DebugDataProvider {
      */
     @NotNull
     default List<HealthCheck> getHealthChecks() {
+        return Collections.emptyList();
+    }
+
+    /**
+     * Charts drawn from this part of the plugin's data, e.g. timings it keeps. Runs on the thread the debug command
+     * runs on, so only copy what is already there.
+     *
+     * @return the charts, empty by default
+     */
+    @NotNull
+    default List<ChartData<?>> getCharts() {
         return Collections.emptyList();
     }
 }

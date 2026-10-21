@@ -11,6 +11,7 @@ import de.eldoria.eldoutilities.debug.data.ExceptionData;
 import de.eldoria.eldoutilities.debug.data.LogData;
 import de.eldoria.eldoutilities.debug.data.PluginMetaData;
 import de.eldoria.eldoutilities.debug.data.ServerMetaData;
+import de.eldoria.eldoutilities.debug.data.chart.ChartData;
 import de.eldoria.eldoutilities.debug.payload.LogMeta;
 import de.eldoria.eldoutilities.debug.payload.PluginMeta;
 import de.eldoria.eldoutilities.debug.payload.ServerMeta;
@@ -48,7 +49,7 @@ public final class DebugReport {
      * @param additional what the plugin's {@link DebugDataProvider}s add
      */
     public record Snapshot(Plugin plugin, PluginMetaData pluginMeta, ServerMetaData serverMeta,
-                           EntryData[] additional, List<HealthCheck> checks) {
+                           EntryData[] additional, List<HealthCheck> checks, List<ChartData<?>> charts) {
     }
 
     /**
@@ -58,7 +59,7 @@ public final class DebugReport {
      */
     public static Snapshot collect(Plugin plugin) {
         return new Snapshot(plugin, PluginMeta.create(plugin), ServerMeta.create(),
-                DebugUtil.getAdditionalPluginMeta(plugin), DebugUtil.getHealthChecks(plugin));
+                DebugUtil.getAdditionalPluginMeta(plugin), DebugUtil.getHealthChecks(plugin), DebugUtil.getCharts(plugin));
     }
 
     /**
@@ -68,10 +69,10 @@ public final class DebugReport {
         LogData log = LogMeta.create(snapshot.plugin(), settings);
         List<ConfigFiles.Read> configs = ConfigFiles.read(snapshot.plugin(), settings.configFiles(snapshot.plugin()));
         return new DebugReport(snapshot.pluginMeta(), snapshot.serverMeta(),
-                sections(snapshot.checks(), snapshot.additional(), log, configs, settings));
+                sections(snapshot.checks(), snapshot.additional(), snapshot.charts(), log, configs, settings));
     }
 
-    static List<Section> sections(List<HealthCheck> checks, EntryData[] additional, LogData log,
+    static List<Section> sections(List<HealthCheck> checks, EntryData[] additional, List<ChartData<?>> charts, LogData log,
                                   List<ConfigFiles.Read> configs, DebugSettings settings) {
         List<Section> sections = new ArrayList<>();
         for (HealthCheck check : checks) {
@@ -80,6 +81,10 @@ public final class DebugReport {
         for (EntryData entry : additional) {
             entry.applyFilter(settings);
             sections.add(Section.meta(entry.getName(), entry.getContent(), entry.getEntries()));
+        }
+        for (ChartData<?> chart : charts) {
+            sections.add(Section.chart(settings.applyFilter(chart.name()), settings.applyFilter(chart.description()),
+                    chart.toChart(settings)));
         }
         sections.add(Section.text(Kind.LOG, "latest.log", log.getLog(), "log"));
         if (!log.getPluginLog().isBlank()) {
@@ -138,25 +143,31 @@ public final class DebugReport {
      * @param count     how often an exception occurred
      * @param firstSeen the log time it first occurred
      * @param lastSeen  the log time it last occurred
+     * @param chart     type, data and hints of a {@link Kind#CHART}
      */
     public record Section(Kind kind, String name, String content, String format, HealthCheck.Level level,
-                          List<Entry> entries, Integer count, String firstSeen, String lastSeen) {
+                          List<Entry> entries, Integer count, String firstSeen, String lastSeen,
+                          Map<String, Object> chart) {
         static Section text(Kind kind, String name, String content, String format) {
-            return new Section(kind, name, content, format, null, null, null, null, null);
+            return new Section(kind, name, content, format, null, null, null, null, null, null);
         }
 
         static Section check(String name, HealthCheck.Level level, String message) {
-            return new Section(Kind.CHECK, name, message, null, level, null, null, null, null);
+            return new Section(Kind.CHECK, name, message, null, level, null, null, null, null, null);
         }
 
         static Section meta(String name, String content, Map<String, String> entries) {
             List<Entry> rows = entries.entrySet().stream().map(e -> new Entry(e.getKey(), e.getValue())).toList();
-            return new Section(Kind.META, name, content, null, null, rows.isEmpty() ? null : rows, null, null, null);
+            return new Section(Kind.META, name, content, null, null, rows.isEmpty() ? null : rows, null, null, null, null);
         }
 
         static Section exception(Kind kind, String name, ExceptionData exception) {
             return new Section(kind, name, exception.text(), null, null, null, exception.count(),
-                    exception.firstSeen(), exception.lastSeen());
+                    exception.firstSeen(), exception.lastSeen(), null);
+        }
+
+        static Section chart(String name, String description, Map<String, Object> chart) {
+            return new Section(Kind.CHART, name, description, null, null, null, null, null, null, chart);
         }
     }
 
@@ -197,6 +208,10 @@ public final class DebugReport {
         /**
          * The outcome of a {@link HealthCheck}.
          */
-        CHECK
+        CHECK,
+        /**
+         * A {@link ChartData chart} the plugin drew from its data.
+         */
+        CHART
     }
 }
