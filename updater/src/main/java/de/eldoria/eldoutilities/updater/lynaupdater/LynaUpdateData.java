@@ -19,6 +19,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * What a Lyna update check needs: the product id and the Lyna host.
@@ -66,6 +67,28 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
 
     public static LynaUpdateDataBuilder builder(Plugin plugin, int productId) {
         return new LynaUpdateDataBuilder(plugin, productId);
+    }
+
+    /**
+     * Creates a builder for the product named by {@link DefaultProperties#LYNA_PRODUCT} in the plugin's
+     * {@code build.data}, so the id is kept in one place: the build.
+     *
+     * @param plugin plugin whose versions are looked up
+     * @return builder for the product
+     * @throws IllegalStateException if the build data names no valid product id
+     */
+    public static LynaUpdateDataBuilder builder(Plugin plugin) {
+        return builder(plugin, productId(UserData.get(plugin).property(DefaultProperties.LYNA_PRODUCT)));
+    }
+
+    static int productId(Optional<String> property) {
+        var value = property.orElseThrow(() -> new IllegalStateException(
+                "The build data names no Lyna product. Add buildData { put(\"lynaProduct\", \"<id>\") } to the build."));
+        try {
+            return Integer.parseInt(value.strip());
+        } catch (NumberFormatException e) {
+            throw new IllegalStateException("The Lyna product in the build data is not a number: " + value, e);
+        }
     }
 
 

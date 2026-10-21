@@ -37,7 +37,11 @@ public enum DefaultProperties {
     /**
      * The build time as {@link Instant#getEpochSecond()}
      */
-    UNIX("unix");
+    UNIX("unix"),
+    /**
+     * Id of the product at Lyna, added to the build data by the build, e.g. {@code buildData { put("lynaProduct", "8") }}
+     */
+    LYNA_PRODUCT("lynaProduct");
 
     private final String key;
 
