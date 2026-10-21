@@ -226,6 +226,37 @@ class UpdaterTest {
         verify(messageSender, times(2)).sendMessage(eq(admin), any(String.class), any(TagResolver.class));
     }
 
+    @Test
+    void aMajorUpdateIsNotInstalledAutomatically() {
+        updater = new TestUpdater(new TestData(plugin, true, true, messageSender), true);
+        updater.performCheck(true);
+
+        assertEquals(0, updater.installs);
+    }
+
+    @Test
+    void downloadingAMajorUpdateAsksToConfirm() {
+        updater = new TestUpdater(new TestData(plugin, true, false, messageSender), true);
+        updater.performCheck(true);
+        var admin = mock(CommandSender.class);
+        when(admin.isOp()).thenReturn(true);
+        var command = new UpdateCommand(plugin, updater);
+
+        command.execute(admin, "eldo-update", new String[]{"download"});
+        runServerTasks();
+
+        var messages = ArgumentCaptor.forClass(String.class);
+        verify(messageSender).sendMessage(eq(admin), messages.capture(), any(TagResolver.class));
+        assertTrue(messages.getValue().contains("/testplugin:eldo-update download confirm"));
+        assertEquals(0, updater.installs);
+
+        command.execute(admin, "eldo-update", new String[]{"download", "confirm"});
+        updater.download().join();
+        runServerTasks();
+
+        assertEquals(1, updater.installs);
+    }
+
     private void runServerTasks() {
         Runnable task;
         while ((task = serverTasks.poll()) != null) task.run();
@@ -261,10 +292,21 @@ class UpdaterTest {
     }
 
     private static final class TestUpdater extends Updater<TestResponse, TestData> {
+        private final boolean major;
         private int installs;
 
         private TestUpdater(TestData data) {
+            this(data, false);
+        }
+
+        private TestUpdater(TestData data, boolean major) {
             super(data);
+            this.major = major;
+        }
+
+        @Override
+        public boolean isMajorUpdate() {
+            return major;
         }
 
         @Override

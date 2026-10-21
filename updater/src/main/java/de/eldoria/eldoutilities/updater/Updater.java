@@ -117,7 +117,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
         if (updateAvailable) {
             logUpdateMessage();
-            if (isAutoUpdate() && updatesAutomatically()) {
+            if (installsAutomatically()) {
                 if (!downloaded) {
                     downloaded = update();
                 }
@@ -170,6 +170,17 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     protected boolean updatesAutomatically() {
         return true;
+    }
+
+    /**
+     * Whether the last checked version is a new major version, which may not be compatible with the installed setup. A
+     * major update is never installed automatically, is marked in the update message, and its download has to be
+     * confirmed.
+     *
+     * @return true for a major update
+     */
+    public boolean isMajorUpdate() {
+        return false;
     }
 
     /**
@@ -251,7 +262,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
             if (!offersAutoUpdate()) return isAutoUpdate();
             autoUpdateOverride = true;
             report(AutoUpdateDecision.ENABLED);
-            if (updateAvailable && !downloaded && lastCheck != null && updatesAutomatically()) {
+            if (updateAvailable && !downloaded && lastCheck != null && updatesAutomatically() && !isMajorUpdate()) {
                 downloaded = update();
             }
             if (updateAvailable) replaceListener(notice());
@@ -295,23 +306,31 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     }
 
     private void logUpdateMessage() {
-        var message = data.updateMessage(lastCheck);
-        String text;
-        try {
-            text = data.messageSender().translatePlain(message, data.placeholders(lastCheck));
-        } catch (Throwable e) {
-            text = message.replaceAll("(§[0-9a-fklmnor])|(<[^>]*>)", "");
+        plainText(data.updateMessage(lastCheck)).lines().forEach(plugin.getLogger()::info);
+        if (isMajorUpdate()) {
+            plugin.getLogger().warning(plainText(UpdaterMessages.resolve(plugin, UpdaterMessages.MAJOR_NOTICE)));
         }
-        text.lines().forEach(plugin.getLogger()::info);
+    }
+
+    private String plainText(String message) {
+        try {
+            return data.messageSender().translatePlain(message, data.placeholders(lastCheck));
+        } catch (Throwable e) {
+            return message.replaceAll("(§[0-9a-fklmnor])|(<[^>]*>)", "");
+        }
+    }
+
+    private boolean installsAutomatically() {
+        return isAutoUpdate() && updatesAutomatically() && !isMajorUpdate();
     }
 
     private Listener notice() {
-        if (downloaded || (isAutoUpdate() && updatesAutomatically())) {
+        if (downloaded || installsAutomatically()) {
             return new DownloadedNotifier<>(plugin, data, lastCheck, downloaded);
         }
         var downloadLine = offersDownload() ? commandLine("download") : null;
         var autoUpdateLine = offersAutoUpdate() ? commandLine("enable-auto") : null;
-        return new UpdateNotifier<>(plugin, data, lastCheck, downloadLine, autoUpdateLine);
+        return new UpdateNotifier<>(plugin, data, lastCheck, downloadLine, autoUpdateLine, isMajorUpdate());
     }
 
     private void report(AutoUpdateDecision decision) {

@@ -19,7 +19,8 @@ import java.util.Locale;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * The actions behind the buttons of the update messages: {@code download} the update, {@code enable-auto} switch
+ * The actions behind the buttons of the update messages: {@code download} the update ({@code download confirm} for a
+ * major update, which asks first), {@code enable-auto} switch
  * automatic updates on, ask again {@code later}, or {@code never} ask again. Without an action it downloads.
  * <p>
  * The command is registered at runtime as {@code /<plugin>:eldo-update}, so a plugin does not have to declare it, and
@@ -64,7 +65,13 @@ class UpdateCommand extends Command {
         }
         var action = args.length == 0 ? "download" : args[0].toLowerCase(Locale.ROOT);
         switch (action) {
-            case "download" -> download(sender);
+            case "download" -> {
+                if (updater.isMajorUpdate() && !(args.length > 1 && "confirm".equalsIgnoreCase(args[1]))) {
+                    askToConfirmMajor(sender);
+                } else {
+                    download(sender);
+                }
+            }
             case "enable-auto" -> enableAutoUpdate(sender);
             case "later" -> send(sender, UpdaterMessages.AUTO_ASK_LATER);
             case "never" -> updater.declineAutoUpdate()
@@ -109,6 +116,17 @@ class UpdateCommand extends Command {
                 sendError(sender, UpdaterMessages.AUTO_UNAVAILABLE);
             }
         }));
+    }
+
+    /**
+     * Asks to confirm the download of a major update, which may not be compatible.
+     *
+     * @param sender who asked for the download
+     */
+    void askToConfirmMajor(CommandSender sender) {
+        updater.getData().messageSender().sendMessage(sender, "%s\n%s".formatted(
+                text(UpdaterMessages.MAJOR_CONFIRM),
+                button("download confirm", UpdaterMessages.MAJOR_CONFIRM_BUTTON)), placeholders());
     }
 
     private String autoUpdatePrompt() {
