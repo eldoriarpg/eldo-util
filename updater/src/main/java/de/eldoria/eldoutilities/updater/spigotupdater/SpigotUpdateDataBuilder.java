@@ -21,6 +21,6 @@ public class SpigotUpdateDataBuilder extends UpdateDataBuilder<SpigotUpdateDataB
 
     @Override
     public SpigotUpdateData build() {
-        return new SpigotUpdateData(plugin, notifyPermission, notifyUpdate, spigotId, updateUrl, updateMessage);
+        return new SpigotUpdateData(plugin, notifyPermission, notifyUpdate, spigotId, updateUrl, updateMessage, messageSender);
     }
 }

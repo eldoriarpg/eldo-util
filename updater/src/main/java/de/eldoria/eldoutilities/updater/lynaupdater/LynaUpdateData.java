@@ -8,6 +8,7 @@ package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import de.eldoria.eldoutilities.debug.DefaultProperties;
 import de.eldoria.eldoutilities.debug.UserData;
+import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.utils.Durations;
 import org.bukkit.plugin.Plugin;
@@ -54,8 +55,8 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
      */
     LynaUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, int productId,
                    String host, String updateUrl, String updateMessage, UpgradeTokenStore tokenStore,
-                   @Nullable Integer downloadType) {
-        super(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage);
+                   @Nullable Integer downloadType, @Nullable MessageSender messageSender) {
+        super(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage, messageSender);
         this.productId = productId;
         this.host = host;
         this.tokenStore = tokenStore;
@@ -84,6 +85,8 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
                 .map(format::format)
                 .ifPresent(time -> replacements.put("current_date_time", time));
         replacements.put("new_date_time", format.format(Instant.ofEpochSecond(updateResponse.published())));
+        replacements.putIfAbsent("current_time", "");
+        replacements.putIfAbsent("current_date_time", "");
         return replacements;
     }
 

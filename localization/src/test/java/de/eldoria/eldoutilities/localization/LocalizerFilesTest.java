@@ -134,6 +134,18 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void codesAddedLaterAreFoundAndWrittenToTheFiles() throws IOException {
+        var localizer = Localizer.builder(plugin, "en_US").build();
+
+        localizer.addLocaleCodes(java.util.Map.of("late.code", "Late text"));
+
+        assertEquals("Late text", localizer.getValue("late.code"));
+        var properties = new Properties();
+        properties.load(new java.io.StringReader(Files.readString(messages.resolve("messages_en_US.properties"))));
+        assertEquals("Late text", properties.getProperty("late.code"));
+    }
+
+    @Test
     void buildLocalizedReplacesLocaleCodes() {
         var localizer = Localizer.builder(plugin, "en_US").build();
 

@@ -7,6 +7,7 @@
 package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import de.eldoria.eldoutilities.updater.UpdateDataBuilder;
+import de.eldoria.eldoutilities.updater.UpdaterMessages;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,11 +22,7 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
         super(plugin);
         this.productId = productId;
         tokenStore = UpgradeTokenStore.file(plugin.getDataFolder().toPath().resolve("upgrade-token.txt"));
-        updateMessage = """
-                New version of <gold>{plugin_name}<default> available.
-                New Version: <gold>{new_version}<default>. Published <gold>{new_time}<default> ago! {new_date_time}
-                Current version: <gold>{current_version}<default> Published <red>{current_time}<default> ago! {current_date_time}<default>
-                Download the new version via Discord: <gold>{website}""".stripIndent();
+        updateMessage = UpdaterMessages.LYNA_NOTICE;
     }
 
     public LynaUpdateDataBuilder host(String host) {
@@ -83,6 +80,6 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
     @Override
     public LynaUpdateData build() {
         return new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, updateUrl,
-                updateMessage, tokenStore, downloadType);
+                updateMessage, tokenStore, downloadType, messageSender);
     }
 }

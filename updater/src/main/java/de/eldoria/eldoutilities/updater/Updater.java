@@ -6,7 +6,6 @@
 
 package de.eldoria.eldoutilities.updater;
 
-import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateChecker;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateData;
 import de.eldoria.eldoutilities.updater.lynaupdater.LynaUpdateDataBuilder;
@@ -59,6 +58,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     protected Updater(T data) {
         this.plugin = data.plugin();
         this.data = data;
+        UpdaterMessages.register(plugin);
     }
 
     /**
@@ -237,13 +237,14 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     }
 
     private void logUpdateMessage() {
-        data.updateMessage(lastCheck).lines().forEach(line -> {
-            try {
-                plugin.getLogger().info(MessageSender.getPluginMessageSender(plugin).translatePlain(line));
-            } catch (Throwable e) {
-                plugin.getLogger().info(line.replaceAll("(§[0-9a-fklmnor])|(<+.?>)", ""));
-            }
-        });
+        var message = data.updateMessage(lastCheck);
+        String text;
+        try {
+            text = data.messageSender().translatePlain(message, data.placeholders(lastCheck));
+        } catch (Throwable e) {
+            text = message.replaceAll("(§[0-9a-fklmnor])|(<[^>]*>)", "");
+        }
+        text.lines().forEach(plugin.getLogger()::info);
     }
 
     private synchronized String downloadCommand() {

@@ -6,7 +6,7 @@
 
 package de.eldoria.eldoutilities.updater;
 
-import de.eldoria.eldoutilities.messages.MessageSender;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
@@ -58,17 +58,18 @@ class DownloadUpdateCommand extends Command {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        var messages = MessageSender.getPluginMessageSender(plugin);
+        var messages = updater.getData().messageSender();
+        var name = Placeholder.unparsed("plugin_name", plugin.getName());
         if (!mayDownload(sender)) {
-            messages.sendError(sender, "You are not allowed to download updates of " + plugin.getName() + ".");
+            messages.sendError(sender, UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_DENIED), name);
             return true;
         }
-        messages.sendMessage(sender, "Downloading the update of " + plugin.getName() + "...");
+        messages.sendMessage(sender, UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOADING), name);
         updater.download().thenAccept(downloaded -> ServerTasks.runGlobal(plugin, () -> {
             if (downloaded) {
-                messages.sendMessage(sender, "<green>Update of " + plugin.getName() + " downloaded. Restart the server to apply it.");
+                messages.sendMessage(sender, UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_DONE), name);
             } else {
-                messages.sendError(sender, "The update of " + plugin.getName() + " could not be downloaded. See the console for details.");
+                messages.sendError(sender, UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_FAILED), name);
             }
         }));
         return true;

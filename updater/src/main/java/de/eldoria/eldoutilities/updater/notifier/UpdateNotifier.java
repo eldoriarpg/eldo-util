@@ -6,9 +6,9 @@
 
 package de.eldoria.eldoutilities.updater.notifier;
 
-import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.updater.UpdateResponse;
+import de.eldoria.eldoutilities.updater.UpdaterMessages;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
@@ -46,14 +46,16 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
     public void onPlayerJoin(PlayerJoinEvent event) {
         // send to operator.
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission(data.notifyPermission())) {
-            MessageSender.getPluginMessageSender(plugin).sendMessage(event.getPlayer(), message());
+            data.messageSender().sendMessage(event.getPlayer(), message(), data.placeholders(latest()));
         }
     }
 
     private String message() {
         var message = data.updateMessage(latest());
         if (downloadCommand == null) return message;
-        return message.stripTrailing() + "\n<click:run_command:'%s'><hover:show_text:'<green>Download version %s'><green>[Download]</green></hover></click>"
-                .formatted(downloadCommand, latest().latestVersion());
+        return message.stripTrailing() + "\n<click:run_command:'%s'><hover:show_text:'%s'>%s</hover></click>".formatted(
+                downloadCommand,
+                UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_HOVER),
+                UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_BUTTON));
     }
 }

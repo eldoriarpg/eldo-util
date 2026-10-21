@@ -6,9 +6,9 @@
 
 package de.eldoria.eldoutilities.updater.notifier;
 
-import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.UpdateData;
 import de.eldoria.eldoutilities.updater.UpdateResponse;
+import de.eldoria.eldoutilities.updater.UpdaterMessages;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
@@ -29,17 +29,9 @@ public class DownloadedNotifier<T extends UpdateResponse> extends UpdateNotifier
     @Override
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
-        var description = plugin.getDescription();
-        // send to operator.
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission(data.notifyPermission())) {
-            if (updated) {
-                MessageSender.getPluginMessageSender(plugin).sendMessage(event.getPlayer(),
-                        "New version of §b" + plugin.getName() + "§r downloaded.\n"
-                        + "Newest version: §a" + latest + "§r! Current version: §c" + description.getVersion() + "§r!\n"
-                        + "Restart to apply update. Patchnotes can be found here: §b" + description.getWebsite());
-            } else {
-                MessageSender.getPluginMessageSender(plugin).sendMessage(event.getPlayer(), data.updateMessage(latest()));
-            }
+            var message = updated ? UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOADED) : data.updateMessage(latest());
+            data.messageSender().sendMessage(event.getPlayer(), message, data.placeholders(latest()));
         }
     }
 }

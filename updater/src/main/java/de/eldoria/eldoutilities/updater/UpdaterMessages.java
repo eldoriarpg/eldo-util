@@ -1,0 +1,92 @@
+/*
+ *     SPDX-License-Identifier: LGPL-3.0-or-later
+ *
+ *     Copyright (C) EldoriaRPG Team and Contributor
+ */
+
+package de.eldoria.eldoutilities.updater;
+
+import de.eldoria.eldoutilities.localization.ILocalizer;
+import org.bukkit.plugin.Plugin;
+
+import java.util.Map;
+
+/**
+ * The texts the updater shows to players, as locale codes with English defaults.
+ * <p>
+ * With a localizer the codes are added to the plugin's locale files, so server owners can translate them and every
+ * player reads them in their own language. Plugins can ship translations for these codes in their bundled locale
+ * files. Without a localizer the English defaults are sent.
+ * <p>
+ * Texts use MiniMessage. Placeholders are tags: {@code <plugin_name>}, {@code <new_version>},
+ * {@code <current_version>} and {@code <website>}, and for Lyna additionally {@code <new_time>},
+ * {@code <new_date_time>}, {@code <current_time>} and {@code <current_date_time>}.
+ */
+public final class UpdaterMessages {
+    public static final String NOTICE = "eldoutilities.updater.notice";
+    public static final String LYNA_NOTICE = "eldoutilities.updater.lyna-notice";
+    public static final String DOWNLOADED = "eldoutilities.updater.downloaded";
+    public static final String DOWNLOAD_BUTTON = "eldoutilities.updater.download-button";
+    public static final String DOWNLOAD_HOVER = "eldoutilities.updater.download-hover";
+    public static final String DOWNLOAD_DENIED = "eldoutilities.updater.download-denied";
+    public static final String DOWNLOADING = "eldoutilities.updater.downloading";
+    public static final String DOWNLOAD_DONE = "eldoutilities.updater.download-done";
+    public static final String DOWNLOAD_FAILED = "eldoutilities.updater.download-failed";
+
+    private static final Map<String, String> DEFAULTS = Map.of(
+            NOTICE, """
+                    New version of <aqua><plugin_name></aqua> available.
+                    Newest version: <green><new_version></green>! Current version: <red><current_version></red>!
+                    Download the new version here: <aqua><website>""",
+            LYNA_NOTICE, """
+                    New version of <gold><plugin_name></gold> available.
+                    New version: <gold><new_version></gold>, published <gold><new_time></gold> ago. <new_date_time>
+                    Current version: <gold><current_version></gold>, published <red><current_time></red> ago. <current_date_time>
+                    Download the new version via Discord: <gold><website>""",
+            DOWNLOADED, """
+                    New version of <aqua><plugin_name></aqua> downloaded.
+                    Newest version: <green><new_version></green>! Current version: <red><current_version></red>!
+                    Restart the server to apply the update. Patch notes: <aqua><website>""",
+            DOWNLOAD_BUTTON, "<green>[Download]</green>",
+            DOWNLOAD_HOVER, "<green>Download version <new_version>",
+            DOWNLOAD_DENIED, "You are not allowed to download updates of <plugin_name>.",
+            DOWNLOADING, "Downloading the update of <plugin_name>...",
+            DOWNLOAD_DONE, "<green>Update of <plugin_name> downloaded. Restart the server to apply it.",
+            DOWNLOAD_FAILED, "The update of <plugin_name> could not be downloaded. See the console for details.");
+
+    private UpdaterMessages() {
+    }
+
+    /**
+     * The updater's locale codes with their English defaults.
+     *
+     * @return codes and defaults
+     */
+    public static Map<String, String> defaults() {
+        return DEFAULTS;
+    }
+
+    /**
+     * Adds the updater's locale codes to the plugin's localizer, if it has one.
+     *
+     * @param plugin plugin owning the updater
+     */
+    static void register(Plugin plugin) {
+        var localizer = ILocalizer.getPluginLocalizer(plugin);
+        if (localizer != ILocalizer.DEFAULT) localizer.addLocaleCodes(DEFAULTS);
+    }
+
+    /**
+     * The message to send for a text: the updater's codes become a locale tag when the plugin has a localizer and
+     * their English default otherwise. Any other text, including a plugin's own locale code, is returned as it is.
+     *
+     * @param plugin plugin owning the updater
+     * @param text   locale code or text
+     * @return message to send
+     */
+    public static String resolve(Plugin plugin, String text) {
+        if (!DEFAULTS.containsKey(text)) return text;
+        if (ILocalizer.getPluginLocalizer(plugin) == ILocalizer.DEFAULT) return DEFAULTS.get(text);
+        return ILocalizer.escape(text);
+    }
+}

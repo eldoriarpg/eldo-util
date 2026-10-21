@@ -304,6 +304,9 @@ public class Localizer implements ILocalizer {
                 if (result != null) break;
             }
         }
+        if (result == null) {
+            result = runtimeLocaleCodes.get(key);
+        }
         return result;
     }
 
@@ -604,9 +607,22 @@ public class Localizer implements ILocalizer {
         return Collections.unmodifiableSet(includedLocales);
     }
 
+    /**
+     * Adds locale codes with their default text.
+     * <p>
+     * Codes added after the localizer was created are appended to the locale files right away and the languages are
+     * read again, so they are available in every language without a restart.
+     *
+     * @param runtimeLocaleCodes map with locales codes to add.
+     */
     @Override
     public void addLocaleCodes(Map<String, String> runtimeLocaleCodes) {
         this.runtimeLocaleCodes.putAll(runtimeLocaleCodes);
+        if (!checked) return;
+        createOrUpdateLocaleFiles();
+        for (var language : List.copyOf(languages.keySet())) {
+            loadLanguage(language);
+        }
     }
 
     @Override

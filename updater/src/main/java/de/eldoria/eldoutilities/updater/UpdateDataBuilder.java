@@ -6,7 +6,9 @@
 
 package de.eldoria.eldoutilities.updater;
 
+import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
@@ -14,11 +16,8 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
     protected boolean notifyUpdate;
     protected boolean autoUpdate;
     protected String updateUrl;
-    protected String updateMessage = """
-            New version of §b{plugin_name}§r available.
-            Newest version: §a{new_version}§r! Current version: §c{current_version}§r!
-            Download new version here: §b{website}
-            """.stripIndent();
+    protected String updateMessage = UpdaterMessages.NOTICE;
+    protected @Nullable MessageSender messageSender;
 
     public UpdateDataBuilder(Plugin plugin) {
         this.plugin = plugin;
@@ -37,6 +36,18 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
 
     public T autoUpdate(boolean autoUpdate) {
         this.autoUpdate = autoUpdate;
+        return (T) this;
+    }
+
+    /**
+     * The message sender the updater sends its messages through. Without one, the sender registered for the plugin
+     * is used.
+     *
+     * @param messageSender message sender of the plugin
+     * @return builder instance
+     */
+    public T messageSender(MessageSender messageSender) {
+        this.messageSender = messageSender;
         return (T) this;
     }
 

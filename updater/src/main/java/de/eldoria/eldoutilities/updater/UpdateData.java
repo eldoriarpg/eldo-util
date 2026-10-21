@@ -6,7 +6,11 @@
 
 package de.eldoria.eldoutilities.updater;
 
+import de.eldoria.eldoutilities.messages.MessageSender;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,6 +27,7 @@ public abstract class UpdateData<T extends UpdateResponse> {
     private final boolean autoUpdate;
     private final String updateUrl;
     private final String updateMessage;
+    private @Nullable MessageSender messageSender;
 
     /**
      * Creates a new Update data.
@@ -41,6 +46,33 @@ public abstract class UpdateData<T extends UpdateResponse> {
         this.autoUpdate = autoUpdate;
         this.updateUrl = updateUrl;
         this.updateMessage = updateMessage;
+    }
+
+    /**
+     * Creates a new Update data with the message sender the updater sends its messages through.
+     *
+     * @param plugin           plugin to check the version for
+     * @param notifyPermission permission a user needs to get a notification
+     * @param notifyUpdate     set to true to notify admins on login
+     * @param autoUpdate       true if the updater should attempt to update the plugin
+     * @param updateUrl        address shown in the update notice
+     * @param updateMessage    update notice, a text or a locale code
+     * @param messageSender    message sender to use, or null for the one registered for the plugin
+     */
+    public UpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, String updateUrl,
+                      String updateMessage, @Nullable MessageSender messageSender) {
+        this(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage);
+        this.messageSender = messageSender;
+    }
+
+    /**
+     * The message sender the updater sends its messages through: the one handed to the builder, or else the one
+     * registered for the plugin.
+     *
+     * @return message sender
+     */
+    public MessageSender messageSender() {
+        return messageSender != null ? messageSender : MessageSender.getPluginMessageSender(plugin);
     }
 
     public String notifyPermission() {
@@ -68,11 +100,31 @@ public abstract class UpdateData<T extends UpdateResponse> {
         return replacements;
     }
 
+    /**
+     * The update notice. The updater's own locale codes become a locale tag or their English default, see
+     * {@link UpdaterMessages#resolve(Plugin, String)}. Placeholders written as {@code {name}} are replaced here; written
+     * as tags they are resolved through {@link #placeholders(UpdateResponse)} when the message is sent.
+     *
+     * @param updateResponse the update check response
+     * @return message to send
+     */
     public String updateMessage(T updateResponse) {
-        var message = updateMessage;
+        var message = UpdaterMessages.resolve(plugin, updateMessage);
         for (var entry : replacements(updateResponse).entrySet()) {
             message = message.replace("{%s}".formatted(entry.getKey()), String.valueOf(entry.getValue()));
         }
         return message;
+    }
+
+    /**
+     * The placeholders of the update messages as tags, shown as plain text.
+     *
+     * @param updateResponse the update check response
+     * @return placeholder tags
+     */
+    public TagResolver placeholders(T updateResponse) {
+        return TagResolver.resolver(replacements(updateResponse).entrySet().stream()
+                .map(entry -> Placeholder.unparsed(entry.getKey(), String.valueOf(entry.getValue())))
+                .toList());
     }
 }

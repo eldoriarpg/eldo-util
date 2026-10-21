@@ -8,7 +8,9 @@ package de.eldoria.eldoutilities.updater.spigotupdater;
 
 import de.eldoria.eldoutilities.updater.DefaultUpdateResponse;
 import de.eldoria.eldoutilities.updater.UpdateData;
+import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Updater implementation for spigot update check.
@@ -26,8 +28,9 @@ public class SpigotUpdateData extends UpdateData<DefaultUpdateResponse> {
      * @param notifyUpdate     set to true to notify admins on login
      * @param spigotId         spigot id of the plugin
      */
-    SpigotUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, int spigotId, String updateUrl, String updateMessage) {
-        super(plugin, notifyPermission, notifyUpdate, false, updateUrl, updateMessage);
+    SpigotUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, int spigotId, String updateUrl, String updateMessage,
+                     @Nullable MessageSender messageSender) {
+        super(plugin, notifyPermission, notifyUpdate, false, updateUrl, updateMessage, messageSender);
         this.spigotId = spigotId;
     }
 
