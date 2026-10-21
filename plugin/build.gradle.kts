@@ -9,5 +9,4 @@ dependencies {
     api(project(":core"))
     api(project(":debugging"))
     api(project(":configuration"))
-    compileOnly(libs.spigot)
 }

@@ -30,21 +30,22 @@ publishData {
 repositories {
     maven("https://eldonexus.de/repository/maven-proxies")
     maven("https://eldonexus.de/repository/maven-public")
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots")
     maven("https://repo.papermc.io/repository/maven-public/")
 }
 
+val libs = versionCatalogs.named("libs")
+
 dependencies {
     compileOnly("org.jetbrains", "annotations", "26.1.0")
+    compileOnly(libs.findLibrary("paper").get())
 
     testImplementation("org.jetbrains", "annotations", "26.1.0")
-    testImplementation("org.spigotmc", "spigot-api", "1.16.5-R0.1-SNAPSHOT")
+    testImplementation(libs.findLibrary("paper").get())
     testImplementation("org.junit.jupiter", "junit-jupiter-api", "6.1.3")
     testImplementation("org.junit.jupiter", "junit-jupiter-params", "6.1.3")
     testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "6.1.3")
     testRuntimeOnly("org.junit.platform", "junit-platform-launcher", "6.1.3")
     testImplementation("org.mockito", "mockito-core", "5.24.0")
-    testImplementation("com.github.seeseemelk", "MockBukkit-v1.19", "2.145.0")
 }
 
 mavenPublishing {

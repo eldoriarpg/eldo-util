@@ -7,8 +7,6 @@
 package de.eldoria.eldoutilities.utils;
 
 import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
-import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.entity.LivingEntity;
@@ -60,7 +58,7 @@ public final class AttributeUtil {
 
     /**
      * Syncs to attributes to the same value.
-     * <p> If the {@link Attribute} is {@link Attribute#GENERIC_MAX_HEALTH} the health of the
+     * <p> If the {@link Attribute} is {@link Attribute#MAX_HEALTH} the health of the
      * entity health will be set to the new max health value.
      *
      * @param source    source of the attribute
@@ -88,14 +86,8 @@ public final class AttributeUtil {
 
         setAttributeValue(target, attribute, sourceAttribute.getValue());
 
-        if (Registry.ATTRIBUTE.get(NamespacedKey.minecraft("generic.max_health")) != null) {
-            if (attribute == Attribute.GENERIC_MAX_HEALTH) {
-                target.setHealth(targetAttribute.getValue());
-            }
-        } else if (Registry.ATTRIBUTE.get(NamespacedKey.minecraft("max_health")) != null) {
-            if (Registry.ATTRIBUTE.get(NamespacedKey.minecraft("max_health")) == attribute) {
-                target.setHealth(targetAttribute.getValue());
-            }
+        if (attribute == Attribute.MAX_HEALTH) {
+            target.setHealth(targetAttribute.getValue());
         }
 
     }

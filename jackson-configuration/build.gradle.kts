@@ -7,7 +7,6 @@ description = "Configuration file wrapper for the jackson-bukkit framework, base
 dependencies {
     api(project(":debugging"))
     api(libs.ocular)
-    api(libs.jackson.bukkit)
+    api(libs.jackson.bukkit.paper)
     api(libs.jackson.dataformat.yaml)
-    compileOnly(libs.spigot)
 }

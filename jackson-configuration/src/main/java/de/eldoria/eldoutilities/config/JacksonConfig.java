@@ -8,7 +8,6 @@ package de.eldoria.eldoutilities.config;
 
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
 import de.eldoria.eldoutilities.debug.data.EntryData;
-import de.eldoria.jacksonbukkit.JacksonBukkit;
 import de.eldoria.jacksonbukkit.JacksonPaper;
 import dev.chojo.ocular.Configurations;
 import dev.chojo.ocular.components.Format;
@@ -24,7 +23,6 @@ import tools.jackson.databind.SerializationFeature;
 import tools.jackson.databind.cfg.MapperBuilder;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,9 +32,9 @@ import java.util.logging.Level;
  * Configuration files of a plugin, stored as yaml relative to {@link Plugin#getDataFolder()}.
  * <p>
  * Files are managed by ocular's {@link Configurations} and identified by a {@link Key}.
- * This class adds the bukkit specifics: files are read with the plugin class loader, which polymorphism and the
- * library loader rely on, the jackson-bukkit module of the running platform is registered, and every loaded file is
- * exposed as debug data.
+ * This class adds the server specifics: files are read with the plugin class loader, which polymorphism and the
+ * library loader rely on, the Paper module of jackson-bukkit is registered, and every loaded file is exposed as debug
+ * data.
  *
  * @param <T> type of main configuration
  */
@@ -87,23 +85,11 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
     /**
      * Modules registered on every mapper. Overrides adding further modules should include this list.
      *
-     * @return list of modules, containing the module of the running platform
+     * @return list of modules, containing the jackson-bukkit Paper module
      */
     @Override
     public List<JacksonModule> additionalModules() {
-        return List.of(getPlatformModule());
-    }
-
-    /**
-     * Get the module for the current platform.
-     *
-     * @return module
-     */
-    public final JacksonModule getPlatformModule() {
-        if (plugin.getServer().getName().toLowerCase(Locale.ROOT).contains("spigot")) {
-            return getBukkitModule();
-        }
-        return getPaperModule();
+        return List.of(getPaperModule());
     }
 
     /**
@@ -113,17 +99,6 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
      */
     protected JacksonPaper getPaperModule() {
         return JacksonPaper.builder()
-                .colorAsHex()
-                .build();
-    }
-
-    /**
-     * Create the module used for spigot/bukkit server.
-     *
-     * @return spigot/bukkit module
-     */
-    protected JacksonBukkit getBukkitModule() {
-        return JacksonBukkit.builder()
                 .colorAsHex()
                 .build();
     }

@@ -8,7 +8,6 @@ package de.eldoria.eldoutilities.messages;
 
 import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.impl.PaperMessageSender;
-import de.eldoria.eldoutilities.messages.impl.SpigotMessageSender;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
@@ -23,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-import static de.eldoria.eldoutilities.utils.ReflectionUtil.isPaper;
 
 public class MessageSenderBuilder {
     private final MiniMessage.Builder miniMessage = MiniMessage.builder();
@@ -32,7 +30,6 @@ public class MessageSenderBuilder {
     private final TagResolver.Builder errorTagResolver = TagResolver.builder()
                                                                     .tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
-    private static final String ADVENTURE_PATH = String.join(".","net", "kyori", "adventure", "text");
 
     @NotNull
     private final Plugin plugin;
@@ -120,40 +117,14 @@ public class MessageSenderBuilder {
         var defaultResolver = defaultTagResolver
                 .resolver(StandardTags.defaults())
                 .build();
-        MessageSender messageSender;
-        plugin.getLogger().info("Determining message sender type");
-        boolean paper = isPaper();
-        if (!paper) {
-            plugin.getLogger().info("Detected non paper based server");
-        }
-        if (!paper || hasRelocatedAdventure()) {
-            plugin.getLogger().info("Using legacy message sender");
-            messageSender = new SpigotMessageSender(plugin,
-                    miniMessage.tags(defaultResolver)
-                               .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                               .build(),
-                    TagResolver.resolver(defaultResolver, messageTagResolver.build()),
-                    TagResolver.resolver(defaultResolver, errorTagResolver.build()),
-                    prefix);
-        } else {
-            plugin.getLogger().info("Using Paper Message Sender");
-            messageSender = new PaperMessageSender(plugin,
-                    miniMessage.tags(defaultResolver)
-                               .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                               .build(),
-                    TagResolver.resolver(defaultResolver, messageTagResolver.build()),
-                    TagResolver.resolver(defaultResolver, errorTagResolver.build()),
-                    prefix);
-        }
+        var messageSender = new PaperMessageSender(plugin,
+                miniMessage.tags(defaultResolver)
+                           .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                           .build(),
+                TagResolver.resolver(defaultResolver, messageTagResolver.build()),
+                TagResolver.resolver(defaultResolver, errorTagResolver.build()),
+                prefix);
         MessageSender.register(messageSender);
         return messageSender;
-    }
-
-    boolean hasRelocatedAdventure() {
-        boolean relocated = !Component.class.getPackageName().startsWith(ADVENTURE_PATH);
-        if (relocated) {
-            plugin.getLogger().info("Found relocated adventure at %s instead of net.kyori.adventure.text.".formatted(Component.class.getPackageName()));
-        }
-        return relocated;
     }
 }

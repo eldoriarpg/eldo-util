@@ -365,7 +365,7 @@ public final class EntityBuilder {
      * @return builder instance
      */
     public EntityBuilder withHealth(double health) {
-        entity.setHealth(EMath.clamp(0, AttributeUtil.getAttributeValue(entity, Attribute.GENERIC_MAX_HEALTH), health));
+        entity.setHealth(EMath.clamp(0, AttributeUtil.getAttributeValue(entity, Attribute.MAX_HEALTH), health));
         return this;
     }
 

@@ -2,7 +2,7 @@ plugins {
     id("eldo-util.java-conventions")
 }
 
-description = "Utility Library for spigot plugins."
+description = "Utility library for Paper plugins."
 
 dependencies {
     api(project(":commands"))
@@ -30,7 +30,7 @@ fun applyJavaDocOptions(options: MinimalJavadocOptions) {
         "https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/",
         "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest",
         "https://javadoc.io/doc/tools.jackson.core/jackson-databind/latest",
-        "https://jd.papermc.io/paper/1.19/"
+        "https://jd.papermc.io/paper/1.21.11/"
     )
 }
 

@@ -36,7 +36,9 @@ class ObjUtilTest {
     @Test
     void nonNullOrElse() {
         PlayerInteractEvent event = mock(PlayerInteractEvent.class);
-        when(event.getItem()).thenReturn(new ItemStack(Material.AIR));
+        ItemStack air = mock(ItemStack.class);
+        when(air.getType()).thenReturn(Material.AIR);
+        when(event.getItem()).thenReturn(air);
         Assertions.assertTrue(ObjUtil.nonNullOrElse(event.getItem(), itemStack -> itemStack.getType() == Material.AIR, false));
 
         event = mock(PlayerInteractEvent.class);
