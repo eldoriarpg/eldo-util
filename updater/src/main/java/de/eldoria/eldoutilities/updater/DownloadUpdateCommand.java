@@ -36,7 +36,7 @@ class DownloadUpdateCommand extends Command {
     }
 
     /**
-     * Registers the command for the updater on the main thread.
+     * Registers the command for the updater on the server's global thread.
      *
      * @param plugin  plugin owning the updater
      * @param updater updater performing the download
@@ -44,7 +44,7 @@ class DownloadUpdateCommand extends Command {
      */
     static String register(Plugin plugin, Updater<?, ?> updater) {
         var prefix = plugin.getName().toLowerCase(Locale.ROOT);
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
+        ServerTasks.runGlobal(plugin, () -> {
             try {
                 var server = plugin.getServer();
                 var commandMap = (CommandMap) server.getClass().getMethod("getCommandMap").invoke(server);
@@ -64,7 +64,7 @@ class DownloadUpdateCommand extends Command {
             return true;
         }
         messages.sendMessage(sender, "Downloading the update of " + plugin.getName() + "...");
-        updater.download().thenAccept(downloaded -> plugin.getServer().getScheduler().runTask(plugin, () -> {
+        updater.download().thenAccept(downloaded -> ServerTasks.runGlobal(plugin, () -> {
             if (downloaded) {
                 messages.sendMessage(sender, "<green>Update of " + plugin.getName() + " downloaded. Restart the server to apply it.");
             } else {

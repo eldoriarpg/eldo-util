@@ -224,15 +224,16 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         if (data.isNotifyUpdate() && !notifyActive) {
             notifyActive = true;
             notifier = listener;
-            plugin.getServer().getPluginManager()
-                    .registerEvents(listener, plugin);
+            ServerTasks.runGlobal(plugin, () -> plugin.getServer().getPluginManager().registerEvents(listener, plugin));
         }
     }
 
     private void replaceListener(Listener listener) {
-        if (notifier != null) {
-            HandlerList.unregisterAll(notifier);
-            notifyActive = false;
+        var previous = notifier;
+        notifier = null;
+        notifyActive = false;
+        if (previous != null) {
+            ServerTasks.runGlobal(plugin, () -> HandlerList.unregisterAll(previous));
         }
         registerListener(listener);
     }
