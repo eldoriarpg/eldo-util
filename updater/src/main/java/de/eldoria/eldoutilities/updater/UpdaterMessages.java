@@ -11,6 +11,8 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.Map;
 
+import static java.util.Map.entry;
+
 /**
  * The texts the updater shows to players, as locale codes with English defaults.
  * <p>
@@ -32,27 +34,49 @@ public final class UpdaterMessages {
     public static final String DOWNLOADING = "eldoutilities.updater.downloading";
     public static final String DOWNLOAD_DONE = "eldoutilities.updater.download-done";
     public static final String DOWNLOAD_FAILED = "eldoutilities.updater.download-failed";
+    public static final String AUTO_BUTTON = "eldoutilities.updater.auto-button";
+    public static final String AUTO_HOVER = "eldoutilities.updater.auto-hover";
+    public static final String AUTO_PROMPT = "eldoutilities.updater.auto-prompt";
+    public static final String AUTO_YES = "eldoutilities.updater.auto-yes";
+    public static final String AUTO_LATER = "eldoutilities.updater.auto-later";
+    public static final String AUTO_NEVER = "eldoutilities.updater.auto-never";
+    public static final String AUTO_ENABLED = "eldoutilities.updater.auto-enabled";
+    public static final String AUTO_ASK_LATER = "eldoutilities.updater.auto-ask-later";
+    public static final String AUTO_NOT_ASKED = "eldoutilities.updater.auto-not-asked";
+    public static final String AUTO_UNAVAILABLE = "eldoutilities.updater.auto-unavailable";
+    public static final String UNKNOWN_ACTION = "eldoutilities.updater.unknown-action";
 
-    private static final Map<String, String> DEFAULTS = Map.of(
-            NOTICE, """
+    private static final Map<String, String> DEFAULTS = Map.ofEntries(
+            entry(NOTICE, """
                     New version of <aqua><plugin_name></aqua> available.
                     Newest version: <green><new_version></green>! Current version: <red><current_version></red>!
-                    Download the new version here: <aqua><website>""",
-            LYNA_NOTICE, """
+                    Download the new version here: <aqua><website>"""),
+            entry(LYNA_NOTICE, """
                     New version of <gold><plugin_name></gold> available.
                     New version: <gold><new_version></gold>, published <gold><new_time></gold> ago. <new_date_time>
                     Current version: <gold><current_version></gold>, published <red><current_time></red> ago. <current_date_time>
-                    Download the new version via Discord: <gold><website>""",
-            DOWNLOADED, """
+                    Download the new version via Discord: <gold><website>"""),
+            entry(DOWNLOADED, """
                     New version of <aqua><plugin_name></aqua> downloaded.
                     Newest version: <green><new_version></green>! Current version: <red><current_version></red>!
-                    Restart the server to apply the update. Patch notes: <aqua><website>""",
-            DOWNLOAD_BUTTON, "<green>[Download]</green>",
-            DOWNLOAD_HOVER, "<green>Download version <new_version>",
-            DOWNLOAD_DENIED, "You are not allowed to download updates of <plugin_name>.",
-            DOWNLOADING, "Downloading the update of <plugin_name>...",
-            DOWNLOAD_DONE, "<green>Update of <plugin_name> downloaded. Restart the server to apply it.",
-            DOWNLOAD_FAILED, "The update of <plugin_name> could not be downloaded. See the console for details.");
+                    Restart the server to apply the update. Patch notes: <aqua><website>"""),
+            entry(DOWNLOAD_BUTTON, "<green>[Download]</green>"),
+            entry(DOWNLOAD_HOVER, "<green>Download version <new_version>"),
+            entry(DOWNLOAD_DENIED, "You are not allowed to download updates of <plugin_name>."),
+            entry(DOWNLOADING, "Downloading the update of <plugin_name>..."),
+            entry(DOWNLOAD_DONE, "<green>Update of <plugin_name> downloaded. Restart the server to apply it."),
+            entry(DOWNLOAD_FAILED, "The update of <plugin_name> could not be downloaded. See the console for details."),
+            entry(AUTO_BUTTON, "<aqua>[Enable auto updates]</aqua>"),
+            entry(AUTO_HOVER, "<aqua>Install new stable versions of <plugin_name> automatically"),
+            entry(AUTO_PROMPT, "Install updates of <plugin_name> automatically in the future?"),
+            entry(AUTO_YES, "<green>[Yes]</green>"),
+            entry(AUTO_LATER, "<yellow>[Not now]</yellow>"),
+            entry(AUTO_NEVER, "<red>[Don't ask again]</red>"),
+            entry(AUTO_ENABLED, "<green>Automatic updates of <plugin_name> are enabled."),
+            entry(AUTO_ASK_LATER, "You will be asked again after the next manual update."),
+            entry(AUTO_NOT_ASKED, "You will not be asked again. Automatic updates can still be enabled in the config of <plugin_name>."),
+            entry(AUTO_UNAVAILABLE, "Automatic updates of <plugin_name> can only be enabled in its config."),
+            entry(UNKNOWN_ACTION, "Unknown action. Use download, enable-auto, later or never."));
 
     private UpdaterMessages() {
     }

@@ -14,18 +14,22 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+
 /**
  * Notifier implementation for updater with update check function.
  * <p>
- * When the updater offers the download, the message ends with a button running the download command.
+ * When the updater offers the download or switching automatic updates on, the message ends with buttons running the
+ * matching commands.
  *
  * @since 1.1.0
  */
 public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
     private final @Nullable String downloadCommand;
+    private final @Nullable String autoUpdateCommand;
 
     public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest) {
-        this(plugin, data, latest, null);
+        this(plugin, data, latest, null, null);
     }
 
     /**
@@ -37,8 +41,23 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
      * @param downloadCommand command line downloading the update, or null to offer no download
      */
     public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest, @Nullable String downloadCommand) {
+        this(plugin, data, latest, downloadCommand, null);
+    }
+
+    /**
+     * Creates a notifier offering the update for download and automatic updates.
+     *
+     * @param plugin            plugin instance
+     * @param data              update data
+     * @param latest            the update check response
+     * @param downloadCommand   command line downloading the update, or null to offer no download
+     * @param autoUpdateCommand command line switching automatic updates on, or null to not offer it
+     */
+    public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest, @Nullable String downloadCommand,
+                          @Nullable String autoUpdateCommand) {
         super(plugin, data, latest);
         this.downloadCommand = downloadCommand;
+        this.autoUpdateCommand = autoUpdateCommand;
     }
 
     @Override
@@ -51,11 +70,20 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
     }
 
     private String message() {
+        var buttons = new ArrayList<String>();
+        if (downloadCommand != null) {
+            buttons.add(button(downloadCommand, UpdaterMessages.DOWNLOAD_HOVER, UpdaterMessages.DOWNLOAD_BUTTON));
+        }
+        if (autoUpdateCommand != null) {
+            buttons.add(button(autoUpdateCommand, UpdaterMessages.AUTO_HOVER, UpdaterMessages.AUTO_BUTTON));
+        }
         var message = data.updateMessage(latest());
-        if (downloadCommand == null) return message;
-        return message.stripTrailing() + "\n<click:run_command:'%s'><hover:show_text:'%s'>%s</hover></click>".formatted(
-                downloadCommand,
-                UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_HOVER),
-                UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOAD_BUTTON));
+        if (buttons.isEmpty()) return message;
+        return message.stripTrailing() + "\n" + String.join(" ", buttons);
+    }
+
+    private String button(String command, String hover, String label) {
+        return "<click:run_command:'%s'><hover:show_text:'%s'>%s</hover></click>".formatted(
+                command, UpdaterMessages.resolve(plugin, hover), UpdaterMessages.resolve(plugin, label));
     }
 }

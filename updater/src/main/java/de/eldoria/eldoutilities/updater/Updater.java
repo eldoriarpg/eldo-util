@@ -53,7 +53,9 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
     private boolean downloaded;
     private V lastCheck;
     private Listener notifier;
-    private String downloadCommand;
+    private String command;
+    private volatile Boolean autoUpdateOverride;
+    private volatile boolean autoUpdateDeclined;
 
     protected Updater(T data) {
         this.plugin = data.plugin();
@@ -115,18 +117,14 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
 
         if (updateAvailable) {
             logUpdateMessage();
-            if (data.isAutoUpdate() && updatesAutomatically()) {
+            if (isAutoUpdate() && updatesAutomatically()) {
                 if (!downloaded) {
                     downloaded = update();
                 }
-                registerListener(new DownloadedNotifier<>(plugin, data, lastCheck, downloaded));
-            } else {
-                var command = offersDownload() ? downloadCommand() : null;
-                if (command != null) {
-                    plugin.getLogger().info("Run " + command + " to download it.");
-                }
-                registerListener(new UpdateNotifier<>(plugin, data, lastCheck, command));
+            } else if (offersDownload()) {
+                plugin.getLogger().info("Run " + commandLine("download") + " to download it.");
             }
+            replaceListener(notice());
         } else {
             if (!silent) {
                 plugin.getLogger().info("Plugin is up to date.");
@@ -157,7 +155,7 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
             if (!downloaded && lastCheck != null && offersDownload()) {
                 downloaded = update();
                 if (downloaded) {
-                    replaceListener(new DownloadedNotifier<>(plugin, data, lastCheck, true));
+                    replaceListener(notice());
                 }
             }
             return downloaded;
@@ -212,9 +210,69 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         if (executor.isShutdown()) return CompletableFuture.completedFuture(null);
         return CompletableFuture.runAsync(() -> {
             this.data = data;
+            autoUpdateOverride = null;
+            autoUpdateDeclined = false;
             updateAvailable = false;
             removeListener();
             performCheck(true);
+        }, executor);
+    }
+
+    /**
+     * Whether updates are installed automatically: as configured, unless an admin switched it on in chat since.
+     *
+     * @return true when automatic updates are on
+     */
+    public final boolean isAutoUpdate() {
+        var override = autoUpdateOverride;
+        return override != null ? override : data.isAutoUpdate();
+    }
+
+    /**
+     * Whether admins are offered to switch automatic updates on in chat. That needs a hook to store the decision,
+     * automatic updates being off, and nobody having chosen not to be asked again.
+     *
+     * @return true when automatic updates are offered
+     */
+    public final boolean offersAutoUpdate() {
+        return data.autoUpdateHook().isPresent() && data.askForAutoUpdate() && !autoUpdateDeclined && !isAutoUpdate();
+    }
+
+    /**
+     * Switches automatic updates on, as chosen by an admin in chat. The plugin's hook receives
+     * {@link AutoUpdateDecision#ENABLED}, and a found update that may be installed automatically is installed right away.
+     * Does nothing unless automatic updates are {@link #offersAutoUpdate() offered}.
+     *
+     * @return future completing with whether automatic updates are on afterward
+     */
+    public final CompletableFuture<Boolean> enableAutoUpdate() {
+        if (executor.isShutdown()) return CompletableFuture.completedFuture(isAutoUpdate());
+        return CompletableFuture.supplyAsync(() -> {
+            if (!offersAutoUpdate()) return isAutoUpdate();
+            autoUpdateOverride = true;
+            report(AutoUpdateDecision.ENABLED);
+            if (updateAvailable && !downloaded && lastCheck != null && updatesAutomatically()) {
+                downloaded = update();
+            }
+            if (updateAvailable) replaceListener(notice());
+            return true;
+        }, executor);
+    }
+
+    /**
+     * Stops offering automatic updates, as chosen by an admin in chat. The plugin's hook receives
+     * {@link AutoUpdateDecision#NEVER_ASK}. Does nothing unless automatic updates are
+     * {@link #offersAutoUpdate() offered}.
+     *
+     * @return future completing once the decision is applied
+     */
+    public final CompletableFuture<Void> declineAutoUpdate() {
+        if (executor.isShutdown()) return CompletableFuture.completedFuture(null);
+        return CompletableFuture.runAsync(() -> {
+            if (!offersAutoUpdate()) return;
+            autoUpdateDeclined = true;
+            report(AutoUpdateDecision.NEVER_ASK);
+            if (updateAvailable) replaceListener(notice());
         }, executor);
     }
 
@@ -247,11 +305,24 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         text.lines().forEach(plugin.getLogger()::info);
     }
 
-    private synchronized String downloadCommand() {
-        if (downloadCommand == null) {
-            downloadCommand = DownloadUpdateCommand.register(plugin, this);
+    private Listener notice() {
+        if (downloaded || (isAutoUpdate() && updatesAutomatically())) {
+            return new DownloadedNotifier<>(plugin, data, lastCheck, downloaded);
         }
-        return downloadCommand;
+        var downloadLine = offersDownload() ? commandLine("download") : null;
+        var autoUpdateLine = offersAutoUpdate() ? commandLine("enable-auto") : null;
+        return new UpdateNotifier<>(plugin, data, lastCheck, downloadLine, autoUpdateLine);
+    }
+
+    private void report(AutoUpdateDecision decision) {
+        data.autoUpdateHook().ifPresent(hook -> ServerTasks.runGlobal(plugin, () -> hook.accept(decision)));
+    }
+
+    private synchronized String commandLine(String action) {
+        if (command == null) {
+            command = UpdateCommand.register(plugin, this);
+        }
+        return command + " " + action;
     }
 
     private void registerListener(Listener listener) {

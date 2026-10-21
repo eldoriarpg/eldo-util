@@ -10,6 +10,8 @@ import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Consumer;
+
 public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
     protected String notifyPermission = "eldoutilitites.admin";
@@ -18,6 +20,8 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
     protected String updateUrl;
     protected String updateMessage = UpdaterMessages.NOTICE;
     protected @Nullable MessageSender messageSender;
+    protected boolean askForAutoUpdate = true;
+    protected @Nullable Consumer<AutoUpdateDecision> autoUpdateHook;
 
     public UpdateDataBuilder(Plugin plugin) {
         this.plugin = plugin;
@@ -80,6 +84,43 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
     public T updateMessage(String updateMessage) {
         this.updateMessage = updateMessage;
         return (T) this;
+    }
+
+    /**
+     * Whether admins may be asked in chat to switch automatic updates on. Pass {@code false} once the hook received
+     * {@link AutoUpdateDecision#NEVER_ASK}.
+     *
+     * @param askForAutoUpdate true to offer automatic updates in chat
+     * @return builder instance
+     */
+    public T askForAutoUpdate(boolean askForAutoUpdate) {
+        this.askForAutoUpdate = askForAutoUpdate;
+        return (T) this;
+    }
+
+    /**
+     * Lets admins switch automatic updates on from chat: the update notice gets a button for it, and after a manual
+     * download they are asked whether future updates should be installed automatically. The hook receives their
+     * decision so the plugin can store it in its config; it runs on the server's global thread. Without a hook,
+     * nothing is offered.
+     *
+     * @param autoUpdateHook receives the decisions
+     * @return builder instance
+     */
+    public T autoUpdateHook(Consumer<AutoUpdateDecision> autoUpdateHook) {
+        this.autoUpdateHook = autoUpdateHook;
+        return (T) this;
+    }
+
+    /**
+     * Applies the settings every update data shares to newly built data. Builders call this on the data they build.
+     *
+     * @param data built data
+     * @return the same data
+     */
+    protected V applyCommon(V data) {
+        data.autoUpdateOptIn(askForAutoUpdate, autoUpdateHook);
+        return data;
     }
 
     public abstract V build();

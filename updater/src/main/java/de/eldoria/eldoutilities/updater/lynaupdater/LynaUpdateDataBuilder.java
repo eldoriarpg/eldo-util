@@ -79,7 +79,7 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
 
     @Override
     public LynaUpdateData build() {
-        return new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, updateUrl,
-                updateMessage, tokenStore, downloadType, messageSender);
+        return applyCommon(new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, updateUrl,
+                updateMessage, tokenStore, downloadType, messageSender));
     }
 }

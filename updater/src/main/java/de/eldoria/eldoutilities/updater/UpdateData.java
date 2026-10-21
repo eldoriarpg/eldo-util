@@ -14,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
  * Update data base implementation.
@@ -28,6 +30,8 @@ public abstract class UpdateData<T extends UpdateResponse> {
     private final String updateUrl;
     private final String updateMessage;
     private @Nullable MessageSender messageSender;
+    private boolean askForAutoUpdate = true;
+    private @Nullable Consumer<AutoUpdateDecision> autoUpdateHook;
 
     /**
      * Creates a new Update data.
@@ -73,6 +77,29 @@ public abstract class UpdateData<T extends UpdateResponse> {
      */
     public MessageSender messageSender() {
         return messageSender != null ? messageSender : MessageSender.getPluginMessageSender(plugin);
+    }
+
+    void autoUpdateOptIn(boolean askForAutoUpdate, @Nullable Consumer<AutoUpdateDecision> autoUpdateHook) {
+        this.askForAutoUpdate = askForAutoUpdate;
+        this.autoUpdateHook = autoUpdateHook;
+    }
+
+    /**
+     * Whether admins may be asked in chat to switch automatic updates on.
+     *
+     * @return false once an admin chose not to be asked again
+     */
+    public boolean askForAutoUpdate() {
+        return askForAutoUpdate;
+    }
+
+    /**
+     * Receives the decisions admins make in chat about automatic updates. Without a hook, nothing is offered.
+     *
+     * @return hook of the plugin
+     */
+    public Optional<Consumer<AutoUpdateDecision>> autoUpdateHook() {
+        return Optional.ofNullable(autoUpdateHook);
     }
 
     public String notifyPermission() {
