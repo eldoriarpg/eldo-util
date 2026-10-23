@@ -53,7 +53,7 @@ The second argument of `builder` is the fallback locale. It is always included, 
 | Builder method | What it does | Default |
 |---|---|---|
 | `setIncludedLocales(String...)` | The locales you ship in the jar. They are copied into the plugin folder. | only the fallback locale |
-| `setUserLocale(Function<Player, String>)` | Which language a player gets. | the fallback locale |
+| `setUserLocale(Function<Player, String>)` | Which language a player gets. | the default language |
 | `setLocalesPath(String)` | The folder inside the plugin folder that holds the files. | `messages` |
 | `setLocalesPrefix(String)` | The file name prefix, both in the jar and on disk. | `messages` |
 | `addLocaleCodes(String key, String value)` | A key with its default text, added to every file. | none |
@@ -79,7 +79,10 @@ So server owners can edit the texts, and they can add a language you do not ship
 `messages_fr_FR.properties` into the folder, and it is loaded and completed on the next start. Files that do not
 match `<prefix>_<locale>.properties` are skipped with a note in the log.
 
-The files are read when the localizer is built. To read edited files, build a new localizer.
+The files are read when the localizer is built. `reload()` reads them again, for example from a reload command of
+your plugin. It runs the same three steps, so edited texts and new language files are used without a restart, and a
+deleted file of an included locale is copied again. If the default language has no file anymore, the fallback locale
+becomes the default language again.
 
 ### Built-in keys
 
@@ -95,9 +98,10 @@ owners can edit it in the files on disk.
 
 ## Which language is used
 
-A message sent to a player is looked up in the language that `setUserLocale` returns for that player. Every other
-receiver, like the console, gets the default language. The default language starts as the fallback locale.
-`setDefaultLocale(String)` changes it to another loaded locale. An unknown locale is ignored with a warning.
+A message sent to a player is looked up in the language that `setUserLocale` returns for that player. Without
+`setUserLocale`, players get the default language, like the console and every other receiver. The default language
+starts as the fallback locale. `setDefaultLocale(String)` changes it to another loaded locale, for players and the
+console alike. An unknown locale is ignored with a warning.
 
 The requested language does not have to match a file exactly. The localizer takes the closest loaded one:
 
@@ -107,12 +111,6 @@ The requested language does not have to match a file exactly. The localizer take
 
 A key missing in that language is taken from the default language, then from child localizers, then from the
 built-in keys. If no text exists at all, the key itself is shown and a warning is logged once per key.
-
-:::warning[Players and the default language]
-Without `setUserLocale`, every player gets the fallback locale given to `builder`, even after `setDefaultLocale`.
-To use one language from your config for everyone, return it for players as well:
-`.setUserLocale(player -> config.main().language())`.
-:::
 
 ## Localize text yourself
 
@@ -127,6 +125,7 @@ read texts directly:
 | `getValue(String key, CommandSender)` | The text, or `null` if it is missing. |
 | `includedLocales()` | The locales given to the builder. |
 | `addLocaleCodes(Map<String, String>)` | Adds keys with default texts after the localizer was built. They are written to the files and available right away. |
+| `reload()` | Reads the locale files again. |
 
 `registerChild(ILocalizer)` adds another localizer as a child. Keys this localizer cannot find are then looked up in
 the child. An add-on registers its own localizer as a child of its main plugin's localizer, so the main plugin can

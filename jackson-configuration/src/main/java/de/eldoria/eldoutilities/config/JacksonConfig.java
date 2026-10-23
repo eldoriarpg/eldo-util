@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.config;
 
+import de.eldoria.eldoutilities.debug.ConfigFiles;
 import de.eldoria.eldoutilities.debug.DebugDataProvider;
 import de.eldoria.eldoutilities.debug.data.EntryData;
 import de.eldoria.jacksonbukkit.JacksonPaper;
@@ -34,13 +35,14 @@ import java.util.logging.Level;
  * Files are managed by ocular's {@link Configurations} and identified by a {@link Key}.
  * This class adds the server specifics: files are read with the plugin class loader, which polymorphism and the
  * library loader rely on, the Paper module of jackson-bukkit is registered, and every loaded file is exposed as debug
- * data.
+ * data unless {@link #excludeFromDebug(Key[])} leaves it out.
  *
  * @param <T> type of main configuration
  */
 public class JacksonConfig<T> extends Configurations<T> implements DebugDataProvider {
     private final Plugin plugin;
     private final Set<Key<?>> keys = ConcurrentHashMap.newKeySet();
+    private final Set<Key<?>> debugExcluded = ConcurrentHashMap.newKeySet();
     private Format<?, ?> debugFormat;
 
     /**
@@ -66,6 +68,22 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
      */
     public Plugin plugin() {
         return plugin;
+    }
+
+    /**
+     * Leaves configuration files out of debug reports, for files whose content the report filters can not hide.
+     * <p>
+     * The files are neither added as debug data of this configuration nor carried as configuration files of the
+     * report. Every file is included until it is excluded here.
+     *
+     * @param keys keys of the files to leave out
+     * @since 3.7.0
+     */
+    public void excludeFromDebug(Key<?>... keys) {
+        for (Key<?> key : keys) {
+            debugExcluded.add(key);
+            ConfigFiles.exclude(plugin, base().resolve(key.path()));
+        }
     }
 
     @Override
@@ -108,7 +126,11 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
 
     @Override
     public @NotNull EntryData[] getDebugInformations() {
-        return keys.stream().map(this::dump).flatMap(Optional::stream).toArray(EntryData[]::new);
+        return keys.stream()
+                .filter(key -> !debugExcluded.contains(key))
+                .map(this::dump)
+                .flatMap(Optional::stream)
+                .toArray(EntryData[]::new);
     }
 
     private Optional<EntryData> dump(Key<?> key) {

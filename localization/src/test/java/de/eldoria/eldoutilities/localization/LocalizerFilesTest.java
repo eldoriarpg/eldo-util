@@ -93,6 +93,19 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void aPlayerWithoutOwnLocaleGetsTheDefaultLanguage() throws IOException {
+        Files.writeString(
+                messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\nfarewell.bye=Au revoir\n");
+        var player = mock(Player.class);
+
+        var localizer = Localizer.builder(plugin, "en_US").build();
+
+        assertEquals("Hello", localizer.getValue("greeting.hello", player));
+        localizer.setDefaultLocale("fr_FR");
+        assertEquals("Bonjour", localizer.getValue("greeting.hello", player));
+    }
+
+    @Test
     void aRenamedKeyIsFoundUnderItsOldName() throws IOException {
         Files.writeString(messages.resolve("messages_en_US.properties"), BUNDLED + "error.unkownPlayer=Who is that?\n");
 
@@ -168,6 +181,33 @@ class LocalizerFilesTest {
         var properties = new Properties();
         properties.load(new java.io.StringReader(Files.readString(messages.resolve("messages_en_US.properties"))));
         assertEquals("Late text", properties.getProperty("late.code"));
+    }
+
+    @Test
+    void reloadReadsEditedAndNewFiles() throws IOException {
+        var localizer = Localizer.builder(plugin, "en_US").build();
+        var english = messages.resolve("messages_en_US.properties");
+        Files.writeString(english, Files.readString(english).replace("greeting.hello=Hello", "greeting.hello=Hi"));
+        Files.writeString(messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\n");
+
+        localizer.reload();
+
+        assertEquals("Hi", localizer.getValue("greeting.hello"));
+        assertEquals("Bonjour", localizer.getValue("greeting.hello", "fr_FR"));
+        assertEquals("Bye", localizer.getValue("farewell.bye", "fr_FR"));
+    }
+
+    @Test
+    void reloadFallsBackWhenTheDefaultLanguageIsGone() throws IOException {
+        var french = messages.resolve("messages_fr_FR.properties");
+        Files.writeString(french, "greeting.hello=Bonjour\n");
+        var localizer = Localizer.builder(plugin, "en_US").build();
+        localizer.setDefaultLocale("fr_FR");
+        Files.delete(french);
+
+        localizer.reload();
+
+        assertEquals("Hello", localizer.getValue("greeting.hello"));
     }
 
     @Test

@@ -130,6 +130,13 @@ public interface ILocalizer {
 
     void registerChild(ILocalizer localizer);
 
+    /**
+     * Reads the locale files again, so edited texts are used without a restart. Localizers without files do nothing.
+     *
+     * @since 3.7.0
+     */
+    default void reload() {}
+
     public class DummyLocalizer implements ILocalizer {
         @Override
         public Plugin plugin() {

@@ -145,6 +145,10 @@ and up to four folders below it. A file larger than 1 MB is left out, and files 
 These limits also apply to files you choose with `withConfigFiles`. Call `ConfigFiles.inDataFolder(plugin)` in your
 function to extend the default instead of replacing it.
 
+`ConfigFiles.exclude(plugin, Path)` leaves a file out, whichever function chose it. The path is absolute or relative
+to your plugin folder. `JacksonConfig.excludeFromDebug` does this for its files, see
+[Configuration](./configuration.md#debug-reports).
+
 :::warning
 The filters catch the usual names, but not every value an admin may consider private. Keep secrets in keys whose
 name contains `password`, `token`, `secret` or `apikey`, or add your own filter.

@@ -215,6 +215,16 @@ public @NotNull List<DebugDataProvider> getDebugProviders() {
 }
 ```
 
+A file whose content the report filters can not hide, like a file that holds nothing but credentials, can be left
+out. `excludeFromDebug` takes the keys of such files. They are then neither in the debug data of the configuration
+nor among the [configuration files](./debugging.md#configuration-files) of the report:
+
+```java
+configuration.excludeFromDebug(DATABASE_KEY);
+```
+
+Every file is included until you exclude it.
+
 ## Dependencies
 
 `jackson-configuration` brings ocular 2.3.1, jackson-bukkit 2.0.0 and jackson-dataformat-yaml 3.2.4. When your

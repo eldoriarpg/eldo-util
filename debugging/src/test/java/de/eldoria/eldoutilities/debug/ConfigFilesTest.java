@@ -82,4 +82,17 @@ class ConfigFilesTest {
 
         assertEquals(List.of(new ConfigFiles.Read("extra.txt", "xxx")), read);
     }
+
+    @Test
+    void anExcludedFileIsNeverRead() throws IOException {
+        write("config.yml", 1);
+        write("database.yml", 1);
+        ConfigFiles.exclude(plugin, Path.of("database.yml"));
+
+        List<String> names = ConfigFiles.read(plugin, ConfigFiles.inDataFolder(plugin)).stream()
+                .map(ConfigFiles.Read::name)
+                .toList();
+
+        assertEquals(List.of("config.yml"), names);
+    }
 }

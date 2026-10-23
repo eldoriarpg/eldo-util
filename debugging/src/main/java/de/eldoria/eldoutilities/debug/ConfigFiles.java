@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -31,8 +32,38 @@ public final class ConfigFiles {
     public static final long MAX_TOTAL_BYTES = 5 * 1024 * 1024;
     private static final Set<String> EXTENSIONS = Set.of("yml", "yaml", "json", "properties", "toml");
     private static final int DEPTH = 4;
+    private static final Set<Path> EXCLUDED = ConcurrentHashMap.newKeySet();
 
     private ConfigFiles() {}
+
+    /**
+     * Leaves a file out of debug reports, whichever function of
+     * {@link DebugSettings.Builder#withConfigFiles(java.util.function.Function)} chose it. Use it for files holding
+     * data that the filters can not hide, like a whole file of credentials.
+     *
+     * @param plugin the plugin whose folder a relative path starts in
+     * @param file   the file, absolute or relative to the plugin's folder
+     * @since 3.7.0
+     */
+    public static void exclude(Plugin plugin, Path file) {
+        EXCLUDED.add(absolute(plugin, file));
+    }
+
+    /**
+     * Whether {@link #exclude(Plugin, Path)} left a file out of debug reports.
+     *
+     * @param plugin the plugin whose folder a relative path starts in
+     * @param file   the file, absolute or relative to the plugin's folder
+     * @return true when the file is left out
+     * @since 3.7.0
+     */
+    public static boolean isExcluded(Plugin plugin, Path file) {
+        return EXCLUDED.contains(absolute(plugin, file));
+    }
+
+    private static Path absolute(Plugin plugin, Path file) {
+        return plugin.getDataFolder().toPath().resolve(file).toAbsolutePath().normalize();
+    }
 
     /**
      * Every {@code .yml}, {@code .yaml}, {@code .json}, {@code .properties} and {@code .toml} file in the plugin's
@@ -53,7 +84,7 @@ public final class ConfigFiles {
     }
 
     /**
-     * Reads the chosen files within the size limits.
+     * Reads the chosen files within the size limits, leaving out the files marked with {@link #exclude(Plugin, Path)}.
      *
      * @return each file's path relative to the plugin's folder (or as given, when outside it) with its content
      */
@@ -62,6 +93,7 @@ public final class ConfigFiles {
         List<Read> read = new ArrayList<>();
         long total = 0;
         for (Path path : chosen) {
+            if (isExcluded(plugin, path)) continue;
             try {
                 long size = Files.size(path);
                 if (size > MAX_FILE_BYTES || total + size > MAX_TOTAL_BYTES) continue;

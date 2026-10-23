@@ -115,7 +115,7 @@ fills `<item_name>`.
 |---|---|
 | `create(String, String)`, `create(String, Object)` | Parsed as MiniMessage. Alias: `replacement`. |
 | `unparsed(String, Object)` | Shown as plain text. Tags in the value stay visible as text. |
-| `create(String, Double)`, `create(String, Float)` | Formatted with two decimals. Alias: `number`. |
+| `create(String, Double)`, `create(String, Float)` | Formatted with two decimals in the server's locale: `1.50`, or `1,50` on a German server. Alias: `number`. |
 | `create(String, Enum)` | The constant's `name()`. Alias: `name`. |
 | `create(String, Player)` | The player's name as plain text. Alias: `player`. |
 | `create(String, World)` | The world's name as plain text. Alias: `world`. |

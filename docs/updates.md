@@ -31,10 +31,7 @@ publishData {
 Build the update data with `LynaUpdateData.builder(plugin)` and create the updater with `Updater.lyna(data)`:
 
 ```java
-LynaUpdateData data = LynaUpdateData.builder(this)
-        .notifyPermission("myplugin.updates")
-        .notifyUpdate(true)
-        .build();
+LynaUpdateData data = LynaUpdateData.builder(this).build();
 
 Updater<LynaUpdateResponse, LynaUpdateData> updater = Updater.lyna(data);
 updater.start();
@@ -42,6 +39,9 @@ updater.start();
 
 `builder(plugin)` throws an `IllegalStateException` when `build.data` has no `lynaProduct` or the value is not a
 number. `builder(plugin, productId)` takes the id directly instead.
+
+Declare the notify permission, by default `<plugin>.updates` with your plugin name in lower case, in your plugin
+descriptor with `default: op`.
 
 `start()` checks right away and then every 6 hours. Checks and downloads run on a thread of the updater, not on the
 server thread.
@@ -61,8 +61,8 @@ files when it is created.
 
 | Method | Default | What it does |
 |---|---|---|
-| `notifyPermission(String)` | `eldoutilities.admin` | Players with this permission (and operators) get the notice on join. It also allows the update command. |
-| `notifyUpdate(boolean)` | `false` | Send the notice to players on join. The console always gets it. |
+| `notifyPermission(String)` | `<plugin>.updates`, your plugin name in lower case | Players with this permission (and operators) get the notice on join. It also allows the update command. |
+| `notifyUpdate(boolean)` | `true` | Send the notice to players on join. The console always gets it. |
 | `autoUpdate(boolean)` | `false` | Download new stable versions on their own. See [automatic updates](#automatic-updates). |
 | `askForAutoUpdate(boolean)` | `true` | Offer admins to switch automatic updates on from chat. |
 | `autoUpdateHook(Consumer<AutoUpdateDecision>)` | none | Receives what an admin chose in chat. Without a hook, nothing is offered in chat. |
@@ -82,7 +82,8 @@ The notice can use these placeholders as tags: `<plugin_name>`, `<new_version>`,
 When a check finds a new version:
 
 - The console logs the notice. A new major version also gets a warning that it may not be compatible.
-- With `notifyUpdate(true)`, players with the notify permission and operators get the notice when they join.
+- Players with the notify permission and operators get the notice when they join, unless `notifyUpdate(false)` was
+  set.
 - The notice ends with buttons when they apply: **Download** and **Enable auto updates**.
 
 All texts of the updater are locale codes that start with `eldoutilities.updater.`. With a localizer they are added
