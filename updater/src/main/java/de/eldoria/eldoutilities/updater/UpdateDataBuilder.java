@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 
 public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
-    protected String notifyPermission = "eldoutilitites.admin";
+    protected String notifyPermission = "eldoutilities.admin";
     protected boolean notifyUpdate;
     protected boolean autoUpdate;
     protected String updateUrl;
