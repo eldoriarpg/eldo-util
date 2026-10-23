@@ -14,7 +14,9 @@ import java.util.function.Function;
 
 /**
  * A simple wrapper for {@link FileConfiguration}
+ * @deprecated Use the jackson-configuration module. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class SimpleConfigWrapper {
     private final Plugin plugin;
     private FileConfiguration config;

@@ -21,21 +21,21 @@ class BukkitFutureResultTest {
     void of() {
         // direct use
         CompletableBukkitFuture.supplyAsync(() -> {
-            //Some heavy async calling to database or other stuff
-            return result;
-        }).whenComplete(plugin, result -> {
-            player.sendMessage(result);
-        });
-
-        // Wrap a completeable future
-        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-            //Some heavy async calling to database or other stuff
-            return result;
-        });
-
-        BukkitFutureResult.of(future)
+                    // Some heavy async calling to database or other stuff
+                    return result;
+                })
                 .whenComplete(plugin, result -> {
                     player.sendMessage(result);
                 });
+
+        // Wrap a completeable future
+        CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
+            // Some heavy async calling to database or other stuff
+            return result;
+        });
+
+        BukkitFutureResult.of(future).whenComplete(plugin, result -> {
+            player.sendMessage(result);
+        });
     }
 }

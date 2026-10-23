@@ -28,6 +28,7 @@ class MessageComposerTest {
 
     @Test
     public void prependText() {
-        Assertions.assertEquals(5, TextUtil.countChars(MessageComposer.create().prependLines(5).build(), '\n'));
+        Assertions.assertEquals(
+                5, TextUtil.countChars(MessageComposer.create().prependLines(5).build(), '\n'));
     }
 }

@@ -23,17 +23,19 @@ public final class PluginBaseConfiguration {
             Path.of("base_configuration.yml"),
             PluginBaseConfiguration.class,
             PluginBaseConfiguration::new);
+
     @JsonProperty
     private int version;
+
     @JsonProperty
     private String lastInstalledVersion;
+
     @JsonDeserialize(using = LevelDeserializer.class)
     @JsonSerialize(using = LevelSerializer.class)
     @JsonProperty
     private Level logLevel = Level.INFO;
 
-    public PluginBaseConfiguration() {
-    }
+    public PluginBaseConfiguration() {}
 
     public PluginBaseConfiguration(int version, String lastInstalledVersion, Level level) {
         this.version = version;

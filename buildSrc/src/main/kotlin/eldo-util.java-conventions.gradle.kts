@@ -1,113 +1,50 @@
-import com.vanniktech.maven.publish.JavaLibrary
-import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SourcesJar
-
 plugins {
     `java-library`
     id("com.diffplug.spotless")
-    id("de.chojo.publishdata")
-    id("com.vanniktech.maven.publish")
-}
-
-group = "de.eldoria.util"
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
-publishData {
-    eldoNexus()
-    channels {
-        clear()
-        release("https://eldonexus.de/repository/maven-releases/")
-        dev("https://eldonexus.de/repository/maven-dev/")
-        snapshot("https://eldonexus.de/repository/maven-snapshots/")
-    }
-}
-
-repositories {
-    maven("https://eldonexus.de/repository/maven-proxies")
-    maven("https://eldonexus.de/repository/maven-public")
-    maven("https://repo.papermc.io/repository/maven-public/")
 }
 
 val libs = versionCatalogs.named("libs")
 
+repositories {
+    mavenCentral()
+    maven("https://repo.papermc.io/repository/maven-public/")
+    maven("https://eldonexus.de/repository/maven-public/")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
 dependencies {
-    compileOnly("org.jetbrains", "annotations", "26.1.0")
+    compileOnly(libs.findLibrary("annotations").get())
     compileOnly(libs.findLibrary("paper").get())
 
-    testImplementation("org.jetbrains", "annotations", "26.1.0")
+    testImplementation(libs.findLibrary("annotations").get())
     testImplementation(libs.findLibrary("paper").get())
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "6.1.3")
-    testImplementation("org.junit.jupiter", "junit-jupiter-params", "6.1.3")
-    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "6.1.3")
-    testRuntimeOnly("org.junit.platform", "junit-platform-launcher", "6.1.3")
-    testImplementation("org.mockito", "mockito-core", "5.24.0")
-}
-
-mavenPublishing {
-    publishToMavenCentral()
-    signAllPublications()
-
-    coordinates(groupId = "de.eldoria.util", artifactId = project.name, version = project.version.toString())
-
-    pom {
-        name.set("eldo-util")
-        description.set(project.description)
-        inceptionYear.set("2025")
-        url.set("https://github.com/eldoriarpg/eldo-util")
-        licenses {
-            license {
-                name.set("LGPL-3.0")
-                url.set("https://opensource.org/license/lgpl-3-0")
-            }
-        }
-
-        developers {
-            developer {
-                id.set("rainbowdashlabs")
-                name.set("Lilly Fülling")
-                email.set("mail@chojo.dev")
-                url.set("https://github.com/rainbowdashlabs")
-            }
-        }
-
-        scm {
-            url.set("https://github.com/eldoriarpg/eldo-util")
-            connection.set("scm:git:git://github.com/eldoriarpg/eldo-util.git")
-            developerConnection.set("scm:git:ssh://github.com/eldoriarpg/eldo-util.git")
-        }
-    }
-
-    configure(
-        JavaLibrary(
-            javadocJar = JavadocJar.Javadoc(),
-            sourcesJar = SourcesJar.Sources()
-        )
-    )
-}
-
-spotless {
-    java {
-        licenseHeaderFile(rootProject.file("HEADER.txt"))
-        target("**/*.java")
-    }
+    testImplementation(platform(libs.findLibrary("junit-bom").get()))
+    testImplementation(libs.findLibrary("junit-jupiter").get())
+    testImplementation(libs.findLibrary("mockito-core").get())
+    testRuntimeOnly(libs.findLibrary("junit-launcher").get())
 }
 
 tasks {
-    compileJava {
+    withType<JavaCompile>().configureEach {
+        options.release = 21
         options.encoding = "UTF-8"
     }
 
-    javadoc {
+    withType<Javadoc>().configureEach {
         options.encoding = "UTF-8"
-    }
-
-    compileTestJava {
-        options.encoding = "UTF-8"
+        (options as StandardJavadocDocletOptions).links(
+            "https://docs.oracle.com/en/java/javase/21/docs/api/",
+            "https://javadoc.io/doc/org.jetbrains/annotations/latest/",
+            "https://javadoc.io/doc/tools.jackson.core/jackson-core/latest/",
+            "https://javadoc.io/doc/tools.jackson.core/jackson-databind/latest/",
+            "https://javadoc.io/doc/com.fasterxml.jackson.core/jackson-annotations/latest/",
+            "https://jd.papermc.io/paper/1.21.11/",
+        )
     }
 
     test {
@@ -116,5 +53,18 @@ tasks {
         testLogging {
             events("passed", "skipped", "failed")
         }
+    }
+}
+
+spotless {
+    java {
+        target("src/**/*.java")
+        licenseHeaderFile(rootProject.file("HEADER.txt"))
+        palantirJavaFormat(libs.findVersion("palantir").get().requiredVersion).formatJavadoc(false)
+        removeUnusedImports()
+        importOrder("", "java", "javax", "\\#")
+        trimTrailingWhitespace()
+        endWithNewline()
+        encoding("UTF-8")
     }
 }

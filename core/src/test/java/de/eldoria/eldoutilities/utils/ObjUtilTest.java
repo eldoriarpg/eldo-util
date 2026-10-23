@@ -18,20 +18,16 @@ import static org.mockito.Mockito.when;
 class ObjUtilTest {
 
     @Test
-    void nonNull() {
-    }
+    void nonNull() {}
 
     @Test
-    void testNonNull() {
-    }
+    void testNonNull() {}
 
     @Test
-    void testNonNull1() {
-    }
+    void testNonNull1() {}
 
     @Test
-    void testNonNull2() {
-    }
+    void testNonNull2() {}
 
     @Test
     void nonNullOrElse() {
@@ -39,10 +35,12 @@ class ObjUtilTest {
         ItemStack air = mock(ItemStack.class);
         when(air.getType()).thenReturn(Material.AIR);
         when(event.getItem()).thenReturn(air);
-        Assertions.assertTrue(ObjUtil.nonNullOrElse(event.getItem(), itemStack -> itemStack.getType() == Material.AIR, false));
+        Assertions.assertTrue(
+                ObjUtil.nonNullOrElse(event.getItem(), itemStack -> itemStack.getType() == Material.AIR, false));
 
         event = mock(PlayerInteractEvent.class);
         when(event.getItem()).thenReturn(null);
-        Assertions.assertFalse(ObjUtil.nonNullOrElse(event.getItem(), itemStack -> itemStack.getType() == Material.AIR, false));
+        Assertions.assertFalse(
+                ObjUtil.nonNullOrElse(event.getItem(), itemStack -> itemStack.getType() == Material.AIR, false));
     }
 }

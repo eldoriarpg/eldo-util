@@ -28,6 +28,7 @@ public abstract class ChartData<T extends ChartData<T>> {
     private final String name;
     private final ChartType type;
     private String description = "";
+
     @Nullable
     private String unit;
 
@@ -107,8 +108,7 @@ public abstract class ChartData<T extends ChartData<T>> {
      *
      * @param chart chart map to add to
      */
-    protected void hints(Map<String, Object> chart) {
-    }
+    protected void hints(Map<String, Object> chart) {}
 
     @SuppressWarnings("unchecked")
     private T self() {

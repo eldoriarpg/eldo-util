@@ -12,8 +12,6 @@ import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.messages.Replacement;
 import de.eldoria.eldoutilities.utils.EnumUtil;
 import de.eldoria.eldoutilities.utils.Parser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -36,7 +34,9 @@ public final class CommandAssertions {
 
     public static void unexpectedRouteEnd(CommandMeta meta, Arguments arguments) throws CommandException {
         if (arguments.isEmpty() && meta.defaultCommand() == null) {
-            var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
+            var subcommands = meta.subCommands().values().stream()
+                    .map(c -> "/" + c.meta().createCommandCall())
+                    .collect(Collectors.joining("\n"));
             throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands));
         }
     }
@@ -44,7 +44,9 @@ public final class CommandAssertions {
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static void unexpectedRouteEnd(CommandMeta meta, Optional<AdvancedCommand> command) throws CommandException {
         if (command.isEmpty()) {
-            var subcommands = meta.subCommands().values().stream().map(c -> "/" + c.meta().createCommandCall()).collect(Collectors.joining("\n"));
+            var subcommands = meta.subCommands().values().stream()
+                    .map(c -> "/" + c.meta().createCommandCall())
+                    .collect(Collectors.joining("\n"));
             throw CommandException.message("error.endOfRoute", Replacement.create("COMMANDS", subcommands));
         }
     }
@@ -57,7 +59,9 @@ public final class CommandAssertions {
      * @throws CommandException when the arguments are not sufficient.
      */
     public static void invalidArguments(CommandMeta meta, String[] args) throws CommandException {
-        isFalse(args.length < meta.requiredArguments(), "error.invalidArguments",
+        isFalse(
+                args.length < meta.requiredArguments(),
+                "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.name() + " " + meta.argumentString()));
     }
 
@@ -69,7 +73,9 @@ public final class CommandAssertions {
      * @throws CommandException when the arguments are not sufficient.
      */
     public static void invalidArguments(CommandMeta meta, Arguments args) throws CommandException {
-        isFalse(args.size() < meta.requiredArguments(), "error.invalidArguments",
+        isFalse(
+                args.size() < meta.requiredArguments(),
+                "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + meta.argumentString()));
     }
 
@@ -81,10 +87,13 @@ public final class CommandAssertions {
      * @param arguments arguments which are required and optional in correct order
      * @throws CommandException when the arguments are not sufficient.
      */
-    public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args) throws CommandException {
+    public static void invalidArguments(CommandMeta meta, Arguments arguments, Argument... args)
+            throws CommandException {
         var required = Arrays.stream(args).filter(Argument::isRequired).count();
         var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
-        isFalse(arguments.size() < required, "error.invalidArguments",
+        isFalse(
+                arguments.size() < required,
+                "error.invalidArguments",
                 Replacement.create("SYNTAX", meta.createCommandCall() + " " + argumentString));
     }
 
@@ -101,8 +110,7 @@ public final class CommandAssertions {
     public static void invalidArguments(Arguments arguments, Argument... args) throws CommandException {
         var required = Arrays.stream(args).filter(Argument::isRequired).count();
         var argumentString = Arrays.stream(args).map(Argument::formatted).collect(Collectors.joining(" "));
-        isFalse(arguments.size() < required, "error.invalidArguments",
-                Replacement.create("SYNTAX", argumentString));
+        isFalse(arguments.size() < required, "error.invalidArguments", Replacement.create("SYNTAX", argumentString));
     }
 
     /**
@@ -167,7 +175,8 @@ public final class CommandAssertions {
         if (silent) {
             throw CommandException.silent();
         }
-        throw CommandException.message("error.permission", Replacement.create("permission", String.join(", ", permissions)));
+        throw CommandException.message(
+                "error.permission", Replacement.create("permission", String.join(", ", permissions)));
     }
 
     /**
@@ -178,7 +187,9 @@ public final class CommandAssertions {
      * @param max   max value
      */
     public static void range(double value, double min, double max) throws CommandException {
-        isTrue(value <= max && value >= min, "error.invalidRange",
+        isTrue(
+                value <= max && value >= min,
+                "error.invalidRange",
                 Replacement.create("MIN", min),
                 Replacement.create("MAX", max));
     }
@@ -191,7 +202,9 @@ public final class CommandAssertions {
      * @param max   max value
      */
     public static void range(int value, int min, int max) throws CommandException {
-        isTrue(value <= max && value >= min, "error.invalidRange",
+        isTrue(
+                value <= max && value >= min,
+                "error.invalidRange",
                 Replacement.create("MIN", min),
                 Replacement.create("MAX", max));
     }
@@ -203,8 +216,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(int value, int min) throws CommandException {
-        isTrue(value >= min, "error.tooLow",
-                Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
     }
 
     /**
@@ -214,8 +226,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(double value, double min) throws CommandException {
-        isTrue(value >= min, "error.tooLow",
-                Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
     }
 
     /**
@@ -225,8 +236,7 @@ public final class CommandAssertions {
      * @param max   max value (inclusive)
      */
     public static void max(int value, int max) throws CommandException {
-        isTrue(value <= max, "error.tooLarge",
-                Replacement.create("MAX", max));
+        isTrue(value <= max, "error.tooLarge", Replacement.create("MAX", max));
     }
 
     /**
@@ -236,8 +246,7 @@ public final class CommandAssertions {
      * @param max   max value (inclusive)
      */
     public static void max(double value, double max) throws CommandException {
-        isTrue(value <= max, "error.tooLarge",
-                Replacement.create("MAX", max));
+        isTrue(value <= max, "error.tooLarge", Replacement.create("MAX", max));
     }
 
     /**
@@ -249,8 +258,10 @@ public final class CommandAssertions {
      * @param <T>   type of enum
      */
     public static <T extends Enum<T>> void enumValue(String value, Class<T> clazz) throws CommandException {
-        isTrue(EnumUtil.parse(value, clazz).isPresent(), "error.invalidEnumValue", Replacement.create("VALUES",
-                Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
+        isTrue(
+                EnumUtil.parse(value, clazz).isPresent(),
+                "error.invalidEnumValue",
+                Replacement.create("VALUES", Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
     }
 
     public static void invalidNumber() throws CommandException {

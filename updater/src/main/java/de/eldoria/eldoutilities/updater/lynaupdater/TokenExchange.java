@@ -15,5 +15,4 @@ package de.eldoria.eldoutilities.updater.lynaupdater;
  * @param filename     file name of the build
  * @param sizeBytes    size of the build
  */
-record TokenExchange(String upgradeToken, String downloadUrl, String version, String filename, long sizeBytes) {
-}
+record TokenExchange(String upgradeToken, String downloadUrl, String version, String filename, long sizeBytes) {}

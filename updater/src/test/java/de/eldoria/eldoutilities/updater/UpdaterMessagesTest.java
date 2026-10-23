@@ -63,7 +63,8 @@ class UpdaterMessagesTest {
 
     @Test
     void withALocalizerItsTranslationIsSent() {
-        var localizer = new MapLocalizer(Map.of(UpdaterMessages.NOTICE, "Neue Version <new_version> von <plugin_name>"));
+        var localizer =
+                new MapLocalizer(Map.of(UpdaterMessages.NOTICE, "Neue Version <new_version> von <plugin_name>"));
         ILocalizer.LOCALIZER.put(plugin.getClass(), localizer);
         var data = new TestData(plugin, UpdaterMessages.NOTICE);
         var response = new TestResponse("2.0.0");
@@ -96,9 +97,8 @@ class UpdaterMessagesTest {
     @Test
     void anInjectedMessageSenderIsUsed() {
         var injected = mock(MessageSender.class);
-        var data = new UpdateData<TestResponse>(plugin, "test.notify", true, false, "https://example.com",
-                UpdaterMessages.NOTICE, injected) {
-        };
+        var data = new UpdateData<TestResponse>(
+                plugin, "test.notify", true, false, "https://example.com", UpdaterMessages.NOTICE, injected) {};
 
         assertSame(injected, data.messageSender());
     }

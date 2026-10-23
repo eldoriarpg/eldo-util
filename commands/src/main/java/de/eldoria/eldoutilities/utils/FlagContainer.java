@@ -73,7 +73,6 @@ public class FlagContainer {
                 continue;
             }
 
-
             if (currFlag != null) {
                 flagArgs.add(arg);
             }
@@ -126,7 +125,8 @@ public class FlagContainer {
      * @param <T>  type of flag
      * @return flag parsed with the function.
      */
-    public <T> T get(@NotNull String flag, ThrowingFunction<@Nullable Input, T, CommandException> map) throws CommandException {
+    public <T> T get(@NotNull String flag, ThrowingFunction<@Nullable Input, T, CommandException> map)
+            throws CommandException {
         var input = get(flag);
         return map.apply(input);
     }

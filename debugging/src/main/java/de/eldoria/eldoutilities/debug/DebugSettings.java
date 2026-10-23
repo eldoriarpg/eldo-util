@@ -34,15 +34,21 @@ public final class DebugSettings {
 
     public static final List<Filter> DEFAULT_FILTER = List.of(
             new Filter(Pattern.compile("(?i)\\b([a-z][a-z0-9+.-]*://)[^\\s/:@]+:[^\\s/@]+@"), "$1*****:*****@"),
-            new Filter(Pattern.compile("([\"']?" + SECRET_KEY + "[\"']?\\s*[:=]\\s*)([\"'])(?:(?!\\2)[^\\\\\\r\\n]|\\\\.)+\\2"),
+            new Filter(
+                    Pattern.compile(
+                            "([\"']?" + SECRET_KEY + "[\"']?\\s*[:=]\\s*)([\"'])(?:(?!\\2)[^\\\\\\r\\n]|\\\\.)+\\2"),
                     "$1$2*****$2"),
-            new Filter(Pattern.compile("(?m)^(\\s*-?\\s*" + SECRET_KEY + "\\s*[:=][ \\t]*)(?![\"'{\\[])\\S[^\\r\\n]*$"),
+            new Filter(
+                    Pattern.compile("(?m)^(\\s*-?\\s*" + SECRET_KEY + "\\s*[:=][ \\t]*)(?![\"'{\\[])\\S[^\\r\\n]*$"),
                     "$1*****"),
             new Filter(Pattern.compile("(?im)^(\\s*-?\\s*user(?:name)?\\s*[:=][ \\t]*)\\S[^\\r\\n]*$"), "$1*****"),
-            new Filter(Pattern.compile("(?<![\\w.])(?!127\\.)(" + OCTET + "\\." + OCTET + ")\\." + OCTET + "\\." + OCTET
-                    + "(?![\\w.])"), "$1.x.x"),
-            new Filter(Pattern.compile("(?<![\\w:])(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}"
-                    + "|(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4}){0,6})?)(?![\\w:])"),
+            new Filter(
+                    Pattern.compile("(?<![\\w.])(?!127\\.)(" + OCTET + "\\." + OCTET + ")\\." + OCTET + "\\." + OCTET
+                            + "(?![\\w.])"),
+                    "$1.x.x"),
+            new Filter(
+                    Pattern.compile("(?<![\\w:])(?:(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}"
+                            + "|(?:[0-9a-fA-F]{1,4}:){1,7}:(?:[0-9a-fA-F]{1,4}(?::[0-9a-fA-F]{1,4}){0,6})?)(?![\\w:])"),
                     "x:x:x:x:x:x:x:x"));
 
     public static final DebugSettings DEFAULT = builder().withDefaultFilter().build();

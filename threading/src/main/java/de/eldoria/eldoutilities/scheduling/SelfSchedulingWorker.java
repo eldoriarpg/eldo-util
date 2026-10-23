@@ -45,8 +45,7 @@ public abstract class SelfSchedulingWorker<V, T extends Collection<V>> extends R
     /**
      * Tick is executed once per tick.
      */
-    protected void tick() {
-    }
+    protected void tick() {}
 
     @Override
     public final void run() {

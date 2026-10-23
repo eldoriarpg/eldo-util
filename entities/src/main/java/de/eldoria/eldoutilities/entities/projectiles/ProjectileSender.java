@@ -43,8 +43,7 @@ public class ProjectileSender {
     /**
      * Empty projectile sender
      */
-    public ProjectileSender() {
-    }
+    public ProjectileSender() {}
 
     /**
      * If an entity is present, perform the given operation on it.

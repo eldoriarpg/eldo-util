@@ -21,9 +21,11 @@ public class DefaultDebug extends AdvancedCommand implements ITabExecutor {
     private final DebugSettings settings;
 
     public DefaultDebug(Plugin plugin, String permission, DebugSettings settings) {
-        super(plugin, CommandMeta.builder("debug")
-                .withPermission(permission, "eldoutilities.debug")
-                .build());
+        super(
+                plugin,
+                CommandMeta.builder("debug")
+                        .withPermission(permission, "eldoutilities.debug")
+                        .build());
         this.settings = settings;
     }
 

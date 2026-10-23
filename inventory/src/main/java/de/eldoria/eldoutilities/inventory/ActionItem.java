@@ -41,7 +41,11 @@ public class ActionItem {
      *                  <p>
      *                  Use this method to save the settings.
      */
-    public ActionItem(ItemStack itemStack, int slot, Consumer<InventoryClickEvent> onClick, Consumer<@Nullable ItemStack> onClose) {
+    public ActionItem(
+            ItemStack itemStack,
+            int slot,
+            Consumer<InventoryClickEvent> onClick,
+            Consumer<@Nullable ItemStack> onClose) {
         this.itemStack = itemStack;
         this.slot = slot;
         this.onClick = onClick;

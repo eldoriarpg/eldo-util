@@ -46,13 +46,16 @@ class HealthChecksTest {
         var worlds = new Provider(List.of(HealthCheck.error("World nether", "Not loaded")), List.of(database));
         Plugin plugin = mock(Plugin.class, withSettings().extraInterfaces(DebugDataProvider.class));
         when(((DebugDataProvider) plugin).getDebugProviders()).thenReturn(List.of(worlds, database));
-        when(((DebugDataProvider) plugin).getHealthChecks()).thenReturn(List.of(HealthCheck.warn("Version", "Outdated")));
+        when(((DebugDataProvider) plugin).getHealthChecks())
+                .thenReturn(List.of(HealthCheck.warn("Version", "Outdated")));
         when(plugin.getLogger()).thenReturn(Logger.getLogger("test"));
 
-        assertEquals(List.of(
-                HealthCheck.warn("Version", "Outdated"),
-                HealthCheck.error("World nether", "Not loaded"),
-                HealthCheck.ok("Database", "Reachable")), DebugUtil.getHealthChecks(plugin));
+        assertEquals(
+                List.of(
+                        HealthCheck.warn("Version", "Outdated"),
+                        HealthCheck.error("World nether", "Not loaded"),
+                        HealthCheck.ok("Database", "Reachable")),
+                DebugUtil.getHealthChecks(plugin));
     }
 
     @Test

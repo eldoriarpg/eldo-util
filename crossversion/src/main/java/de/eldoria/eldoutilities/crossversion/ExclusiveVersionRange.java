@@ -8,6 +8,10 @@ package de.eldoria.eldoutilities.crossversion;
 
 import de.eldoria.eldoutilities.utils.Version;
 
+/**
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
+ */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public record ExclusiveVersionRange(Version lower, Version upper) implements VersionRange {
     @Override
     public boolean contains(Version version) {

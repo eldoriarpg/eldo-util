@@ -32,8 +32,7 @@ public final class ConfigFiles {
     private static final Set<String> EXTENSIONS = Set.of("yml", "yaml", "json", "properties", "toml");
     private static final int DEPTH = 4;
 
-    private ConfigFiles() {
-    }
+    private ConfigFiles() {}
 
     /**
      * Every {@code .yml}, {@code .yaml}, {@code .json}, {@code .properties} and {@code .toml} file in the plugin's
@@ -43,7 +42,10 @@ public final class ConfigFiles {
         Path folder = plugin.getDataFolder().toPath();
         if (!Files.isDirectory(folder)) return List.of();
         try (Stream<Path> files = Files.walk(folder, DEPTH)) {
-            return files.filter(Files::isRegularFile).filter(ConfigFiles::isConfig).sorted().toList();
+            return files.filter(Files::isRegularFile)
+                    .filter(ConfigFiles::isConfig)
+                    .sorted()
+                    .toList();
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Could not list the configuration files.", e);
             return List.of();
@@ -87,6 +89,5 @@ public final class ConfigFiles {
     /**
      * @param name where the file is, relative to the plugin's folder
      */
-    record Read(String name, String content) {
-    }
+    record Read(String name, String content) {}
 }

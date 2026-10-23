@@ -30,7 +30,9 @@ public class DownloadedNotifier<T extends UpdateResponse> extends UpdateNotifier
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         if (event.getPlayer().isOp() || event.getPlayer().hasPermission(data.notifyPermission())) {
-            var message = updated ? UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOADED) : data.updateMessage(latest());
+            var message = updated
+                    ? UpdaterMessages.resolve(plugin, UpdaterMessages.DOWNLOADED)
+                    : data.updateMessage(latest());
             data.messageSender().sendMessage(event.getPlayer(), message, data.placeholders(latest()));
         }
     }

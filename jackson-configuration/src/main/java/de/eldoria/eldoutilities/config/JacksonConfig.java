@@ -50,7 +50,12 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
      * @param mainKey key for the main configuration file former config.yml
      */
     public JacksonConfig(@NotNull Plugin plugin, @NotNull Key<T> mainKey) {
-        super(plugin.getDataFolder().toPath(), mainKey, List.of(new YamlDataFormat()), plugin.getClass().getClassLoader(), null);
+        super(
+                plugin.getDataFolder().toPath(),
+                mainKey,
+                List.of(new YamlDataFormat()),
+                plugin.getClass().getClassLoader(),
+                null);
         this.plugin = plugin;
     }
 
@@ -98,22 +103,18 @@ public class JacksonConfig<T> extends Configurations<T> implements DebugDataProv
      * @return paper module
      */
     protected JacksonPaper getPaperModule() {
-        return JacksonPaper.builder()
-                .colorAsHex()
-                .build();
+        return JacksonPaper.builder().colorAsHex().build();
     }
 
     @Override
     public @NotNull EntryData[] getDebugInformations() {
-        return keys.stream()
-                .map(this::dump)
-                .flatMap(Optional::stream)
-                .toArray(EntryData[]::new);
+        return keys.stream().map(this::dump).flatMap(Optional::stream).toArray(EntryData[]::new);
     }
 
     private Optional<EntryData> dump(Key<?> key) {
         try {
-            return Optional.of(new EntryData(key.toString(), debugFormat().writer().writeValueAsString(secondary(key))));
+            return Optional.of(
+                    new EntryData(key.toString(), debugFormat().writer().writeValueAsString(secondary(key))));
         } catch (JacksonException e) {
             plugin.getLogger().log(Level.SEVERE, "Could not dump config", e);
             return Optional.empty();

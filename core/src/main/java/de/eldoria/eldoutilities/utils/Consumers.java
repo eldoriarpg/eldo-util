@@ -11,12 +11,10 @@ import java.util.function.Consumer;
 
 public class Consumers {
     public static <T> Consumer<T> emptyConsumer() {
-        return t -> {
-        };
+        return t -> {};
     }
 
     public static <T, U> BiConsumer<T, U> emptyBiConsumer() {
-        return (t, u) -> {
-        };
+        return (t, u) -> {};
     }
 }

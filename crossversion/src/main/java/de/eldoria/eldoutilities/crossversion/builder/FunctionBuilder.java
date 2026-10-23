@@ -6,11 +6,8 @@
 
 package de.eldoria.eldoutilities.crossversion.builder;
 
-import de.eldoria.eldoutilities.crossversion.VersionRange;
 import de.eldoria.eldoutilities.crossversion.function.VersionFunction;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -18,10 +15,11 @@ import java.util.function.Function;
  *
  * @param <A> first Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class FunctionBuilder<A, R> extends VersionFunctionBuilder<VersionFunction<A, R>, Function<A, R>> {
-    protected FunctionBuilder() {
-    }
+    protected FunctionBuilder() {}
 
     /**
      * Build the version function.

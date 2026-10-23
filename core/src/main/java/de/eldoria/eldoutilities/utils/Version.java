@@ -125,7 +125,8 @@ public record Version(String version, List<Integer> nums) implements Comparable<
     public int compareTo(@NotNull Version version) {
         int numbers = Math.max(version.nums().size(), nums().size());
         for (int i = 0; i < numbers; i++) {
-            int compare = Integer.compare(nums().size() > i ? nums().get(i) : 0,
+            int compare = Integer.compare(
+                    nums().size() > i ? nums().get(i) : 0,
                     version.nums().size() > i ? version.nums().get(i) : 0);
             if (compare != 0) return compare;
         }

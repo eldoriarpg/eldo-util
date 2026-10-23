@@ -30,11 +30,9 @@ public class InventoryActionHandler implements Listener {
 
     private final Map<UUID, InventoryActions> inventories = new HashMap<>();
 
-    private Runnable onClose = () -> {
-    };
+    private Runnable onClose = () -> {};
 
-    public InventoryActionHandler() {
-    }
+    public InventoryActionHandler() {}
 
     public InventoryActionHandler(Runnable onClose) {
         this.onClose = onClose;
@@ -46,7 +44,6 @@ public class InventoryActionHandler implements Listener {
             Bukkit.getPluginManager().registerEvents(handler, plugin);
             return handler;
         });
-
     }
 
     public static InventoryActionHandler create(Plugin plugin, Runnable onClose) {
@@ -55,7 +52,6 @@ public class InventoryActionHandler implements Listener {
             Bukkit.getPluginManager().registerEvents(handler, plugin);
             return handler;
         });
-
     }
 
     public static InventoryActionHandler getPluginInventoryHandler(Class<? extends Plugin> plugin) {
@@ -96,5 +92,4 @@ public class InventoryActionHandler implements Listener {
             event.setCancelled(true);
         }
     }
-
 }

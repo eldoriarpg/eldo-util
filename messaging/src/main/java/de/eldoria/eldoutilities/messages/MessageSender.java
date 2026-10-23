@@ -43,15 +43,22 @@ import java.util.Set;
  */
 public abstract class MessageSender {
     private static final Map<Class<? extends Plugin>, MessageSender> PLUGIN_SENDER = new HashMap<>();
+
     @NotNull
     private final Class<? extends Plugin> ownerPlugin;
+
     private final Plugin plugin;
     private MiniMessage miniMessage;
     private TagResolver messageTagResolver;
     private TagResolver errorTagResolver;
     private Component prefix;
 
-    public MessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    public MessageSender(
+            Plugin plugin,
+            MiniMessage miniMessage,
+            TagResolver messageTagResolver,
+            TagResolver errorTagResolver,
+            Component prefix) {
         this.ownerPlugin = plugin.getClass();
         this.plugin = plugin;
         this.miniMessage = miniMessage;
@@ -104,7 +111,8 @@ public abstract class MessageSender {
         return PLUGIN_SENDER.get(plugin);
     }
 
-    private MessageSender update(MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    private MessageSender update(
+            MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
         this.miniMessage = miniMessage;
         this.messageTagResolver = messageTagResolver;
         this.errorTagResolver = errorTagResolver;
@@ -126,7 +134,6 @@ public abstract class MessageSender {
         sendMessage(sender, serialize(sender, message, messageTagResolver, placeholder));
     }
 
-
     /**
      * Send a message to a sender
      * <p>
@@ -138,8 +145,13 @@ public abstract class MessageSender {
      * @param composer message composer
      */
     public void sendMessage(CommandSender sender, IMessageComposer composer) {
-        sendMessage(sender, serialize(sender, composer.build(), messageTagResolver,
-                composer.replacements().toArray(new TagResolver[0])));
+        sendMessage(
+                sender,
+                serialize(
+                        sender,
+                        composer.build(),
+                        messageTagResolver,
+                        composer.replacements().toArray(new TagResolver[0])));
     }
 
     /**
@@ -167,8 +179,13 @@ public abstract class MessageSender {
      * @param composer message composer
      */
     public void sendError(CommandSender sender, IMessageComposer composer) {
-        sendMessage(sender, serialize(sender, composer.build(), errorTagResolver,
-                composer.replacements().toArray(new TagResolver[0])));
+        sendMessage(
+                sender,
+                serialize(
+                        sender,
+                        composer.build(),
+                        errorTagResolver,
+                        composer.replacements().toArray(new TagResolver[0])));
     }
 
     public abstract void sendMessage(CommandSender sender, Component component);
@@ -182,7 +199,12 @@ public abstract class MessageSender {
      * @param title  title to send
      */
     public void sendTitle(Player player, String title, String subtitle, Title.Times times, TagResolver... placeholder) {
-        sendTitle(player, Title.title(serialize(player, title, messageTagResolver, placeholder), serialize(player, subtitle, messageTagResolver, placeholder), times));
+        sendTitle(
+                player,
+                Title.title(
+                        serialize(player, title, messageTagResolver, placeholder),
+                        serialize(player, subtitle, messageTagResolver, placeholder),
+                        times));
     }
 
     /**
@@ -211,15 +233,20 @@ public abstract class MessageSender {
 
     public abstract void sendBossBar(Player player, BossBar bossBar);
 
-    public abstract BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags);
+    public abstract BossBar sendBossBar(
+            Player player,
+            String message,
+            float progress,
+            BossBar.Color color,
+            BossBar.Overlay overlay,
+            Set<BossBar.Flag> flags);
 
     public abstract void hideBossBar(Player player, BossBar bossBar);
 
     /**
      * Releases what the sender holds. The sender must not be used afterward.
      */
-    public void close() {
-    }
+    public void close() {}
 
     private ILocalizer loc() {
         return ILocalizer.getPluginLocalizer(ownerPlugin);
@@ -232,7 +259,8 @@ public abstract class MessageSender {
      * plain text such as {@code example.com} stays as it is otherwise. The {@code <i18n:key>} tag is always
      * available and falls back to the key without a localizer.
      */
-    protected Component serialize(CommandSender sender, String message, TagResolver resolver, TagResolver... placeholder) {
+    protected Component serialize(
+            CommandSender sender, String message, TagResolver resolver, TagResolver... placeholder) {
         var converted = MiniMessageConversion.convertLegacyColorCodes(message);
         if (!converted.equals(message)) {
             plugin.getLogger().warning("Found legacy color codes in message.");
@@ -243,7 +271,7 @@ public abstract class MessageSender {
             message = ILocalizer.escape(message);
         }
         message = "<default>" + message;
-        var finalResolver = new TagResolver[]{resolver};
+        var finalResolver = new TagResolver[] {resolver};
         if (placeholder.length > 0) {
             var tags = Arrays.copyOf(placeholder, placeholder.length + 1);
             tags[tags.length - 1] = resolver;
@@ -270,18 +298,19 @@ public abstract class MessageSender {
         return prefix.appendSpace().append(component);
     }
 
-
     public String translatePlain(String message, TagResolver... replacements) {
         return translatePlain(null, message, replacements);
     }
 
     public String translatePlain(@Nullable CommandSender sender, String message, TagResolver... replacements) {
-        return PlainTextComponentSerializer.plainText().serialize(serialize(sender, message, messageTagResolver, replacements));
+        return PlainTextComponentSerializer.plainText()
+                .serialize(serialize(sender, message, messageTagResolver, replacements));
     }
 
     public Component serializeMessage(String message, TagResolver... placeholder) {
         return serializeMessage(null, message, placeholder);
     }
+
     public Component serializeMessage(@Nullable CommandSender sender, String message, TagResolver... placeholder) {
         return serialize(sender, message, messageTagResolver, placeholder);
     }
@@ -299,14 +328,18 @@ public abstract class MessageSender {
     }
 
     private TagResolver addI18nTag(CommandSender sender, TagResolver resolvers) {
-        return TagResolver.resolver(resolvers, TagResolver.builder()
-                .tag("i18n", (argumentQueue, context) -> localizeTag(sender, argumentQueue, context)).build());
+        return TagResolver.resolver(
+                resolvers,
+                TagResolver.builder()
+                        .tag("i18n", (argumentQueue, context) -> localizeTag(sender, argumentQueue, context))
+                        .build());
     }
 
-    private net.kyori.adventure.text.minimessage.tag.Tag localizeTag(CommandSender sender, ArgumentQueue args, Context ctx) {
-        return Tag.selfClosingInserting(ctx.deserialize(loc().localize(sender, args.popOr("locale tag required").value())));
+    private net.kyori.adventure.text.minimessage.tag.Tag localizeTag(
+            CommandSender sender, ArgumentQueue args, Context ctx) {
+        return Tag.selfClosingInserting(ctx.deserialize(
+                loc().localize(sender, args.popOr("locale tag required").value())));
     }
-
 
     public boolean isAnonymous() {
         return ownerPlugin == null;

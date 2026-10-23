@@ -23,7 +23,9 @@ class FileUpgradeTokenStoreTest {
 
     @Test
     void missingFileHasNoToken() {
-        assertEquals(Optional.empty(), UpgradeTokenStore.file(dir.resolve("upgrade-token.txt")).token());
+        assertEquals(
+                Optional.empty(),
+                UpgradeTokenStore.file(dir.resolve("upgrade-token.txt")).token());
     }
 
     @Test

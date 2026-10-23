@@ -52,8 +52,8 @@ public final class DebugUtil {
     static final String CONSENT = "debugConsent";
     private static final Gson GSON = new Gson();
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
-    private static final DateTimeFormatter DATE = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG)
-            .withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter DATE =
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withZone(ZoneId.systemDefault());
     private static final String CONSENT_TEXT = """
             <gold>Debug reports</gold>
             <gray>This uploads data about your server to <white><host></white>, so we can help you:</gray>
@@ -65,8 +65,7 @@ public final class DebugUtil {
             <gray>Only who has the link can read the report. <red>Everyone you give the link to can read it.</red> It is deleted after two weeks, or earlier with the delete link.</gray>
             <green>Run the command again to agree and upload.</green> <gray>You are asked once; set <white>debugConsent: false</white> in plugins/EldoUtilities/config.yml to withdraw.</gray>""";
 
-    private DebugUtil() {
-    }
+    private DebugUtil() {}
 
     /**
      * Collects a debug report about the plugin, uploads it, and sends the links to the sender.
@@ -81,7 +80,8 @@ public final class DebugUtil {
     public static void dispatchDebug(CommandSender sender, Plugin plugin, DebugSettings settings) {
         var config = EldoUtilities.getConfiguration();
         if (!config.getBoolean(CONSENT, false)) {
-            sender.sendMessage(MINI_MESSAGE.deserialize(CONSENT_TEXT,
+            sender.sendMessage(MINI_MESSAGE.deserialize(
+                    CONSENT_TEXT,
                     Placeholder.unparsed("host", settings.getHost()),
                     Placeholder.unparsed("plugin", plugin.getName())));
             config.set(CONSENT, true);
@@ -100,7 +100,8 @@ public final class DebugUtil {
                 .whenComplete((result, error) -> {
                     if (error != null) {
                         plugin.getLogger().log(Level.WARNING, "Could not create a debug report.", error);
-                        sender.sendMessage(Component.text("Could not create the debug report. See the console.", NamedTextColor.RED));
+                        sender.sendMessage(Component.text(
+                                "Could not create the debug report. See the console.", NamedTextColor.RED));
                         return;
                     }
                     sender.sendMessage(message(result, settings));
@@ -109,26 +110,32 @@ public final class DebugUtil {
 
     static Component message(Result result, DebugSettings settings) {
         if (result instanceof Uploaded uploaded) {
-            return MINI_MESSAGE.deserialize("""
+            return MINI_MESSAGE.deserialize(
+                    """
                             <green>Debug report uploaded.</green>
                             <gray>Read:</gray> <read>
                             <gray>Delete:</gray> <delete>
                             <gray>Give the read link to whoever helps you. The report is deleted on <white><expires></white>.</gray>""",
                     Placeholder.component("read", link(uploaded.readUrl(), NamedTextColor.AQUA, "Open the report")),
-                    Placeholder.component("delete", link(uploaded.deleteUrl(), NamedTextColor.RED, "Delete the report")),
+                    Placeholder.component(
+                            "delete", link(uploaded.deleteUrl(), NamedTextColor.RED, "Delete the report")),
                     Placeholder.unparsed("expires", DATE.format(uploaded.expires())));
         }
         var failed = (Failed) result;
         TagResolver details = TagResolver.resolver(
                 Placeholder.unparsed("message", failed.message()),
                 Placeholder.unparsed("host", settings.getHost()),
-                Placeholder.unparsed("seconds", String.valueOf(failed.retryAfter().orElse(10))));
-        return MINI_MESSAGE.deserialize(switch (failed.reason()) {
-            case RATE_LIMITED -> "<red>A report was just uploaded from this server. Try again in <seconds> seconds.</red>";
-            case TOO_LARGE -> "<red>The report is too large: <message></red>";
-            case REFUSED -> "<red>The report was refused: <message></red>";
-            case UNREACHABLE -> "<red>Could not upload to <host> (<message>). Try again later.</red>";
-        }, details);
+                Placeholder.unparsed(
+                        "seconds", String.valueOf(failed.retryAfter().orElse(10))));
+        return MINI_MESSAGE.deserialize(
+                switch (failed.reason()) {
+                    case RATE_LIMITED ->
+                        "<red>A report was just uploaded from this server. Try again in <seconds> seconds.</red>";
+                    case TOO_LARGE -> "<red>The report is too large: <message></red>";
+                    case REFUSED -> "<red>The report was refused: <message></red>";
+                    case UNREACHABLE -> "<red>Could not upload to <host> (<message>). Try again later.</red>";
+                },
+                details);
     }
 
     private static Component link(String url, NamedTextColor color, String hover) {
@@ -200,9 +207,9 @@ public final class DebugUtil {
                 if (!debugged.add(nextProvider)) {
                     plugin.getLogger()
                             .warning("Loop in debug data detected. Instance of class "
-                                     + nextProvider.getClass().getSimpleName()
-                                     + " returns a reference to already debugged instance of "
-                                     + provider.getClass().getSimpleName());
+                                    + nextProvider.getClass().getSimpleName()
+                                    + " returns a reference to already debugged instance of "
+                                    + provider.getClass().getSimpleName());
                     continue;
                 }
                 providers.add(nextProvider);

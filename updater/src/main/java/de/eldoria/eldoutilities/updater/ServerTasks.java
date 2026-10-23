@@ -14,8 +14,7 @@ import org.bukkit.plugin.Plugin;
  * Paper's global region scheduler is that thread on Folia and the main thread everywhere else, so it serves both.
  */
 final class ServerTasks {
-    private ServerTasks() {
-    }
+    private ServerTasks() {}
 
     /**
      * Runs a task on the global thread of the server. Does nothing once the plugin is disabled, since the scheduler

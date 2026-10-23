@@ -21,8 +21,7 @@ import java.util.function.Consumer;
  * @since 1.2.3
  */
 public final class ActionConsumer {
-    private ActionConsumer() {
-    }
+    private ActionConsumer() {}
 
     /**
      * Get a consumer which allows to raise and lower a value between a range.
@@ -62,7 +61,10 @@ public final class ActionConsumer {
             }
 
             var finalAmount = amount;
-            int curr = DataContainerUtil.compute(clickEvent.getCurrentItem(), key, PersistentDataType.INTEGER,
+            int curr = DataContainerUtil.compute(
+                    clickEvent.getCurrentItem(),
+                    key,
+                    PersistentDataType.INTEGER,
                     integer -> EMath.clamp(min, max, integer + finalAmount));
             ItemStackBuilder.of(clickEvent.getCurrentItem(), false).withLore(String.valueOf(curr));
         };
@@ -106,7 +108,10 @@ public final class ActionConsumer {
             }
 
             var finalAmount = amount;
-            double curr = DataContainerUtil.compute(clickEvent.getCurrentItem(), key, PersistentDataType.DOUBLE,
+            double curr = DataContainerUtil.compute(
+                    clickEvent.getCurrentItem(),
+                    key,
+                    PersistentDataType.DOUBLE,
                     integer -> EMath.clamp(min, max, integer + finalAmount));
             ItemStackBuilder.of(clickEvent.getCurrentItem(), false).withLore(String.format("%.2f", curr));
         };

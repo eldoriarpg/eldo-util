@@ -1,8 +1,9 @@
 plugins {
     id("eldo-util.java-conventions")
+    id("eldo-util.publishing-conventions")
 }
 
-description = "Legacy ported module for conversations. Deprecated."
+description = "Deprecated: Bukkit conversations. Removed in 4.0."
 
 dependencies{
     api(project(":core"))

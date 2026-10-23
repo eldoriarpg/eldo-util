@@ -23,15 +23,22 @@ import java.util.Map;
 
 /**
  * Wrapper for {@link Conversation}
+ * @deprecated This module is removed in 4.0 without a replacement.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class EldoConversation extends Conversation {
     private final ILocalizer localizer;
     private final MessageSender sender;
     private final String userPrefix;
     private final Component pluginPrefix;
 
-    public EldoConversation(@Nullable Plugin plugin, @NotNull Conversable forWhom, @Nullable Prompt firstPrompt,
-                            @NotNull Map<Object, Object> initialSessionData, Component pluginPrefix, String userPrefix) {
+    public EldoConversation(
+            @Nullable Plugin plugin,
+            @NotNull Conversable forWhom,
+            @Nullable Prompt firstPrompt,
+            @NotNull Map<Object, Object> initialSessionData,
+            Component pluginPrefix,
+            String userPrefix) {
         super(plugin, forWhom, firstPrompt, initialSessionData);
         localizer = ILocalizer.getPluginLocalizer(plugin);
         sender = MessageSender.getPluginMessageSender(plugin);

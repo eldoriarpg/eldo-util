@@ -43,7 +43,13 @@ public abstract class UpdateData<T extends UpdateResponse> {
      * @param autoUpdate       true if the updater should attempt to update the plugin. If true the updater should
      *                         implement the {@link Updater#update()} method.
      */
-    public UpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, String updateUrl, String updateMessage) {
+    public UpdateData(
+            Plugin plugin,
+            String notifyPermission,
+            boolean notifyUpdate,
+            boolean autoUpdate,
+            String updateUrl,
+            String updateMessage) {
         this.plugin = plugin;
         this.notifyPermission = notifyPermission;
         this.notifyUpdate = notifyUpdate;
@@ -63,8 +69,14 @@ public abstract class UpdateData<T extends UpdateResponse> {
      * @param updateMessage    update notice, a text or a locale code
      * @param messageSender    message sender to use, or null for the one registered for the plugin
      */
-    public UpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, String updateUrl,
-                      String updateMessage, @Nullable MessageSender messageSender) {
+    public UpdateData(
+            Plugin plugin,
+            String notifyPermission,
+            boolean notifyUpdate,
+            boolean autoUpdate,
+            String updateUrl,
+            String updateMessage,
+            @Nullable MessageSender messageSender) {
         this(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage);
         this.messageSender = messageSender;
     }

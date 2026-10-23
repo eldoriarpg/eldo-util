@@ -6,12 +6,8 @@
 
 package de.eldoria.eldoutilities.crossversion.builder;
 
-import de.eldoria.eldoutilities.crossversion.VersionRange;
 import de.eldoria.eldoutilities.crossversion.function.QuadVersionFunction;
 import de.eldoria.eldoutilities.functions.QuadFunction;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A builder for a  {@link QuadVersionFunction} with version sensitive context.
@@ -21,10 +17,12 @@ import java.util.Map;
  * @param <C> third Input Type
  * @param <D> fourth Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
-public class QuadFunctionBuilder<A, B, C, D, R> extends VersionFunctionBuilder<QuadVersionFunction<A, B, C, D, R>, QuadFunction<A, B, C, D, R>> {
-    protected QuadFunctionBuilder() {
-    }
+@Deprecated(since = "3.6.0", forRemoval = true)
+public class QuadFunctionBuilder<A, B, C, D, R>
+        extends VersionFunctionBuilder<QuadVersionFunction<A, B, C, D, R>, QuadFunction<A, B, C, D, R>> {
+    protected QuadFunctionBuilder() {}
 
     /**
      * Build the version function.

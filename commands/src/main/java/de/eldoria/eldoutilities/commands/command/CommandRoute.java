@@ -19,7 +19,8 @@ public interface CommandRoute {
         throw CommandException.message("No command type is implemented");
     }
 
-    default @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments arguments) throws CommandException {
+    default @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments arguments)
+            throws CommandException {
         return Collections.emptyList();
     }
 }

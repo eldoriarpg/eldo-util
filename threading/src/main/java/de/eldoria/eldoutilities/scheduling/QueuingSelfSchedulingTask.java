@@ -42,8 +42,7 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     /**
      * Tick is executed once per tick.
      */
-    public void tick() {
-    }
+    public void tick() {}
 
     @Override
     public final void run() {
@@ -111,5 +110,4 @@ public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
     protected boolean removeIf(Predicate<? super T> filter) {
         return tasks.removeIf(filter);
     }
-
 }

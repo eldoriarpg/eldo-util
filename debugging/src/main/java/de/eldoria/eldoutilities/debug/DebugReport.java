@@ -48,9 +48,13 @@ public final class DebugReport {
      *
      * @param additional what the plugin's {@link DebugDataProvider}s add
      */
-    public record Snapshot(Plugin plugin, PluginMetaData pluginMeta, ServerMetaData serverMeta,
-                           EntryData[] additional, List<HealthCheck> checks, List<ChartData<?>> charts) {
-    }
+    public record Snapshot(
+            Plugin plugin,
+            PluginMetaData pluginMeta,
+            ServerMetaData serverMeta,
+            EntryData[] additional,
+            List<HealthCheck> checks,
+            List<ChartData<?>> charts) {}
 
     /**
      * Asks the server and the plugin about themselves.
@@ -58,8 +62,13 @@ public final class DebugReport {
      * @param plugin the plugin the report is about
      */
     public static Snapshot collect(Plugin plugin) {
-        return new Snapshot(plugin, PluginMeta.create(plugin), ServerMeta.create(),
-                DebugUtil.getAdditionalPluginMeta(plugin), DebugUtil.getHealthChecks(plugin), DebugUtil.getCharts(plugin));
+        return new Snapshot(
+                plugin,
+                PluginMeta.create(plugin),
+                ServerMeta.create(),
+                DebugUtil.getAdditionalPluginMeta(plugin),
+                DebugUtil.getHealthChecks(plugin),
+                DebugUtil.getCharts(plugin));
     }
 
     /**
@@ -68,12 +77,19 @@ public final class DebugReport {
     public static DebugReport create(Snapshot snapshot, DebugSettings settings) {
         LogData log = LogMeta.create(snapshot.plugin(), settings);
         List<ConfigFiles.Read> configs = ConfigFiles.read(snapshot.plugin(), settings.configFiles(snapshot.plugin()));
-        return new DebugReport(snapshot.pluginMeta(), snapshot.serverMeta(),
+        return new DebugReport(
+                snapshot.pluginMeta(),
+                snapshot.serverMeta(),
                 sections(snapshot.checks(), snapshot.additional(), snapshot.charts(), log, configs, settings));
     }
 
-    static List<Section> sections(List<HealthCheck> checks, EntryData[] additional, List<ChartData<?>> charts, LogData log,
-                                  List<ConfigFiles.Read> configs, DebugSettings settings) {
+    static List<Section> sections(
+            List<HealthCheck> checks,
+            EntryData[] additional,
+            List<ChartData<?>> charts,
+            LogData log,
+            List<ConfigFiles.Read> configs,
+            DebugSettings settings) {
         List<Section> sections = new ArrayList<>();
         for (HealthCheck check : checks) {
             sections.add(Section.check(check.name(), check.level(), settings.applyFilter(check.message())));
@@ -83,7 +99,9 @@ public final class DebugReport {
             sections.add(Section.meta(entry.getName(), entry.getContent(), entry.getEntries()));
         }
         for (ChartData<?> chart : charts) {
-            sections.add(Section.chart(settings.applyFilter(chart.name()), settings.applyFilter(chart.description()),
+            sections.add(Section.chart(
+                    settings.applyFilter(chart.name()),
+                    settings.applyFilter(chart.description()),
                     chart.toChart(settings)));
         }
         sections.add(Section.text(Kind.LOG, "latest.log", log.getLog(), "log"));
@@ -93,8 +111,8 @@ public final class DebugReport {
         addExceptions(sections, Kind.INTERNAL_EXCEPTION, "Plugin exception", log.getInternalExceptions());
         addExceptions(sections, Kind.EXTERNAL_EXCEPTION, "Other exception", log.getExternalExceptions());
         for (ConfigFiles.Read config : configs) {
-            sections.add(Section.text(Kind.CONFIG, config.name(), settings.applyFilter(config.content()),
-                    formatOf(config.name())));
+            sections.add(Section.text(
+                    Kind.CONFIG, config.name(), settings.applyFilter(config.content()), formatOf(config.name())));
         }
         return sections;
     }
@@ -145,9 +163,17 @@ public final class DebugReport {
      * @param lastSeen  the log time it last occurred
      * @param chart     type, data and hints of a {@link Kind#CHART}
      */
-    public record Section(Kind kind, String name, String content, String format, HealthCheck.Level level,
-                          List<Entry> entries, Integer count, String firstSeen, String lastSeen,
-                          Map<String, Object> chart) {
+    public record Section(
+            Kind kind,
+            String name,
+            String content,
+            String format,
+            HealthCheck.Level level,
+            List<Entry> entries,
+            Integer count,
+            String firstSeen,
+            String lastSeen,
+            Map<String, Object> chart) {
         static Section text(Kind kind, String name, String content, String format) {
             return new Section(kind, name, content, format, null, null, null, null, null, null);
         }
@@ -157,13 +183,25 @@ public final class DebugReport {
         }
 
         static Section meta(String name, String content, Map<String, String> entries) {
-            List<Entry> rows = entries.entrySet().stream().map(e -> new Entry(e.getKey(), e.getValue())).toList();
-            return new Section(Kind.META, name, content, null, null, rows.isEmpty() ? null : rows, null, null, null, null);
+            List<Entry> rows = entries.entrySet().stream()
+                    .map(e -> new Entry(e.getKey(), e.getValue()))
+                    .toList();
+            return new Section(
+                    Kind.META, name, content, null, null, rows.isEmpty() ? null : rows, null, null, null, null);
         }
 
         static Section exception(Kind kind, String name, ExceptionData exception) {
-            return new Section(kind, name, exception.text(), null, null, null, exception.count(),
-                    exception.firstSeen(), exception.lastSeen(), null);
+            return new Section(
+                    kind,
+                    name,
+                    exception.text(),
+                    null,
+                    null,
+                    null,
+                    exception.count(),
+                    exception.firstSeen(),
+                    exception.lastSeen(),
+                    null);
         }
 
         static Section chart(String name, String description, Map<String, Object> chart) {
@@ -174,8 +212,7 @@ public final class DebugReport {
     /**
      * A row of a {@link Kind#META} section's table.
      */
-    public record Entry(String key, String value) {
-    }
+    public record Entry(String key, String value) {}
 
     /**
      * What a section holds, which decides how the viewer shows it.

@@ -15,7 +15,8 @@ public class LogData {
     private final ExceptionData[] internalExceptions;
     private final ExceptionData[] externalExceptions;
 
-    public LogData(String log, String pluginLog, ExceptionData[] internalExceptions, ExceptionData[] externalExceptions) {
+    public LogData(
+            String log, String pluginLog, ExceptionData[] internalExceptions, ExceptionData[] externalExceptions) {
         this.log = log;
         this.pluginLog = pluginLog;
         this.internalExceptions = internalExceptions;

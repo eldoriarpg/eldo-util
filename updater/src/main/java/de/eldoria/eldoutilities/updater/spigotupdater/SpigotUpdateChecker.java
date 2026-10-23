@@ -19,7 +19,9 @@ import java.util.Optional;
  * Updater implementation for spigot update check.
  *
  * @since 1.0.0
+ * @deprecated Use the Lyna updater from {@link de.eldoria.eldoutilities.updater.Updater#lyna}. Removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public final class SpigotUpdateChecker extends Updater<DefaultUpdateResponse, SpigotUpdateData> {
     public SpigotUpdateChecker(SpigotUpdateData data) {
         super(data);

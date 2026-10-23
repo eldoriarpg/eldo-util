@@ -31,7 +31,6 @@ public final class TextUtil {
         return i;
     }
 
-
     /**
      * Trims a text to the desired length. Returns unmodified input if max chars is larger or equal string.length().
      *

@@ -16,7 +16,9 @@ import java.util.Map;
 
 /**
  * Interface to create different function builders.
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public abstract class VersionFunctionBuilder<T, V> {
     protected final Map<VersionRange, V> functions = new HashMap<>();
 
@@ -61,7 +63,8 @@ public abstract class VersionFunctionBuilder<T, V> {
      * @param <R> result type
      * @return new tri function builder instance
      */
-    public static <A, B, C, R> TriFunctionBuilder<A, B, C, R> triFunctionBuilder(Class<A> a, Class<B> b, Class<C> c, Class<R> r) {
+    public static <A, B, C, R> TriFunctionBuilder<A, B, C, R> triFunctionBuilder(
+            Class<A> a, Class<B> b, Class<C> c, Class<R> r) {
         return new TriFunctionBuilder<>();
     }
 

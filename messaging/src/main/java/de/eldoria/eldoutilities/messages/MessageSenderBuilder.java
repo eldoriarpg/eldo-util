@@ -22,17 +22,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
-
 public class MessageSenderBuilder {
     private final MiniMessage.Builder miniMessage = MiniMessage.builder();
-    private final TagResolver.Builder messageTagResolver = TagResolver.builder()
-                                                                      .tag("default", Tag.styling(NamedTextColor.GREEN));
-    private final TagResolver.Builder errorTagResolver = TagResolver.builder()
-                                                                    .tag("default", Tag.styling(NamedTextColor.RED));
+    private final TagResolver.Builder messageTagResolver =
+            TagResolver.builder().tag("default", Tag.styling(NamedTextColor.GREEN));
+    private final TagResolver.Builder errorTagResolver =
+            TagResolver.builder().tag("default", Tag.styling(NamedTextColor.RED));
     private final TagResolver.Builder defaultTagResolver = TagResolver.builder();
 
     @NotNull
     private final Plugin plugin;
+
     private Component prefix = Component.empty();
     private ILocalizer localizer = ILocalizer.DEFAULT;
     private UnaryOperator<String> preProcessor = s -> s;
@@ -59,8 +59,7 @@ public class MessageSenderBuilder {
     }
 
     public MessageSenderBuilder prefix(String prefix) {
-        return prefix(MiniMessage.miniMessage()
-                                 .deserialize(prefix));
+        return prefix(MiniMessage.miniMessage().deserialize(prefix));
     }
 
     public MessageSenderBuilder messageColor(TextColor color) {
@@ -114,13 +113,14 @@ public class MessageSenderBuilder {
      * @return registered message sender
      */
     public MessageSender register() {
-        var defaultResolver = defaultTagResolver
-                .resolver(StandardTags.defaults())
-                .build();
-        var messageSender = new PaperMessageSender(plugin,
-                miniMessage.tags(defaultResolver)
-                           .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                           .build(),
+        var defaultResolver =
+                defaultTagResolver.resolver(StandardTags.defaults()).build();
+        var messageSender = new PaperMessageSender(
+                plugin,
+                miniMessage
+                        .tags(defaultResolver)
+                        .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
+                        .build(),
                 TagResolver.resolver(defaultResolver, messageTagResolver.build()),
                 TagResolver.resolver(defaultResolver, errorTagResolver.build()),
                 prefix);

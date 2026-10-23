@@ -1,0 +1,15 @@
+name: Docs
+
+on:
+  push:
+    paths: ['docs/**', '.github/workflows/docs.yml']
+  pull_request:
+
+jobs:
+  docs:
+    uses: rainbowdashlabs/docs-hub/.github/workflows/space.yml@v1
+    with:
+      hub-repository: eldoriarpg/docs
+      app-id: ${{ vars.DOCS_APP_ID }}
+    secrets:
+      DOCS_APP_PRIVATE_KEY: ${{ secrets.DOCS_APP_PRIVATE_KEY }}

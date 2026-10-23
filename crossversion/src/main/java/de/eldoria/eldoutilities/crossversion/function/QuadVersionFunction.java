@@ -20,7 +20,9 @@ import java.util.Map;
  * @param <C> third Input Type
  * @param <D> fourth Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class QuadVersionFunction<A, B, C, D, R> extends BaseVersionFunction<QuadFunction<A, B, C, D, R>> {
     public QuadVersionFunction(Map<VersionRange, QuadFunction<A, B, C, D, R>> functions) {
         super(functions);

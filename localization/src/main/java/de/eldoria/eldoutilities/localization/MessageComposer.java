@@ -28,8 +28,7 @@ public class MessageComposer implements IMessageComposer {
     private final StringBuilder stringBuilder = new StringBuilder();
     private final List<TagResolver> replacements = new ArrayList<>();
 
-    private MessageComposer() {
-    }
+    private MessageComposer() {}
 
     public static MessageComposer create() {
         return new MessageComposer();
@@ -149,7 +148,8 @@ public class MessageComposer implements IMessageComposer {
      * @return localized message
      */
     public String buildLocalized(ILocalizer localizer) {
-        return LOCALE_TAG.matcher(stringBuilder.toString())
+        return LOCALE_TAG
+                .matcher(stringBuilder.toString())
                 .replaceAll(match -> Matcher.quoteReplacement(localizer.localize(match.group(1))));
     }
 }

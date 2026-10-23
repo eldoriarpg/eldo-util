@@ -34,7 +34,9 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
      * Default adress to submit debug data and update checks
      */
     public static final String HOST = "https://lyna.eldoria.de";
-    private static final DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").withZone(ZoneId.of("Z"));
+
+    private static final DateTimeFormatter format =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").withZone(ZoneId.of("Z"));
 
     private final int productId;
     private final String host;
@@ -54,9 +56,18 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
      * @param tokenStore       upgrade token of a premium product
      * @param downloadType     download type to request for a premium product, or null for the first one available
      */
-    LynaUpdateData(Plugin plugin, String notifyPermission, boolean notifyUpdate, boolean autoUpdate, int productId,
-                   String host, String updateUrl, String updateMessage, UpgradeTokenStore tokenStore,
-                   @Nullable Integer downloadType, @Nullable MessageSender messageSender) {
+    LynaUpdateData(
+            Plugin plugin,
+            String notifyPermission,
+            boolean notifyUpdate,
+            boolean autoUpdate,
+            int productId,
+            String host,
+            String updateUrl,
+            String updateMessage,
+            UpgradeTokenStore tokenStore,
+            @Nullable Integer downloadType,
+            @Nullable MessageSender messageSender) {
         super(plugin, notifyPermission, notifyUpdate, autoUpdate, updateUrl, updateMessage, messageSender);
         this.productId = productId;
         this.host = host;
@@ -82,15 +93,15 @@ public class LynaUpdateData extends UpdateData<LynaUpdateResponse> {
     }
 
     static int productId(Optional<String> property) {
-        var value = property.orElseThrow(() -> new IllegalStateException(
-                "The build data names no Lyna product. Add buildData { put(\"lynaProduct\", \"<id>\") } to the build."));
+        var value = property.orElseThrow(
+                () -> new IllegalStateException(
+                        "The build data names no Lyna product. Add buildData { put(\"lynaProduct\", \"<id>\") } to the build."));
         try {
             return Integer.parseInt(value.strip());
         } catch (NumberFormatException e) {
             throw new IllegalStateException("The Lyna product in the build data is not a number: " + value, e);
         }
     }
-
 
     @Override
     protected Map<String, Object> replacements(LynaUpdateResponse updateResponse) {

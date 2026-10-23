@@ -63,7 +63,11 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         registerSelf(this);
     }
 
-    public EldoPlugin(@NotNull JavaPluginLoader loader, @NotNull PluginDescriptionFile description, @NotNull File dataFolder, @NotNull File file) {
+    public EldoPlugin(
+            @NotNull JavaPluginLoader loader,
+            @NotNull PluginDescriptionFile description,
+            @NotNull File dataFolder,
+            @NotNull File file) {
         super(loader, description, dataFolder, file);
         registerSelf(this);
     }
@@ -76,14 +80,20 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         for (var clazz : eldoPlugin.getConfigSerialization()) {
             if (clazz.isAnnotationPresent(PluginSerializationName.class)) {
                 var annotation = clazz.getAnnotation(PluginSerializationName.class);
-                ConfigurationSerialization.registerClass(clazz,
-                        annotation.value().replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
+                ConfigurationSerialization.registerClass(
+                        clazz,
+                        annotation
+                                .value()
+                                .replace("{plugin}", eldoPlugin.getName().toLowerCase(Locale.ROOT)));
             }
             ConfigurationSerialization.registerClass(clazz);
         }
 
         EldoUtilities.preWarm(eldoPlugin);
-        eldoPlugin.failcmd = AdvancedCommandAdapter.wrap(eldoPlugin, new FailsaveCommand(eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase()));
+        eldoPlugin.failcmd = AdvancedCommandAdapter.wrap(
+                eldoPlugin,
+                new FailsaveCommand(
+                        eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase()));
     }
 
     public static EldoPlugin getInstance() {
@@ -225,7 +235,6 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         return getServer().getScheduler();
     }
 
-
     /**
      * Get a list of classes which should be registered via {@link  ConfigurationSerialization#registerClass(Class)}.
      * <p>
@@ -254,9 +263,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      *
      * @throws Throwable any throwable
      */
-    public void onPluginLoad() throws Throwable {
-
-    }
+    public void onPluginLoad() throws Throwable {}
 
     @Override
     public final void onEnable() {
@@ -320,7 +327,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     private void initFailsave(String message, Throwable e) {
         getLogger().log(Level.SEVERE, message, e);
         getLogger().log(Level.SEVERE, "Initializing failsave mode.");
-        var failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        var failcmd =
+                new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
         for (var cmd : failsafeCommands()) {
             try {
                 registerCommand(cmd, failcmd);
@@ -357,8 +365,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      *
      * @throws Throwable any throwable
      */
-    public void onPluginReload() throws Throwable {
-    }
+    public void onPluginReload() throws Throwable {}
 
     /**
      * Called when the server has started completely.
@@ -368,8 +375,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      * @param reload indicated that the call was caused by a server reload
      * @throws Throwable any throwable
      */
-    public void onPostStart(boolean reload) throws Throwable {
-    }
+    public void onPostStart(boolean reload) throws Throwable {}
 
     /**
      * Called when the server has started completely.
@@ -378,8 +384,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      *
      * @throws Throwable any throwable
      */
-    public void onPostStart() throws Throwable {
-    }
+    public void onPostStart() throws Throwable {}
 
     /**
      * Called when this plugin is enabled. Replacement for {@link Plugin#onEnable()}
@@ -389,8 +394,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      * @param reload indicated that the call was caused by a server reload
      * @throws Throwable any throwable
      */
-    public void onPluginEnable(boolean reload) throws Throwable {
-    }
+    public void onPluginEnable(boolean reload) throws Throwable {}
 
     /**
      * Called when this plugin is enabled. Replacement for {@link Plugin#onEnable()}
@@ -399,8 +403,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      *
      * @throws Throwable any throwable
      */
-    public void onPluginEnable() throws Throwable {
-    }
+    public void onPluginEnable() throws Throwable {}
 
     @Override
     public final void onDisable() {
@@ -446,8 +449,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
      *
      * @throws Throwable any exception
      */
-    public void onPluginDisable() throws Throwable {
-    }
+    public void onPluginDisable() throws Throwable {}
 
     @Override
     public @NotNull EntryData[] getDebugInformations() {
@@ -455,7 +457,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     }
 
     @Override
-    public final boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public final boolean onCommand(
+            @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return AdvancedCommandAdapter.wrap(this, failcmd).onCommand(sender, command, label, args);
     }
 
@@ -464,7 +467,8 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
         @EventHandler
         public void onCommand(PlayerCommandPreprocessEvent event) {
-            if (event.getPlayer().hasPermission("bukkit.command.reload") || event.getPlayer().isOp()) {
+            if (event.getPlayer().hasPermission("bukkit.command.reload")
+                    || event.getPlayer().isOp()) {
                 if (event.getMessage().startsWith("/reload")) {
                     reload = true;
                 }

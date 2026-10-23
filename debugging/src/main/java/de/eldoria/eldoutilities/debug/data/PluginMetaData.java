@@ -17,7 +17,16 @@ public class PluginMetaData {
     protected String[] softDependencies;
     protected String[] provides;
 
-    public PluginMetaData(String name, String version, boolean enabled, String main, String[] authors, String[] loadBefore, String[] dependencies, String[] softDependencies, String[] provides) {
+    public PluginMetaData(
+            String name,
+            String version,
+            boolean enabled,
+            String main,
+            String[] authors,
+            String[] loadBefore,
+            String[] dependencies,
+            String[] softDependencies,
+            String[] provides) {
         this.name = name;
         this.version = version;
         this.enabled = enabled;

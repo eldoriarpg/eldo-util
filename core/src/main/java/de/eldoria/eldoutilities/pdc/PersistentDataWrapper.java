@@ -81,7 +81,8 @@ public class PersistentDataWrapper {
      * @param <Z>             type of value
      * @return the value associated with this key. can be null if holder is null.
      */
-    public @Nullable <T, Z> Z computeIfPresent(NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> mappingFunction) {
+    public @Nullable <T, Z> Z computeIfPresent(
+            NamespacedKey key, PersistentDataType<T, Z> type, Function<Z, Z> mappingFunction) {
         return DataContainerUtil.computeIfPresent(container, key, type, mappingFunction);
     }
 

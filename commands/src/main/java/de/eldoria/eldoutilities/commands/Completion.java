@@ -50,7 +50,8 @@ public final class Completion {
     private static final Map<String, List<String>> SMART_SHORT_MATS;
     private static final Map<String, List<String>> SMART_PART_MATS;
     private static final Pattern SHORT_NAME = Pattern.compile("(?:(?:^|_)(.))");
-    private static final Cache<String, List<String>> SMART_MAT_RESULTS = CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
+    private static final Cache<String, List<String>> SMART_MAT_RESULTS =
+            CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build();
     private static Instant lastPlayerRefresh = Instant.now();
 
     static {
@@ -61,10 +62,14 @@ public final class Completion {
         for (var material : Material.values()) {
             var name = material.name();
             if (name.startsWith("LEGACY")) continue;
-            SMART_SHORT_MATS.computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+            SMART_SHORT_MATS
+                    .computeIfAbsent(getShortName(material).toLowerCase(Locale.ROOT), k -> new ArrayList<>())
+                    .add(name);
             SMART_MATS.add(name);
             for (var part : getParts(material)) {
-                SMART_PART_MATS.computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>()).add(name);
+                SMART_PART_MATS
+                        .computeIfAbsent(part.toLowerCase(Locale.ROOT), k -> new ArrayList<>())
+                        .add(name);
             }
         }
     }
@@ -113,7 +118,8 @@ public final class Completion {
 
         var finalValue = value.toUpperCase(Locale.ROOT);
 
-        results.addAll(SMART_MATS.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
+        results.addAll(
+                SMART_MATS.stream().filter(mat -> mat.contains(finalValue)).collect(Collectors.toList()));
 
         return results.stream()
                 .map(name -> lowerCase ? name.toLowerCase(Locale.ROOT) : name)
@@ -128,8 +134,7 @@ public final class Completion {
      * @return list of strings
      */
     public static List<String> complete(String value, String... inputs) {
-        return ArrayUtil.startingWithInArray(value, inputs)
-                .collect(Collectors.toCollection(ArrayList::new));
+        return ArrayUtil.startingWithInArray(value, inputs).collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -142,8 +147,7 @@ public final class Completion {
     public static List<String> complete(String value, Stream<String> inputs) {
         if (value.isEmpty()) return inputs.collect(Collectors.toList());
         var lowerValue = value.toLowerCase(Locale.ROOT);
-        return inputs
-                .filter(i -> i.toLowerCase().startsWith(lowerValue))
+        return inputs.filter(i -> i.toLowerCase().startsWith(lowerValue))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -225,13 +229,13 @@ public final class Completion {
      */
     public static List<String> completePlayers(String value) {
         if (PLAYER_NAMES.isEmpty()) {
-            PLAYER_NAMES.addAll(
-                    Arrays.stream(Bukkit.getOfflinePlayers())
-                            .filter(p -> Instant.ofEpochMilli(p.getLastPlayed()).isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
-                            .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
-                            .limit(OFFLINE_PLAYER_CACHE_SIZE)
-                            .map(OfflinePlayer::getName)
-                            .collect(Collectors.toSet()));
+            PLAYER_NAMES.addAll(Arrays.stream(Bukkit.getOfflinePlayers())
+                    .filter(p -> Instant.ofEpochMilli(p.getLastPlayed())
+                            .isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
+                    .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
+                    .limit(OFFLINE_PLAYER_CACHE_SIZE)
+                    .map(OfflinePlayer::getName)
+                    .collect(Collectors.toSet()));
         }
 
         Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
@@ -249,13 +253,13 @@ public final class Completion {
         Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
         if (ONLINE_NAMES.isEmpty() || lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
             ONLINE_NAMES.clear();
-            ONLINE_NAMES.addAll(Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
+            ONLINE_NAMES.addAll(
+                    Bukkit.getOnlinePlayers().stream().map(HumanEntity::getName).collect(Collectors.toSet()));
             lastPlayerRefresh = Instant.now();
         }
         complete.addAll(complete(value, ONLINE_NAMES.stream()));
         return new ArrayList<>(complete);
     }
-
 
     /**
      * Completes a enum. will return the enum values in lower case with underscores.
@@ -279,8 +283,10 @@ public final class Completion {
      * @param <T>       type of enum
      * @return list of strings
      */
-    public static <T extends Enum<T>> List<String> complete(String value, Class<T> clazz, boolean lowerCase, boolean strip) {
-        return complete(value,
+    public static <T extends Enum<T>> List<String> complete(
+            String value, Class<T> clazz, boolean lowerCase, boolean strip) {
+        return complete(
+                value,
                 Arrays.stream(clazz.getEnumConstants())
                         .map(Enum::name)
                         .map(v -> lowerCase ? v.toLowerCase() : v)
@@ -400,7 +406,8 @@ public final class Completion {
      * @param defaultComplete default completion output
      * @return list of string with length 1
      */
-    public static List<String> completeFreeInput(String value, int maxLength, String defaultComplete) throws CommandException {
+    public static List<String> completeFreeInput(String value, int maxLength, String defaultComplete)
+            throws CommandException {
         CommandAssertions.invalidLength(value, maxLength);
         return singleEntryList(defaultComplete);
     }

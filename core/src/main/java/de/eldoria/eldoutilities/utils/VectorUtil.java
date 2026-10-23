@@ -14,7 +14,6 @@ public final class VectorUtil {
         throw new UnsupportedOperationException("This is a utility class.");
     }
 
-
     public static Vector getDirectionVector(Location start, Location target) {
         return getDirectionVector(start.toVector(), target.toVector());
     }

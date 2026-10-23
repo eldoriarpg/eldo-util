@@ -19,7 +19,9 @@ import java.util.Map;
  * @param <B> second Input Type
  * @param <C> third Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class TriVersionFunction<A, B, C, R> extends BaseVersionFunction<TriFunction<A, B, C, R>> {
 
     public TriVersionFunction(Map<VersionRange, TriFunction<A, B, C, R>> functions) {

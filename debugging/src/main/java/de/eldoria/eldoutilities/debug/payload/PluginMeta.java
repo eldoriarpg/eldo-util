@@ -11,7 +11,16 @@ import org.bukkit.plugin.Plugin;
 
 public final class PluginMeta extends PluginMetaData {
 
-    private PluginMeta(String name, String version, boolean enabled, String main, String[] authors, String[] loadBefore, String[] dependencies, String[] softDependencies, String[] provides) {
+    private PluginMeta(
+            String name,
+            String version,
+            boolean enabled,
+            String main,
+            String[] authors,
+            String[] loadBefore,
+            String[] dependencies,
+            String[] softDependencies,
+            String[] provides) {
         super(name, version, enabled, main, authors, loadBefore, dependencies, softDependencies, provides);
     }
 
@@ -38,8 +47,7 @@ public final class PluginMeta extends PluginMetaData {
         } catch (NoSuchMethodError e) {
             provides = new String[0];
         }
-        return new PluginMeta(name, version, enabled, main, authors,
-                loadBefore, dependencies, softDependencies, provides);
+        return new PluginMeta(
+                name, version, enabled, main, authors, loadBefore, dependencies, softDependencies, provides);
     }
-
 }

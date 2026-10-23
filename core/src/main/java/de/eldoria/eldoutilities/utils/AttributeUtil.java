@@ -20,8 +20,7 @@ import java.util.logging.Level;
  * @since 1.1.0
  */
 public final class AttributeUtil {
-    private AttributeUtil() {
-    }
+    private AttributeUtil() {}
 
     /**
      * Sets the {@link AttributeInstance#getBaseValue()} to the value which is required to get the target value on
@@ -45,12 +44,16 @@ public final class AttributeUtil {
      * @param attribute attribute type to set if present
      * @param target    target value which should be retrieved via {@link AttributeInstance#getValue()}
      */
-    public static void setAttributeValue(@NotNull LivingEntity entity, @NotNull Attribute attribute, @NotNull double target) {
+    public static void setAttributeValue(
+            @NotNull LivingEntity entity, @NotNull Attribute attribute, @NotNull double target) {
         var a = entity.getAttribute(attribute);
         if (a == null) {
-            Bukkit.getLogger().log(Level.WARNING, "[EldoUtilities] Attempted to set attribute "
-                                                  + attribute + " for " + entity.getType() + ", but Attribute is not present on this type.",
-                    new IllegalArgumentException("A not present attribute was requested to change"));
+            Bukkit.getLogger()
+                    .log(
+                            Level.WARNING,
+                            "[EldoUtilities] Attempted to set attribute " + attribute + " for " + entity.getType()
+                                    + ", but Attribute is not present on this type.",
+                            new IllegalArgumentException("A not present attribute was requested to change"));
             return;
         }
         setAttributeValue(a, target);
@@ -70,17 +73,25 @@ public final class AttributeUtil {
         var targetAttribute = target.getAttribute(attribute);
 
         if (sourceAttribute == null) {
-            Bukkit.getLogger().log(Level.WARNING, "Attempted to sync attribute "
-                                                  + attribute + " between source " + source.getType() + " and target " + target.getType()
-                                                  + ", but Attribute is not present on source",
-                    new IllegalArgumentException("A not present attribute was requested to change"));
+            Bukkit.getLogger()
+                    .log(
+                            Level.WARNING,
+                            "Attempted to sync attribute "
+                                    + attribute + " between source " + source.getType() + " and target "
+                                    + target.getType()
+                                    + ", but Attribute is not present on source",
+                            new IllegalArgumentException("A not present attribute was requested to change"));
             return;
         }
         if (targetAttribute == null) {
-            Bukkit.getLogger().log(Level.WARNING, "Attempted to sync attribute "
-                                                  + attribute + " between source " + source.getType() + " and target " + target.getType()
-                                                  + ", but Attribute is not present on target",
-                    new IllegalArgumentException("A not present attribute was requested to change"));
+            Bukkit.getLogger()
+                    .log(
+                            Level.WARNING,
+                            "Attempted to sync attribute "
+                                    + attribute + " between source " + source.getType() + " and target "
+                                    + target.getType()
+                                    + ", but Attribute is not present on target",
+                            new IllegalArgumentException("A not present attribute was requested to change"));
             return;
         }
 
@@ -89,7 +100,6 @@ public final class AttributeUtil {
         if (attribute == Attribute.MAX_HEALTH) {
             target.setHealth(targetAttribute.getValue());
         }
-
     }
 
     public static double getAttributeValue(LivingEntity entity, Attribute attribute) {

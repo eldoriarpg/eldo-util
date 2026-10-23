@@ -10,8 +10,8 @@ import de.eldoria.eldoutilities.messages.MessageSender;
 import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
-import org.bukkit.Server;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import org.bukkit.Server;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.HandlerList;
@@ -74,10 +74,12 @@ class UpdaterTest {
         when(server.getGlobalRegionScheduler()).thenReturn(scheduler);
         when(server.getCommandMap()).thenReturn(mock(CommandMap.class));
         doAnswer(invocation -> serverTasks.add(invocation.getArgument(1)))
-                .when(scheduler).execute(any(Plugin.class), any(Runnable.class));
+                .when(scheduler)
+                .execute(any(Plugin.class), any(Runnable.class));
         handlerLists = mockStatic(HandlerList.class);
         messageSender = mock(MessageSender.class);
-        when(messageSender.translatePlain(any(String.class), any(TagResolver[].class))).thenReturn("Update available");
+        when(messageSender.translatePlain(any(String.class), any(TagResolver[].class)))
+                .thenReturn("Update available");
     }
 
     @AfterEach
@@ -242,7 +244,7 @@ class UpdaterTest {
         when(admin.isOp()).thenReturn(true);
         var command = new UpdateCommand(plugin, updater);
 
-        command.execute(admin, "eldo-update", new String[]{"download"});
+        command.execute(admin, "eldo-update", new String[] {"download"});
         runServerTasks();
 
         var messages = ArgumentCaptor.forClass(String.class);
@@ -250,7 +252,7 @@ class UpdaterTest {
         assertTrue(messages.getValue().contains("/testplugin:eldo-update download confirm"));
         assertEquals(0, updater.installs);
 
-        command.execute(admin, "eldo-update", new String[]{"download", "confirm"});
+        command.execute(admin, "eldo-update", new String[] {"download", "confirm"});
         updater.download().join();
         runServerTasks();
 
@@ -278,8 +280,7 @@ class UpdaterTest {
         return data;
     }
 
-    private record TestResponse(boolean isOutdated, String latestVersion) implements UpdateResponse {
-    }
+    private record TestResponse(boolean isOutdated, String latestVersion) implements UpdateResponse {}
 
     private static final class TestData extends UpdateData<TestResponse> {
         private TestData(Plugin plugin, boolean notifyUpdate, boolean autoUpdate) {
@@ -287,7 +288,14 @@ class UpdaterTest {
         }
 
         private TestData(Plugin plugin, boolean notifyUpdate, boolean autoUpdate, MessageSender messageSender) {
-            super(plugin, "test.notify", notifyUpdate, autoUpdate, "https://example.com", "Update to {new_version}", messageSender);
+            super(
+                    plugin,
+                    "test.notify",
+                    notifyUpdate,
+                    autoUpdate,
+                    "https://example.com",
+                    "Update to {new_version}",
+                    messageSender);
         }
     }
 

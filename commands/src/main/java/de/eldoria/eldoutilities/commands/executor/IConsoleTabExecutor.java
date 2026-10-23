@@ -16,10 +16,13 @@ import java.util.Collections;
 import java.util.List;
 
 public interface IConsoleTabExecutor {
-    void onCommand(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args) throws CommandException;
+    void onCommand(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args)
+            throws CommandException;
 
     @Nullable
-    default List<String> onTabComplete(@NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args) throws CommandException {
+    default List<String> onTabComplete(
+            @NotNull ConsoleCommandSender console, @NotNull String alias, @NotNull Arguments args)
+            throws CommandException {
         return Collections.emptyList();
     }
 }

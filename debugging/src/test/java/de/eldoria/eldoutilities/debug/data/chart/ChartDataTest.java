@@ -25,12 +25,12 @@ class ChartDataTest {
     @Test
     void seriesChartsSendNamedSeriesWithTheirHints() {
         var chart = sent(SeriesChart.line("Render time")
-                                    .series("render", Arrays.asList(1.5, null, 3))
-                                    .xLabels(List.of("a", "b", "c"))
-                                    .yLabel("ms")
-                                    .yRange(0, 50)
-                                    .mark(25, "budget")
-                                    .unit("ms"));
+                .series("render", Arrays.asList(1.5, null, 3))
+                .xLabels(List.of("a", "b", "c"))
+                .yLabel("ms")
+                .yRange(0, 50)
+                .mark(25, "budget")
+                .unit("ms"));
 
         assertEquals("line", chart.get("type"));
         assertEquals(Map.of("render", Arrays.asList(1.5, null, 3)), chart.get("data"));
@@ -44,10 +44,12 @@ class ChartDataTest {
 
     @Test
     void scatterChartsSendPointsPerSeries() {
-        var chart = sent(ScatterChart.scatter("Points").point("a", 1, 2).point("a", 3, 4).point("b", 0, 1));
+        var chart = sent(
+                ScatterChart.scatter("Points").point("a", 1, 2).point("a", 3, 4).point("b", 0, 1));
 
         assertEquals("scatter", chart.get("type"));
-        assertEquals(Map.of("a", List.of(List.of(1, 2), List.of(3, 4)), "b", List.of(List.of(0, 1))), chart.get("data"));
+        assertEquals(
+                Map.of("a", List.of(List.of(1, 2), List.of(3, 4)), "b", List.of(List.of(0, 1))), chart.get("data"));
         assertFalse(chart.containsKey("marks"));
     }
 
@@ -63,21 +65,32 @@ class ChartDataTest {
 
     @Test
     void heatmapsSendRowsOrCellsButNotBoth() {
-        var rows = sent(HeatmapChart.heatmap("Load").row(List.of(1, 2)).row(List.of(3, 4)).yLabels(List.of("mon", "tue")));
+        var rows = sent(HeatmapChart.heatmap("Load")
+                .row(List.of(1, 2))
+                .row(List.of(3, 4))
+                .yLabels(List.of("mon", "tue")));
         assertEquals(List.of(List.of(1, 2), List.of(3, 4)), rows.get("data"));
         assertEquals(Map.of("labels", List.of("mon", "tue")), rows.get("y"));
 
         var cells = sent(HeatmapChart.heatmap("Load").cell("noon", "mon", 5));
         assertEquals(List.of(Map.of("x", "noon", "y", "mon", "value", 5)), cells.get("data"));
 
-        assertThrows(IllegalStateException.class, () -> HeatmapChart.heatmap("x").row(List.of(1)).cell(0, 0, 1));
-        assertThrows(IllegalStateException.class, () -> HeatmapChart.heatmap("x").cell(0, 0, 1).row(List.of(1)));
+        assertThrows(
+                IllegalStateException.class,
+                () -> HeatmapChart.heatmap("x").row(List.of(1)).cell(0, 0, 1));
+        assertThrows(
+                IllegalStateException.class,
+                () -> HeatmapChart.heatmap("x").cell(0, 0, 1).row(List.of(1)));
     }
 
     @Test
     void gaugesSendValueAndScale() {
-        assertEquals(Map.of("value", 42, "min", 0, "max", 100), sent(GaugeChart.gauge("Usage", 42)).get("data"));
-        assertEquals(Map.of("value", 7, "min", 5, "max", 10), sent(GaugeChart.gauge("Usage", 7).range(5, 10)).get("data"));
+        assertEquals(
+                Map.of("value", 42, "min", 0, "max", 100),
+                sent(GaugeChart.gauge("Usage", 42)).get("data"));
+        assertEquals(
+                Map.of("value", 7, "min", 5, "max", 10),
+                sent(GaugeChart.gauge("Usage", 7).range(5, 10)).get("data"));
     }
 
     @Test
