@@ -163,12 +163,6 @@ public final class DebugUtil {
     }
 
     /**
-     * Runs the health checks of every {@link DebugDataProvider} the plugin reaches.
-     *
-     * @param plugin plugin to check
-     * @return the outcomes, in the order the providers were found
-     */
-    /**
      * Collects the charts of every {@link DebugDataProvider} the plugin reaches.
      *
      * @param plugin plugin
@@ -182,6 +176,12 @@ public final class DebugUtil {
         return charts;
     }
 
+    /**
+     * Runs the health checks of every {@link DebugDataProvider} the plugin reaches.
+     *
+     * @param plugin plugin to check
+     * @return the outcomes, in the order the providers were found
+     */
     public static @NotNull List<HealthCheck> getHealthChecks(Plugin plugin) {
         List<HealthCheck> checks = new ArrayList<>();
         for (var provider : providers(plugin)) {
