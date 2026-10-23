@@ -51,7 +51,8 @@ public interface FutureResult<T> {
      *
      * @return the result
      */
-    @Nullable T join();
+    @Nullable
+    T join();
 
     /**
      * Encapsulates this {@link FutureResult} as a {@link CompletableFuture}.

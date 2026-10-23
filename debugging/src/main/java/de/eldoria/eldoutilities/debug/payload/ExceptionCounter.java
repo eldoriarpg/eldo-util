@@ -25,8 +25,7 @@ import java.util.regex.Pattern;
  */
 final class ExceptionCounter {
     private static final Pattern EXCEPTION = Pattern.compile(
-            "([0-9]{2}:[0-9]{2}:[0-9]{2})] (\\[[^\\]]*?(?:ERROR|WARN)]:.*?)^\\[",
-            Pattern.DOTALL + Pattern.MULTILINE);
+            "([0-9]{2}:[0-9]{2}:[0-9]{2})] (\\[[^\\]]*?(?:ERROR|WARN)]:.*?)^\\[", Pattern.DOTALL + Pattern.MULTILINE);
 
     private final String project;
     private final Map<String, Occurrences> internal = new LinkedHashMap<>();
@@ -79,11 +78,12 @@ final class ExceptionCounter {
 
     private static ExceptionData[] filtered(Map<String, Occurrences> found, DebugSettings settings) {
         Map<String, Occurrences> merged = new LinkedHashMap<>();
-        found.forEach((message, occurrences) ->
-                merged.computeIfAbsent(settings.applyFilter(message), key -> new Occurrences()).merge(occurrences));
+        found.forEach((message, occurrences) -> merged.computeIfAbsent(
+                        settings.applyFilter(message), key -> new Occurrences())
+                .merge(occurrences));
         return merged.entrySet().stream()
-                .map(entry -> new ExceptionData(entry.getKey(), entry.getValue().count, entry.getValue().first,
-                        entry.getValue().last))
+                .map(entry -> new ExceptionData(
+                        entry.getKey(), entry.getValue().count, entry.getValue().first, entry.getValue().last))
                 .toArray(ExceptionData[]::new);
     }
 

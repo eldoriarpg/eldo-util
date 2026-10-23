@@ -41,12 +41,8 @@ class ConsumersTest {
             this.v = v;
         }
 
-        public void consumer(Consumer<T> consumer) {
+        public void consumer(Consumer<T> consumer) {}
 
-        }
-
-        public void consumer(BiConsumer<T, V> consumer) {
-
-        }
+        public void consumer(BiConsumer<T, V> consumer) {}
     }
 }

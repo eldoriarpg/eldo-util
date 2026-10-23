@@ -17,8 +17,8 @@ public class VersionTest {
         Assertions.assertFalse(version.isNewer(Version.of(1, 17)));
         Assertions.assertTrue(version.isOlderOrEqual(Version.of(1, 17)));
         Assertions.assertTrue(version.isOlderOrEqual(Version.of(1, 16, 5)));
-        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1,16,5)));
-        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1,16,4)));
-        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1,16)));
+        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1, 16, 5)));
+        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1, 16, 4)));
+        Assertions.assertTrue(version.isNewerOrEqual(Version.of(1, 16)));
     }
 }

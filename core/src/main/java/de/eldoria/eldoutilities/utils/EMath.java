@@ -17,8 +17,7 @@ import static java.lang.Math.pow;
  * Utility class with basic math functions which are not covered by java.math
  */
 public final class EMath {
-    private EMath() {
-    }
+    private EMath() {}
 
     /**
      * Clamp a value.
@@ -102,7 +101,6 @@ public final class EMath {
         return abs(a) + abs(b);
     }
 
-
     /**
      * Returns the total difference between two numbers
      *
@@ -141,7 +139,6 @@ public final class EMath {
 
         return Pair.of(small, large);
     }
-
 
     /**
      * Compare two values
@@ -203,7 +200,6 @@ public final class EMath {
     public static double parabolaValue(double xVector, double yVector, double xPoint, double yPoint, double x) {
         return (yPoint - yVector) / pow(xPoint - xVector, 2) * pow(x - xVector, 2) + yVector;
     }
-
 
     /**
      * Returns a smooth curve created with two opposite parabolas.
@@ -268,6 +264,7 @@ public final class EMath {
     }
 
     private enum CurveType {
-        ASCENDING, DESCENDING
+        ASCENDING,
+        DESCENDING
     }
 }

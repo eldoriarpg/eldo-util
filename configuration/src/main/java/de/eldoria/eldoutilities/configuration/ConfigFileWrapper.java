@@ -28,8 +28,10 @@ import java.util.logging.Level;
 @Deprecated(since = "3.6.0", forRemoval = true)
 public final class ConfigFileWrapper {
     private final File file;
+
     @Nullable
     private final Plugin plugin;
+
     private FileConfiguration fileConfiguration;
 
     private ConfigFileWrapper(@Nullable Plugin plugin, Path filePath, @Nullable Configuration defaultConfig) {
@@ -88,7 +90,8 @@ public final class ConfigFileWrapper {
      * @param defaultMap a map with default values to set.
      * @return new instance
      */
-    public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, Map<String, Object> defaultMap) {
+    public static ConfigFileWrapper forFileWithDefaults(
+            Plugin plugin, String filePath, Map<String, Object> defaultMap) {
         var defaults = new YamlConfiguration();
         defaultMap.forEach(defaults::set);
         return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), defaults);
@@ -116,7 +119,8 @@ public final class ConfigFileWrapper {
      * @param defaultConfig a configuration with default values to set.
      * @return new instance
      */
-    public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
+    public static ConfigFileWrapper forFileWithDefaults(
+            Plugin plugin, String filePath, @Nullable Configuration defaultConfig) {
         return new ConfigFileWrapper(plugin, resolvePath(plugin, filePath), defaultConfig);
     }
 
@@ -128,7 +132,8 @@ public final class ConfigFileWrapper {
      * @param defaultConfig a configuration with default values to set.
      * @return new instance
      */
-    public static ConfigFileWrapper forFileWithDefaults(Plugin plugin, Path filePath, @Nullable Configuration defaultConfig) {
+    public static ConfigFileWrapper forFileWithDefaults(
+            Plugin plugin, Path filePath, @Nullable Configuration defaultConfig) {
         return new ConfigFileWrapper(plugin, filePath, defaultConfig);
     }
 
@@ -201,5 +206,4 @@ public final class ConfigFileWrapper {
             plugin.getLogger().log(level, message, e);
         }
     }
-
 }

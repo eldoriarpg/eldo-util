@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 class ConfigFilesTest {
     @TempDir
     Path folder;
+
     private final Plugin plugin = mock(Plugin.class);
 
     @BeforeEach
@@ -51,7 +52,8 @@ class ConfigFilesTest {
         write("store.json", 1);
 
         List<String> names = ConfigFiles.read(plugin, ConfigFiles.inDataFolder(plugin)).stream()
-                .map(ConfigFiles.Read::name).toList();
+                .map(ConfigFiles.Read::name)
+                .toList();
 
         assertEquals(List.of("config.yml", "messages.properties", "mobs/zombie.yaml", "store.json"), names);
     }
@@ -62,7 +64,9 @@ class ConfigFilesTest {
         List<Path> chosen = new java.util.ArrayList<>(List.of(huge));
         for (int i = 0; i < 6; i++) chosen.add(write("b" + i + ".yml", 1024 * 1024 - 10));
 
-        List<String> names = ConfigFiles.read(plugin, chosen).stream().map(ConfigFiles.Read::name).toList();
+        List<String> names = ConfigFiles.read(plugin, chosen).stream()
+                .map(ConfigFiles.Read::name)
+                .toList();
 
         assertEquals(List.of("b0.yml", "b1.yml", "b2.yml", "b3.yml", "b4.yml"), names);
     }
@@ -71,7 +75,8 @@ class ConfigFilesTest {
     void settingsReplaceTheChoice() throws IOException {
         write("config.yml", 1);
         Path extra = write("extra.txt", 3);
-        var settings = DebugSettings.builder().withConfigFiles(p -> List.of(extra)).build();
+        var settings =
+                DebugSettings.builder().withConfigFiles(p -> List.of(extra)).build();
 
         var read = ConfigFiles.read(plugin, settings.configFiles(plugin));
 

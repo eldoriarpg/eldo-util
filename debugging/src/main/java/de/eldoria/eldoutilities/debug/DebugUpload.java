@@ -32,33 +32,30 @@ import java.util.zip.GZIPOutputStream;
 public final class DebugUpload {
     static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(10);
     static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(60);
-    private static final HttpClient CLIENT = HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
+    private static final HttpClient CLIENT =
+            HttpClient.newBuilder().connectTimeout(CONNECT_TIMEOUT).build();
     private static final Gson GSON = new Gson();
 
-    private DebugUpload() {
-    }
+    private DebugUpload() {}
 
     /**
      * What became of an upload.
      */
-    public sealed interface Result permits Uploaded, Failed {
-    }
+    public sealed interface Result permits Uploaded, Failed {}
 
     /**
      * @param readUrl   the viewer, for whoever helps
      * @param deleteUrl deletes the report
      * @param expires   when Lyna deletes it on its own
      */
-    public record Uploaded(String readUrl, String deleteUrl, Instant expires) implements Result {
-    }
+    public record Uploaded(String readUrl, String deleteUrl, Instant expires) implements Result {}
 
     /**
      * @param reason     why
      * @param message    what Lyna said, or what went wrong on the way
      * @param retryAfter seconds to wait before trying again, when Lyna said so
      */
-    public record Failed(Reason reason, String message, OptionalLong retryAfter) implements Result {
-    }
+    public record Failed(Reason reason, String message, OptionalLong retryAfter) implements Result {}
 
     public enum Reason {
         /**
@@ -79,11 +76,9 @@ public final class DebugUpload {
         UNREACHABLE
     }
 
-    private record Receipt(String readKey, String deleteKey, String readUrl, String deleteUrl, String expires) {
-    }
+    private record Receipt(String readKey, String deleteKey, String readUrl, String deleteUrl, String expires) {}
 
-    private record Problem(String error, String message) {
-    }
+    private record Problem(String error, String message) {}
 
     /**
      * Sends a report.
@@ -103,7 +98,8 @@ public final class DebugUpload {
                     .POST(HttpRequest.BodyPublishers.ofByteArray(gzip(json)))
                     .build();
         } catch (IllegalArgumentException e) {
-            return CompletableFuture.completedFuture(new Failed(Reason.UNREACHABLE, "Invalid host " + host, OptionalLong.empty()));
+            return CompletableFuture.completedFuture(
+                    new Failed(Reason.UNREACHABLE, "Invalid host " + host, OptionalLong.empty()));
         }
         return CLIENT.sendAsync(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
                 .thenApply(DebugUpload::read)
@@ -114,12 +110,17 @@ public final class DebugUpload {
         try {
             return switch (response.statusCode()) {
                 case 200 -> uploaded(GSON.fromJson(response.body(), Receipt.class));
-                case 429 -> new Failed(Reason.RATE_LIMITED, problem(response),
-                        retryAfter(response.headers().firstValue("Retry-After").orElse("")));
+                case 429 ->
+                    new Failed(
+                            Reason.RATE_LIMITED,
+                            problem(response),
+                            retryAfter(
+                                    response.headers().firstValue("Retry-After").orElse("")));
                 case 413 -> new Failed(Reason.TOO_LARGE, problem(response), OptionalLong.empty());
                 case 400, 422 -> new Failed(Reason.REFUSED, problem(response), OptionalLong.empty());
-                default -> new Failed(Reason.UNREACHABLE, "Lyna answered " + response.statusCode() + ".",
-                        OptionalLong.empty());
+                default ->
+                    new Failed(
+                            Reason.UNREACHABLE, "Lyna answered " + response.statusCode() + ".", OptionalLong.empty());
             };
         } catch (JsonParseException | DateTimeParseException e) {
             return new Failed(Reason.UNREACHABLE, "Lyna answered something unexpected.", OptionalLong.empty());

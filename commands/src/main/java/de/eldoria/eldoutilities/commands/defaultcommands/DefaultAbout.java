@@ -29,7 +29,8 @@ public class DefaultAbout extends AdvancedCommand implements ITabExecutor {
         this.localeTag = localeTag;
         var descr = plugin.getDescription();
         resolver = TagResolver.builder()
-                .resolvers(Replacement.create("plugin_name", descr.getName()),
+                .resolvers(
+                        Replacement.create("plugin_name", descr.getName()),
                         Replacement.create("authors", String.join(", ", descr.getAuthors())),
                         Replacement.create("version", descr.getVersion()),
                         Replacement.create("website", link(descr.getWebsite())),

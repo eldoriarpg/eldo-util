@@ -19,13 +19,21 @@ public class FailsaveCommand extends DefaultDebug {
     @Override
     public void onCommand(@NotNull CommandSender sender, @NotNull String alias, @NotNull Arguments args) {
         if (args.isEmpty()) {
-            messageSender().sendError(sender, "<red>The plugin failed to load correctly. Please use <gold>/" + alias + "<red> debug to create a debug paste and send it to the developer.");
+            messageSender()
+                    .sendError(
+                            sender,
+                            "<red>The plugin failed to load correctly. Please use <gold>/" + alias
+                                    + "<red> debug to create a debug paste and send it to the developer.");
             return;
         }
         if ("debug".equalsIgnoreCase(args.get(0).asString())) {
             super.onCommand(sender, alias, args);
             return;
         }
-        messageSender().sendMessage(sender, "<red>The plugin failed to load correctly. Please use <gold>/" + alias + "<red> debug to create a debug paste and send it to the developer.");
+        messageSender()
+                .sendMessage(
+                        sender,
+                        "<red>The plugin failed to load correctly. Please use <gold>/" + alias
+                                + "<red> debug to create a debug paste and send it to the developer.");
     }
 }

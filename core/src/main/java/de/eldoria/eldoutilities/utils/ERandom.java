@@ -15,8 +15,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class ERandom {
-    private ERandom() {
-    }
+    private ERandom() {}
 
     /**
      * Get a random vector with a gaussian random number.
@@ -32,7 +31,6 @@ public final class ERandom {
         }
         return vecs;
     }
-
 
     public static Vector getRandomVector() {
         return getRandomVector(ThreadLocalRandom.current());

@@ -30,8 +30,16 @@ public class CommandMeta {
     private final int requiredArguments;
     private AdvancedCommand parent;
 
-    public CommandMeta(String name, String[] aliases, Set<String> permissions, Set<Class<? extends CommandSender>> allowedSender, List<Argument> arguments,
-                       AdvancedCommand defaultCommand, Map<String, AdvancedCommand> subCommands, AdvancedCommand parent, boolean hidden) {
+    public CommandMeta(
+            String name,
+            String[] aliases,
+            Set<String> permissions,
+            Set<Class<? extends CommandSender>> allowedSender,
+            List<Argument> arguments,
+            AdvancedCommand defaultCommand,
+            Map<String, AdvancedCommand> subCommands,
+            AdvancedCommand parent,
+            boolean hidden) {
         this.name = name;
         this.aliases = aliases;
         this.permissions = permissions;
@@ -45,7 +53,8 @@ public class CommandMeta {
                 .collect(Collectors.toSet());
         this.parent = parent;
         this.hidden = hidden;
-        requiredArguments = (int) arguments().stream().filter(Argument::isRequired).count();
+        requiredArguments =
+                (int) arguments().stream().filter(Argument::isRequired).count();
     }
 
     public static CommandMetaBuilder builder(String name) {

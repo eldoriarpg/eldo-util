@@ -14,5 +14,4 @@ package de.eldoria.eldoutilities.debug.data;
  * @param firstSeen the log time of the first occurrence, {@code HH:mm:ss}
  * @param lastSeen  the log time of the last occurrence, {@code HH:mm:ss}
  */
-public record ExceptionData(String text, int count, String firstSeen, String lastSeen) {
-}
+public record ExceptionData(String text, int count, String firstSeen, String lastSeen) {}

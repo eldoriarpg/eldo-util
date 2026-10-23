@@ -30,8 +30,7 @@ public final class EldoUtilities {
     private static YamlConfiguration configuration;
     private static Path configurationFile;
 
-    private EldoUtilities() {
-    }
+    private EldoUtilities() {}
 
     public static Logger logger() {
         return Bukkit.getLogger();
@@ -42,16 +41,23 @@ public final class EldoUtilities {
     }
 
     public static void ignite(Plugin plugin) {
-        configurationFile = plugin.getDataFolder().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+        configurationFile = plugin.getDataFolder()
+                .toPath()
+                .toAbsolutePath()
+                .getParent()
+                .resolve(Paths.get("EldoUtilities", "config.yml"));
         configuration = YamlConfiguration.loadConfiguration(configurationFile.toFile());
     }
 
-    public static void shutdown() {
-    }
+    public static void shutdown() {}
 
     public static YamlConfiguration getConfiguration() {
         if (configuration == null) {
-            configurationFile = Bukkit.getUpdateFolderFile().toPath().toAbsolutePath().getParent().resolve(Paths.get("EldoUtilities", "config.yml"));
+            configurationFile = Bukkit.getUpdateFolderFile()
+                    .toPath()
+                    .toAbsolutePath()
+                    .getParent()
+                    .resolve(Paths.get("EldoUtilities", "config.yml"));
             configuration = YamlConfiguration.loadConfiguration(configurationFile.toFile());
         }
         return configuration;

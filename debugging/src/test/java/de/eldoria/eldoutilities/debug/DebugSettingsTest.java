@@ -36,13 +36,15 @@ class DebugSettingsTest {
 
     @Test
     void urlCredentialsAreHidden() {
-        assertEquals("url: jdbc:postgresql://*****:*****@db:5432/mc",
+        assertEquals(
+                "url: jdbc:postgresql://*****:*****@db:5432/mc",
                 filter("url: jdbc:postgresql://admin:hunter2@db:5432/mc"));
     }
 
     @Test
     void secretsInYamlAndPropertiesAreHidden() {
-        assertEquals("database:\n  password: *****\n  port: 5432", filter("database:\n  password: hunter2\n  port: 5432"));
+        assertEquals(
+                "database:\n  password: *****\n  port: 5432", filter("database:\n  password: hunter2\n  port: 5432"));
         assertEquals("api-key=*****", filter("api-key=abc123"));
         assertEquals("discord:\n  bot-token: \"*****\"", filter("discord:\n  bot-token: \"abc.def\""));
         assertEquals("  user: *****", filter("  user: minecraft"));
@@ -50,11 +52,17 @@ class DebugSettingsTest {
 
     @Test
     void secretsInJsonAreHidden() {
-        assertEquals("{\"clientSecret\": \"*****\", \"port\": 1}", filter("{\"clientSecret\": \"s3cr3t\", \"port\": 1}"));
+        assertEquals(
+                "{\"clientSecret\": \"*****\", \"port\": 1}", filter("{\"clientSecret\": \"s3cr3t\", \"port\": 1}"));
     }
 
     @Test
     void customHostLosesItsTrailingSlash() {
-        assertEquals("https://lyna.example.com", DebugSettings.builder().forHost("https://lyna.example.com/").build().getHost());
+        assertEquals(
+                "https://lyna.example.com",
+                DebugSettings.builder()
+                        .forHost("https://lyna.example.com/")
+                        .build()
+                        .getHost());
     }
 }

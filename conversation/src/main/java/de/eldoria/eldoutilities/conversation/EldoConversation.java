@@ -32,8 +32,13 @@ public class EldoConversation extends Conversation {
     private final String userPrefix;
     private final Component pluginPrefix;
 
-    public EldoConversation(@Nullable Plugin plugin, @NotNull Conversable forWhom, @Nullable Prompt firstPrompt,
-                            @NotNull Map<Object, Object> initialSessionData, Component pluginPrefix, String userPrefix) {
+    public EldoConversation(
+            @Nullable Plugin plugin,
+            @NotNull Conversable forWhom,
+            @Nullable Prompt firstPrompt,
+            @NotNull Map<Object, Object> initialSessionData,
+            Component pluginPrefix,
+            String userPrefix) {
         super(plugin, forWhom, firstPrompt, initialSessionData);
         localizer = ILocalizer.getPluginLocalizer(plugin);
         sender = MessageSender.getPluginMessageSender(plugin);

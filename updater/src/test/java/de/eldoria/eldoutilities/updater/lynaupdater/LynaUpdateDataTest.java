@@ -28,7 +28,9 @@ class LynaUpdateDataTest {
 
     @Test
     void linksToTheProductPage() {
-        assertEquals("https://lyna.eldoria.de/products/8", LynaUpdateDataBuilder.productPage("https://lyna.eldoria.de", 8));
-        assertEquals("https://lyna.eldoria.de/products/8", LynaUpdateDataBuilder.productPage("https://lyna.eldoria.de/", 8));
+        assertEquals(
+                "https://lyna.eldoria.de/products/8", LynaUpdateDataBuilder.productPage("https://lyna.eldoria.de", 8));
+        assertEquals(
+                "https://lyna.eldoria.de/products/8", LynaUpdateDataBuilder.productPage("https://lyna.eldoria.de/", 8));
     }
 }

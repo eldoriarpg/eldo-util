@@ -15,7 +15,6 @@ import de.eldoria.eldoutilities.updater.notifier.DownloadedNotifier;
 import de.eldoria.eldoutilities.updater.notifier.UpdateNotifier;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateChecker;
 import de.eldoria.eldoutilities.updater.spigotupdater.SpigotUpdateData;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
@@ -153,15 +152,17 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     public final CompletableFuture<Boolean> download() {
         if (executor.isShutdown()) return CompletableFuture.completedFuture(downloaded);
-        return CompletableFuture.supplyAsync(() -> {
-            if (!downloaded && lastCheck != null && offersDownload()) {
-                downloaded = update();
-                if (downloaded) {
-                    replaceListener(notice());
-                }
-            }
-            return downloaded;
-        }, executor);
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    if (!downloaded && lastCheck != null && offersDownload()) {
+                        downloaded = update();
+                        if (downloaded) {
+                            replaceListener(notice());
+                        }
+                    }
+                    return downloaded;
+                },
+                executor);
     }
 
     /**
@@ -221,14 +222,16 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     public final CompletableFuture<Void> reconfigure(T data) {
         if (executor.isShutdown()) return CompletableFuture.completedFuture(null);
-        return CompletableFuture.runAsync(() -> {
-            this.data = data;
-            autoUpdateOverride = null;
-            autoUpdateDeclined = false;
-            updateAvailable = false;
-            removeListener();
-            performCheck(true);
-        }, executor);
+        return CompletableFuture.runAsync(
+                () -> {
+                    this.data = data;
+                    autoUpdateOverride = null;
+                    autoUpdateDeclined = false;
+                    updateAvailable = false;
+                    removeListener();
+                    performCheck(true);
+                },
+                executor);
     }
 
     /**
@@ -260,16 +263,22 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     public final CompletableFuture<Boolean> enableAutoUpdate() {
         if (executor.isShutdown()) return CompletableFuture.completedFuture(isAutoUpdate());
-        return CompletableFuture.supplyAsync(() -> {
-            if (!offersAutoUpdate()) return isAutoUpdate();
-            autoUpdateOverride = true;
-            report(AutoUpdateDecision.ENABLED);
-            if (updateAvailable && !downloaded && lastCheck != null && updatesAutomatically() && !isMajorUpdate()) {
-                downloaded = update();
-            }
-            if (updateAvailable) replaceListener(notice());
-            return true;
-        }, executor);
+        return CompletableFuture.supplyAsync(
+                () -> {
+                    if (!offersAutoUpdate()) return isAutoUpdate();
+                    autoUpdateOverride = true;
+                    report(AutoUpdateDecision.ENABLED);
+                    if (updateAvailable
+                            && !downloaded
+                            && lastCheck != null
+                            && updatesAutomatically()
+                            && !isMajorUpdate()) {
+                        downloaded = update();
+                    }
+                    if (updateAvailable) replaceListener(notice());
+                    return true;
+                },
+                executor);
     }
 
     /**
@@ -281,12 +290,14 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      */
     public final CompletableFuture<Void> declineAutoUpdate() {
         if (executor.isShutdown()) return CompletableFuture.completedFuture(null);
-        return CompletableFuture.runAsync(() -> {
-            if (!offersAutoUpdate()) return;
-            autoUpdateDeclined = true;
-            report(AutoUpdateDecision.NEVER_ASK);
-            if (updateAvailable) replaceListener(notice());
-        }, executor);
+        return CompletableFuture.runAsync(
+                () -> {
+                    if (!offersAutoUpdate()) return;
+                    autoUpdateDeclined = true;
+                    report(AutoUpdateDecision.NEVER_ASK);
+                    if (updateAvailable) replaceListener(notice());
+                },
+                executor);
     }
 
     /**
@@ -350,7 +361,8 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
         if (data.isNotifyUpdate() && !notifyActive) {
             notifyActive = true;
             notifier = listener;
-            ServerTasks.runGlobal(plugin, () -> plugin.getServer().getPluginManager().registerEvents(listener, plugin));
+            ServerTasks.runGlobal(
+                    plugin, () -> plugin.getServer().getPluginManager().registerEvents(listener, plugin));
         }
     }
 

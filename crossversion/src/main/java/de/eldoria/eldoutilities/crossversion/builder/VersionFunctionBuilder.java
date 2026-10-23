@@ -63,7 +63,8 @@ public abstract class VersionFunctionBuilder<T, V> {
      * @param <R> result type
      * @return new tri function builder instance
      */
-    public static <A, B, C, R> TriFunctionBuilder<A, B, C, R> triFunctionBuilder(Class<A> a, Class<B> b, Class<C> c, Class<R> r) {
+    public static <A, B, C, R> TriFunctionBuilder<A, B, C, R> triFunctionBuilder(
+            Class<A> a, Class<B> b, Class<C> c, Class<R> r) {
         return new TriFunctionBuilder<>();
     }
 

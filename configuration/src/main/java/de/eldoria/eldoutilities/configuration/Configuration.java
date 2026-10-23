@@ -19,16 +19,11 @@ public class Configuration extends EldoConfig {
     }
 
     @Override
-    protected void saveConfigs() {
-    }
+    protected void saveConfigs() {}
 
     @Override
-    protected void reloadConfigs() {
-
-    }
+    protected void reloadConfigs() {}
 
     @Override
-    protected void init() {
-
-    }
+    protected void init() {}
 }

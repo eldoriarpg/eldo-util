@@ -46,12 +46,9 @@ public final class UserData {
                         .collect(Collectors.toMap(e -> e[0], e -> e[1]));
             }
             Path pluginFile = Plugins.getPluginFile(plugin).get().toPath();
-            String md5 = Hashing.md5()
-                    .hashBytes(Files.readAllBytes(pluginFile))
-                    .toString();
-            String sha256 = Hashing.sha256()
-                    .hashBytes(Files.readAllBytes(pluginFile))
-                    .toString();
+            String md5 = Hashing.md5().hashBytes(Files.readAllBytes(pluginFile)).toString();
+            String sha256 =
+                    Hashing.sha256().hashBytes(Files.readAllBytes(pluginFile)).toString();
             buildProperties.put("md5", md5);
             buildProperties.put("sha256", sha256);
         } catch (IOException e) {
@@ -86,7 +83,9 @@ public final class UserData {
         properties.add("Premium: " + isPremium());
         properties.add("User: " + user());
         properties.add("Nonce: " + nonce);
-        buildProperties.entrySet().stream().map(e -> "%s: %s".formatted(e.getKey(), e.getValue())).forEach(properties::add);
+        buildProperties.entrySet().stream()
+                .map(e -> "%s: %s".formatted(e.getKey(), e.getValue()))
+                .forEach(properties::add);
         return String.join("\n", properties);
     }
 }

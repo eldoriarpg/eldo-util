@@ -16,8 +16,7 @@ import org.bukkit.projectiles.BlockProjectileSource;
  * @since 1.0.0
  */
 public final class ProjectileUtil {
-    private ProjectileUtil() {
-    }
+    private ProjectileUtil() {}
 
     /**
      * Check if a entity is a projectile. If the entity is a projectile try to find the projectile sender.
@@ -48,5 +47,4 @@ public final class ProjectileUtil {
         // This should likely never happen
         throw new IllegalArgumentException(source.getClass().getSimpleName() + " is either a block nor an entity");
     }
-
 }

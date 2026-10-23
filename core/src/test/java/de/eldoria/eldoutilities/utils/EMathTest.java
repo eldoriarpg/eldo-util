@@ -32,7 +32,7 @@ public class EMathTest {
         assertEquals(rightUp, leftUp);
         assertEquals(1, leftUp);
         assertNotEquals(2, parabolaValue(0, 0, 1, 1, 2));
-        //down
+        // down
         double rightDown = parabolaValue(0, 0, -1, -1, 1);
         double leftDown = parabolaValue(0, 0, -1, -1, -1);
         assertEquals(rightDown, leftDown);

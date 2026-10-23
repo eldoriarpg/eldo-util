@@ -354,7 +354,6 @@ public final class ItemStackBuilder {
             if (clazz.isAssignableFrom(itemMeta.getClass())) {
                 consumer.accept((T) itemMeta);
             }
-
         }
         itemStack.setItemMeta(itemMeta);
         return this;

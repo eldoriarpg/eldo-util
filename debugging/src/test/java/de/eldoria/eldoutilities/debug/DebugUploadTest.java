@@ -59,7 +59,8 @@ class DebugUploadTest {
     }
 
     private DebugUpload.Result send() {
-        return DebugUpload.send("http://127.0.0.1:" + server.getAddress().getPort(), "{\"v\":2}").join();
+        return DebugUpload.send("http://127.0.0.1:" + server.getAddress().getPort(), "{\"v\":2}")
+                .join();
     }
 
     private void answer(int status, String body) {
@@ -74,7 +75,10 @@ class DebugUploadTest {
 
         var uploaded = assertInstanceOf(Uploaded.class, send());
 
-        assertEquals(new Uploaded("https://lyna/debug/r", "https://lyna/debug/delete/d", Instant.parse("2026-10-29T12:00:00Z")), uploaded);
+        assertEquals(
+                new Uploaded(
+                        "https://lyna/debug/r", "https://lyna/debug/delete/d", Instant.parse("2026-10-29T12:00:00Z")),
+                uploaded);
         assertEquals("{\"v\":2}", received.get());
         assertEquals("gzip", encoding.get());
     }
@@ -111,7 +115,10 @@ class DebugUploadTest {
     @Test
     void aHostNobodyListensOnIsUnreachable() {
         server.stop(0);
-        var failed = assertInstanceOf(Failed.class, DebugUpload.send("http://127.0.0.1:" + server.getAddress().getPort(), "{}").join());
+        var failed = assertInstanceOf(
+                Failed.class,
+                DebugUpload.send("http://127.0.0.1:" + server.getAddress().getPort(), "{}")
+                        .join());
         assertEquals(Reason.UNREACHABLE, failed.reason());
     }
 }

@@ -35,7 +35,8 @@ public class AdvancedCommandAdapter extends AdvancedCommand implements TabExecut
     }
 
     @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public boolean onCommand(
+            @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         try {
             executeCommand(sender, label, args);
         } catch (CommandException e) {
@@ -44,14 +45,16 @@ public class AdvancedCommandAdapter extends AdvancedCommand implements TabExecut
         return true;
     }
 
-    private void executeCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args) throws CommandException {
+    private void executeCommand(@NotNull CommandSender sender, @NotNull String label, @NotNull String[] args)
+            throws CommandException {
         var arguments = Arguments.create(plugin(), sender, args);
         advancedCommand.commandRoute(sender, label, arguments);
     }
 
     @Nullable
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public List<String> onTabComplete(
+            @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         var arguments = Arguments.create(plugin(), sender, args);
         List<String> strings;
         try {

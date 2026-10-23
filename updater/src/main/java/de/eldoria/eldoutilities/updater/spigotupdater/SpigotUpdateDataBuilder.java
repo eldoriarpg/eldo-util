@@ -22,9 +22,9 @@ public class SpigotUpdateDataBuilder extends UpdateDataBuilder<SpigotUpdateDataB
         updateUrl = "https://www.spigotmc.org/resources/%s/".formatted(spigotId);
     }
 
-
     @Override
     public SpigotUpdateData build() {
-        return applyCommon(new SpigotUpdateData(plugin, notifyPermission, notifyUpdate, spigotId, updateUrl, updateMessage, messageSender));
+        return applyCommon(new SpigotUpdateData(
+                plugin, notifyPermission, notifyUpdate, spigotId, updateUrl, updateMessage, messageSender));
     }
 }

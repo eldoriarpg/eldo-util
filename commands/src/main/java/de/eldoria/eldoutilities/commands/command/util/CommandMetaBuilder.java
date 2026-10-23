@@ -127,7 +127,16 @@ public class CommandMetaBuilder {
     }
 
     public CommandMeta build() {
-        return new CommandMeta(name, alias.toArray(new String[0]), permissions, allowedSender, arguments, defaultCommand, subCommands, parent, hidden);
+        return new CommandMeta(
+                name,
+                alias.toArray(new String[0]),
+                permissions,
+                allowedSender,
+                arguments,
+                defaultCommand,
+                subCommands,
+                parent,
+                hidden);
     }
 
     public CommandMetaBuilder allowCommandSender(Set<Class<? extends CommandSender>> allowedSender) {

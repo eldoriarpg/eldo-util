@@ -13,7 +13,7 @@ package de.eldoria.eldoutilities.configuration;
 @Deprecated(since = "3.6.0", forRemoval = true)
 public class ExternalConfigException extends RuntimeException {
     public ExternalConfigException() {
-        super("You tried to load a configuration file from an external configuration. This is forbidden. " +
-              "Please use only the main config instance to load other config files.");
+        super("You tried to load a configuration file from an external configuration. This is forbidden. "
+                + "Please use only the main config instance to load other config files.");
     }
 }

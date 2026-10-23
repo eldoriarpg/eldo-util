@@ -14,5 +14,4 @@ import org.jetbrains.annotations.Nullable;
  * @param version      version of the build
  * @param downloadType download type of the build, or null for the first one the account may have
  */
-record TokenRequest(String version, @Nullable Integer downloadType) {
-}
+record TokenRequest(String version, @Nullable Integer downloadType) {}

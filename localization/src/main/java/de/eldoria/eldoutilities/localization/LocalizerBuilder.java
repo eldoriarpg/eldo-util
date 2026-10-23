@@ -63,6 +63,7 @@ public class LocalizerBuilder {
     }
 
     public Localizer build() {
-        return new Localizer(plugin, localesPath, localesPrefix, fallbackLocale, userLocale, includedLocales, runtimeLocaleCodes);
+        return new Localizer(
+                plugin, localesPath, localesPrefix, fallbackLocale, userLocale, includedLocales, runtimeLocaleCodes);
     }
 }

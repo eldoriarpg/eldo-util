@@ -7,10 +7,10 @@
 package de.eldoria.eldoutilities.updater.lynaupdater;
 
 import com.google.gson.Gson;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 

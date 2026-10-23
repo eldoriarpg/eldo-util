@@ -43,7 +43,6 @@ public class Pair<A, B> {
         return new Pair<>(x, y);
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -64,9 +63,6 @@ public class Pair<A, B> {
 
     @Override
     public String toString() {
-        return "Pair{" +
-               "first=" + first +
-               ", second=" + second +
-               '}';
+        return "Pair{" + "first=" + first + ", second=" + second + '}';
     }
 }

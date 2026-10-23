@@ -34,7 +34,11 @@ class UpdateCommand extends Command {
     private final String commandLine;
 
     UpdateCommand(Plugin plugin, Updater<?, ?> updater) {
-        super(NAME, "Manages updates of " + plugin.getName(), "/" + NAME + " <download|enable-auto|later|never>", List.of());
+        super(
+                NAME,
+                "Manages updates of " + plugin.getName(),
+                "/" + NAME + " <download|enable-auto|later|never>",
+                List.of());
         this.plugin = plugin;
         this.updater = updater;
         this.commandLine = commandLine(plugin);
@@ -48,8 +52,11 @@ class UpdateCommand extends Command {
      * @return the command line running the command, without an action
      */
     static String register(Plugin plugin, Updater<?, ?> updater) {
-        ServerTasks.runGlobal(plugin, () -> plugin.getServer().getCommandMap()
-                .register(plugin.getName().toLowerCase(Locale.ROOT), new UpdateCommand(plugin, updater)));
+        ServerTasks.runGlobal(
+                plugin,
+                () -> plugin.getServer()
+                        .getCommandMap()
+                        .register(plugin.getName().toLowerCase(Locale.ROOT), new UpdateCommand(plugin, updater)));
         return commandLine(plugin);
     }
 
@@ -74,8 +81,10 @@ class UpdateCommand extends Command {
             }
             case "enable-auto" -> enableAutoUpdate(sender);
             case "later" -> send(sender, UpdaterMessages.AUTO_ASK_LATER);
-            case "never" -> updater.declineAutoUpdate()
-                    .thenRun(() -> ServerTasks.runGlobal(plugin, () -> send(sender, UpdaterMessages.AUTO_NOT_ASKED)));
+            case "never" ->
+                updater.declineAutoUpdate()
+                        .thenRun(() ->
+                                ServerTasks.runGlobal(plugin, () -> send(sender, UpdaterMessages.AUTO_NOT_ASKED)));
             default -> sendError(sender, UpdaterMessages.UNKNOWN_ACTION);
         }
         return true;
@@ -90,16 +99,17 @@ class UpdateCommand extends Command {
      */
     CompletableFuture<Void> download(CommandSender sender) {
         send(sender, UpdaterMessages.DOWNLOADING);
-        return updater.download().thenAccept(downloaded -> ServerTasks.runGlobal(plugin, () -> {
-            if (!downloaded) {
-                sendError(sender, UpdaterMessages.DOWNLOAD_FAILED);
-                return;
-            }
-            send(sender, UpdaterMessages.DOWNLOAD_DONE);
-            if (updater.offersAutoUpdate()) {
-                updater.getData().messageSender().sendMessage(sender, autoUpdatePrompt(), placeholders());
-            }
-        }));
+        return updater.download()
+                .thenAccept(downloaded -> ServerTasks.runGlobal(plugin, () -> {
+                    if (!downloaded) {
+                        sendError(sender, UpdaterMessages.DOWNLOAD_FAILED);
+                        return;
+                    }
+                    send(sender, UpdaterMessages.DOWNLOAD_DONE);
+                    if (updater.offersAutoUpdate()) {
+                        updater.getData().messageSender().sendMessage(sender, autoUpdatePrompt(), placeholders());
+                    }
+                }));
     }
 
     /**
@@ -109,13 +119,14 @@ class UpdateCommand extends Command {
      * @return future completing once the result was sent
      */
     CompletableFuture<Void> enableAutoUpdate(CommandSender sender) {
-        return updater.enableAutoUpdate().thenAccept(enabled -> ServerTasks.runGlobal(plugin, () -> {
-            if (enabled) {
-                send(sender, UpdaterMessages.AUTO_ENABLED);
-            } else {
-                sendError(sender, UpdaterMessages.AUTO_UNAVAILABLE);
-            }
-        }));
+        return updater.enableAutoUpdate()
+                .thenAccept(enabled -> ServerTasks.runGlobal(plugin, () -> {
+                    if (enabled) {
+                        send(sender, UpdaterMessages.AUTO_ENABLED);
+                    } else {
+                        sendError(sender, UpdaterMessages.AUTO_UNAVAILABLE);
+                    }
+                }));
     }
 
     /**
@@ -124,17 +135,24 @@ class UpdateCommand extends Command {
      * @param sender who asked for the download
      */
     void askToConfirmMajor(CommandSender sender) {
-        updater.getData().messageSender().sendMessage(sender, "%s\n%s".formatted(
-                text(UpdaterMessages.MAJOR_CONFIRM),
-                button("download confirm", UpdaterMessages.MAJOR_CONFIRM_BUTTON)), placeholders());
+        updater.getData()
+                .messageSender()
+                .sendMessage(
+                        sender,
+                        "%s\n%s"
+                                .formatted(
+                                        text(UpdaterMessages.MAJOR_CONFIRM),
+                                        button("download confirm", UpdaterMessages.MAJOR_CONFIRM_BUTTON)),
+                        placeholders());
     }
 
     private String autoUpdatePrompt() {
-        return "%s\n%s %s %s".formatted(
-                text(UpdaterMessages.AUTO_PROMPT),
-                button("enable-auto", UpdaterMessages.AUTO_YES),
-                button("later", UpdaterMessages.AUTO_LATER),
-                button("never", UpdaterMessages.AUTO_NEVER));
+        return "%s\n%s %s %s"
+                .formatted(
+                        text(UpdaterMessages.AUTO_PROMPT),
+                        button("enable-auto", UpdaterMessages.AUTO_YES),
+                        button("later", UpdaterMessages.AUTO_LATER),
+                        button("never", UpdaterMessages.AUTO_NEVER));
     }
 
     private String button(String action, String label) {
@@ -159,7 +177,7 @@ class UpdateCommand extends Command {
 
     private boolean mayManage(CommandSender sender) {
         return sender instanceof ConsoleCommandSender
-               || sender.isOp()
-               || sender.hasPermission(updater.getData().notifyPermission());
+                || sender.isOp()
+                || sender.hasPermission(updater.getData().notifyPermission());
     }
 }

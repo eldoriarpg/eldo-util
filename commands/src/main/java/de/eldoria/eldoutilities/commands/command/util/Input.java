@@ -10,8 +10,6 @@ import de.eldoria.eldoutilities.commands.exceptions.CommandException;
 import de.eldoria.eldoutilities.messages.Replacement;
 import de.eldoria.eldoutilities.utils.EnumUtil;
 import de.eldoria.eldoutilities.utils.Parser;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
@@ -48,8 +46,7 @@ public class Input {
      * @throws CommandException when the argument is not an integer
      */
     public int asInt() throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseInt(asString())
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return Parser.parseInt(asString()).orElseThrow(() -> CommandException.message("error.invalidNumber"));
     }
 
     /**
@@ -57,8 +54,7 @@ public class Input {
      * @throws CommandException when the argument is not a long
      */
     public long asLong() throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseLong(asString())
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return Parser.parseLong(asString()).orElseThrow(() -> CommandException.message("error.invalidNumber"));
     }
 
     /**
@@ -66,8 +62,7 @@ public class Input {
      * @throws CommandException when the argument is not a double
      */
     public double asDouble() throws CommandException, IndexOutOfBoundsException {
-        return Parser.parseDouble(asString())
-                .orElseThrow(() -> CommandException.message("error.invalidNumber"));
+        return Parser.parseDouble(asString()).orElseThrow(() -> CommandException.message("error.invalidNumber"));
     }
 
     /**
@@ -90,8 +85,10 @@ public class Input {
      */
     public boolean asBoolean(String aTrue, String aFalse) throws CommandException, IndexOutOfBoundsException {
         return Parser.parseBoolean(asString(), aTrue, aFalse)
-                .orElseThrow(() -> CommandException.message("error.invalidBoolean",
-                        Replacement.create("true", aTrue), Replacement.create("false", aFalse)));
+                .orElseThrow(() -> CommandException.message(
+                        "error.invalidBoolean",
+                        Replacement.create("true", aTrue),
+                        Replacement.create("false", aFalse)));
     }
 
     /**
@@ -145,10 +142,11 @@ public class Input {
      * @throws CommandException When the string could not be parsed to an enum
      */
     @NotNull
-    public <T extends Enum<T>> T asEnum(Class<T> clazz, boolean stripStrings) throws CommandException, IndexOutOfBoundsException {
+    public <T extends Enum<T>> T asEnum(Class<T> clazz, boolean stripStrings)
+            throws CommandException, IndexOutOfBoundsException {
         return EnumUtil.parse(asString(), clazz, stripStrings)
-                .orElseThrow(() -> CommandException.message("error.invalidEnumValue",
-                        Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
+                .orElseThrow(() -> CommandException.message(
+                        "error.invalidEnumValue", Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
     }
 
     /**

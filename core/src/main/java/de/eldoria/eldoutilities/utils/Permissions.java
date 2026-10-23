@@ -16,8 +16,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 public final class Permissions {
-    private Permissions() {
-    }
+    private Permissions() {}
 
     /**
      * Find a permission which indicates a number in the format {@code permission.node.<number>}.
@@ -85,7 +84,8 @@ public final class Permissions {
      * @param <T>      requested value
      * @return collection which contains all matchin permission. Contains no null values.
      */
-    public static <T> Collection<@NotNull T> findPermissions(Player player, String prefix, boolean truncate, Function<String, T> parse) {
+    public static <T> Collection<@NotNull T> findPermissions(
+            Player player, String prefix, boolean truncate, Function<String, T> parse) {
         var permissions = player.getEffectivePermissions();
 
         Set<T> matches = new HashSet<>();

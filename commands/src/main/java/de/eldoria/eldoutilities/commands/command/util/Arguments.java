@@ -527,7 +527,8 @@ public class Arguments implements Iterable<Input> {
      * @throws CommandException When the string could not be parsed to an enum
      */
     @NotNull
-    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, T def) throws CommandException {
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, T def)
+            throws CommandException {
         if (hasArg(index)) return asEnum(index, clazz, stripStrings);
         return def;
     }
@@ -544,7 +545,8 @@ public class Arguments implements Iterable<Input> {
      * @throws CommandException When the string could not be parsed to an enum
      */
     @NotNull
-    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, Supplier<T> def) throws CommandException {
+    public <T extends Enum<T>> T asEnum(int index, Class<T> clazz, boolean stripStrings, Supplier<T> def)
+            throws CommandException {
         if (hasArg(index)) return asEnum(index, clazz, stripStrings);
         return def.get();
     }
@@ -792,7 +794,8 @@ public class Arguments implements Iterable<Input> {
      * @return arguments without the first arguments.
      */
     public Arguments subArguments(int nesting) {
-        return Arguments.create(plugin, sender, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
+        return Arguments.create(
+                plugin, sender, ArgumentUtils.getRangeAsList(rawArgs, nesting).toArray(new String[0]));
     }
 
     /**
@@ -840,10 +843,9 @@ public class Arguments implements Iterable<Input> {
 
     @Override
     public String toString() {
-        return "Arguments{" +
-               "flags=" + flags +
-               ", plugin=" + plugin.getName() +
-               ", args=" + Arrays.toString(rawArgs) +
-               '}';
+        return "Arguments{" + "flags="
+                + flags + ", plugin="
+                + plugin.getName() + ", args="
+                + Arrays.toString(rawArgs) + '}';
     }
 }

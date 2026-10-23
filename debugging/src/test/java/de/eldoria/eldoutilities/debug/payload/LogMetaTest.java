@@ -33,11 +33,13 @@ import static org.mockito.Mockito.when;
 class LogMetaTest {
     @TempDir
     Path folder;
+
     private final Plugin plugin = mock(Plugin.class);
 
     @BeforeEach
     void setUp() {
-        when(plugin.getDescription()).thenReturn(new PluginDescriptionFile("BloodNight", "1.0", "de.eldoria.bloodnight.Main"));
+        when(plugin.getDescription())
+                .thenReturn(new PluginDescriptionFile("BloodNight", "1.0", "de.eldoria.bloodnight.Main"));
     }
 
     @Test
@@ -52,7 +54,11 @@ class LogMetaTest {
     void aLongLogKeepsItsStartAndItsEnd() throws IOException {
         int lines = LogMeta.MAX_LOG_PART_SIZE * 3;
         Path log = folder.resolve("latest.log");
-        Files.write(log, IntStream.range(0, lines).mapToObj(i -> "[12:00:00] [Server thread/INFO]: line " + i).toList());
+        Files.write(
+                log,
+                IntStream.range(0, lines)
+                        .mapToObj(i -> "[12:00:00] [Server thread/INFO]: line " + i)
+                        .toList());
 
         String text = LogMeta.fromFile(log, plugin, DebugSettings.DEFAULT).getLog();
 
@@ -77,8 +83,13 @@ class LogMetaTest {
         var exceptions = LogMeta.fromFile(log, plugin, DebugSettings.DEFAULT).getInternalExceptions();
 
         assertEquals(1, exceptions.length);
-        assertEquals(new ExceptionData("[Server thread/ERROR]: boom\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
-                3, "12:00:00", "12:10:00"), exceptions[0]);
+        assertEquals(
+                new ExceptionData(
+                        "[Server thread/ERROR]: boom\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
+                        3,
+                        "12:00:00",
+                        "12:10:00"),
+                exceptions[0]);
     }
 
     @Test
@@ -113,15 +124,22 @@ class LogMetaTest {
 
         var data = LogMeta.fromFile(log, plugin, DebugSettings.DEFAULT);
 
-        assertArrayEquals(new String[]{
-                "[Server thread/ERROR]: first\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
-                "[Server thread/ERROR]: second\n\tat de.eldoria.bloodnight.Mob.tick(Mob.java:1)\n"},
-                Arrays.stream(data.getInternalExceptions()).map(ExceptionData::text).toArray(String[]::new));
+        assertArrayEquals(
+                new String[] {
+                    "[Server thread/ERROR]: first\n\tat de.eldoria.bloodnight.Main.run(Main.java:1)\n",
+                    "[Server thread/ERROR]: second\n\tat de.eldoria.bloodnight.Mob.tick(Mob.java:1)\n"
+                },
+                Arrays.stream(data.getInternalExceptions())
+                        .map(ExceptionData::text)
+                        .toArray(String[]::new));
         assertEquals(1, data.getExternalExceptions().length);
     }
 
     @Test
     void aMissingLogSaysSo() {
-        assertEquals("Could not read latest log.", LogMeta.fromFile(folder.resolve("none.log"), plugin, DebugSettings.DEFAULT).getLog());
+        assertEquals(
+                "Could not read latest log.",
+                LogMeta.fromFile(folder.resolve("none.log"), plugin, DebugSettings.DEFAULT)
+                        .getLog());
     }
 }

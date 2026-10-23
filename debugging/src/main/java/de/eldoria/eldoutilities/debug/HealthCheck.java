@@ -27,6 +27,8 @@ public record HealthCheck(String name, Level level, String message) {
     }
 
     public enum Level {
-        OK, WARN, ERROR
+        OK,
+        WARN,
+        ERROR
     }
 }

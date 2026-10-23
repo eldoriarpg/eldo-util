@@ -137,8 +137,7 @@ public interface ILocalizer {
         }
 
         @Override
-        public void setLocale(String language) {
-        }
+        public void setLocale(String language) {}
 
         @Override
         public String getMessage(String key) {
@@ -156,8 +155,7 @@ public interface ILocalizer {
         }
 
         @Override
-        public void addLocaleCodes(Map<String, String> runtimeLocaleCodes) {
-        }
+        public void addLocaleCodes(Map<String, String> runtimeLocaleCodes) {}
 
         @Override
         public String getMessage(String key, CommandSender sender) {
@@ -200,8 +198,6 @@ public interface ILocalizer {
         }
 
         @Override
-        public void registerChild(ILocalizer localizer) {
-
-        }
+        public void registerChild(ILocalizer localizer) {}
     }
 }

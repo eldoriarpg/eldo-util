@@ -94,8 +94,18 @@ public class LynaUpdateDataBuilder extends UpdateDataBuilder<LynaUpdateDataBuild
     @Override
     public LynaUpdateData build() {
         var url = customUpdateUrl ? updateUrl : productPage(host, productId);
-        return applyCommon(new LynaUpdateData(plugin, notifyPermission, notifyUpdate, autoUpdate, productId, host, url,
-                updateMessage, tokenStore, downloadType, messageSender));
+        return applyCommon(new LynaUpdateData(
+                plugin,
+                notifyPermission,
+                notifyUpdate,
+                autoUpdate,
+                productId,
+                host,
+                url,
+                updateMessage,
+                tokenStore,
+                downloadType,
+                messageSender));
     }
 
     static String productPage(String host, int productId) {

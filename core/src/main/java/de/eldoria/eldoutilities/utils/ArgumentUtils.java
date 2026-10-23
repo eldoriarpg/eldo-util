@@ -107,8 +107,12 @@ public final class ArgumentUtils {
         return parse.apply(arg);
     }
 
-    public static <T> T getDefaultFromPlayerOrArg(String[] args, int index, CommandSender sender,
-                                                  Function<Player, T> playerFunction, Function<String, T> argFunction) {
+    public static <T> T getDefaultFromPlayerOrArg(
+            String[] args,
+            int index,
+            CommandSender sender,
+            Function<Player, T> playerFunction,
+            Function<String, T> argFunction) {
         T result = null;
         if (sender instanceof Player) {
             result = playerFunction.apply((Player) sender);
@@ -144,7 +148,8 @@ public final class ArgumentUtils {
             return "";
         }
 
-        return String.join(delimiter, Arrays.copyOfRange(source, finalFrom, finalTo)).trim();
+        return String.join(delimiter, Arrays.copyOfRange(source, finalFrom, finalTo))
+                .trim();
     }
 
     /**

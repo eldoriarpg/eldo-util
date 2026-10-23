@@ -92,8 +92,14 @@ public class Localizer implements ILocalizer {
      * @param fallbackLocale  fallbackLocale
      * @param includedLocales internal provided locales
      */
-    Localizer(Plugin plugin, String localesPath,
-              String localesPrefix, String fallbackLocale, Function<Player, String> userLocale, Set<String> includedLocales, Map<String, String> runtimeLocaleCodes) {
+    Localizer(
+            Plugin plugin,
+            String localesPath,
+            String localesPrefix,
+            String fallbackLocale,
+            Function<Player, String> userLocale,
+            Set<String> includedLocales,
+            Map<String, String> runtimeLocaleCodes) {
         this.plugin = plugin;
         this.localesPath = localesPath;
         this.localesPrefix = localesPrefix;
@@ -135,8 +141,7 @@ public class Localizer implements ILocalizer {
      * @deprecated Use the builder provided by {@link #builder(Plugin, String)}
      */
     @Deprecated(forRemoval = true)
-    public static ILocalizer create(Plugin plugin,
-                                    String... includedLocales) {
+    public static ILocalizer create(Plugin plugin, String... includedLocales) {
         return create(plugin, "messages", "messages", Locale.US, includedLocales);
     }
 
@@ -160,9 +165,14 @@ public class Localizer implements ILocalizer {
      * @deprecated Use the builder provided by {@link #builder(Plugin, String)}
      */
     @Deprecated(forRemoval = true)
-    public static ILocalizer create(Plugin plugin, String localesPath,
-                                    String localesPrefix, Locale fallbackLocale, String... includedLocales) {
-        ILocalizer localizer = new LocalizerBuilder(plugin, fallbackLocale.toLanguageTag()).setLocalesPath(localesPath).setLocalesPrefix(localesPrefix).setUserLocale(e -> fallbackLocale.toLanguageTag()).setIncludedLocales(includedLocales).build();
+    public static ILocalizer create(
+            Plugin plugin, String localesPath, String localesPrefix, Locale fallbackLocale, String... includedLocales) {
+        ILocalizer localizer = new LocalizerBuilder(plugin, fallbackLocale.toLanguageTag())
+                .setLocalesPath(localesPath)
+                .setLocalesPrefix(localesPrefix)
+                .setUserLocale(e -> fallbackLocale.toLanguageTag())
+                .setIncludedLocales(includedLocales)
+                .build();
         LOCALIZER.put(plugin.getClass(), localizer);
         return localizer;
     }
@@ -174,13 +184,19 @@ public class Localizer implements ILocalizer {
     private void createDefaults() {
         runtimeLocaleCodes.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
         runtimeLocaleCodes.put("error.invalidCommand", "Invalid Command");
-        runtimeLocaleCodes.put("error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
-        runtimeLocaleCodes.put("error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
-        runtimeLocaleCodes.put("error.invalidRange", "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
-        runtimeLocaleCodes.put("error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
+        runtimeLocaleCodes.put(
+                "error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
+        runtimeLocaleCodes.put(
+                "error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
+        runtimeLocaleCodes.put(
+                "error.invalidRange",
+                "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
+        runtimeLocaleCodes.put(
+                "error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
         runtimeLocaleCodes.put("error.invalidMaterial", "Invalid material.");
         runtimeLocaleCodes.put("error.invalidNumber", "Invalid number");
-        runtimeLocaleCodes.put("error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
+        runtimeLocaleCodes.put(
+                "error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
         runtimeLocaleCodes.put("error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
         runtimeLocaleCodes.put("error.notOnline", "Invalid player. This player is not online.");
         runtimeLocaleCodes.put("error.unknownPlayer", "Invalid player. This player has never played on this server.");
@@ -193,7 +209,9 @@ public class Localizer implements ILocalizer {
         runtimeLocaleCodes.put("error.notAsPlayer", "This command can not be executed as player");
         runtimeLocaleCodes.put("error.tooSmall", "The number is too small. Min: <gold><min>");
         runtimeLocaleCodes.put("error.tooLarge", "The number is too Large. Max: <gold><max>");
-        runtimeLocaleCodes.put("commands.about", "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
+        runtimeLocaleCodes.put(
+                "commands.about",
+                "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
         runtimeLocaleCodes.put("dialog.accept", "accept");
         runtimeLocaleCodes.put("dialog.deny", "deny");
         runtimeLocaleCodes.put("dialog.add", "add");
@@ -240,7 +258,6 @@ public class Localizer implements ILocalizer {
         }
         this.defaultLanguage = language;
     }
-
 
     @Override
     public String getMessage(String key, @Nullable CommandSender sender) {
@@ -396,7 +413,9 @@ public class Localizer implements ILocalizer {
     }
 
     private boolean hasLocaleFileName(Path path) {
-        return path.toFile().getName().matches(Pattern.quote(localesPrefix) + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties");
+        return path.toFile()
+                .getName()
+                .matches(Pattern.quote(localesPrefix) + "_[a-zA-Z]{2}(_[a-zA-Z]{2})?\\.properties");
     }
 
     private List<String> localesInDirectory() {
@@ -416,10 +435,11 @@ public class Localizer implements ILocalizer {
     private ResourceBundle getDefaultLanguage() throws IOException {
         try (var input = plugin.getResource(localesPrefix + ".properties")) {
             if (input == null) {
-                plugin.getLogger().severe("Could not load locale file " + localesPrefix + ".properties. Does it exist?");
+                plugin.getLogger()
+                        .severe("Could not load locale file " + localesPrefix + ".properties. Does it exist?");
                 return new DummyResourceBundle();
             }
-            //TODO: Lazy getter
+            // TODO: Lazy getter
             return new PropertyResourceBundle(input);
         }
     }
@@ -427,7 +447,9 @@ public class Localizer implements ILocalizer {
     private ResourceBundle getBundle(String locale) throws IOException {
         try (var input = plugin.getResource(getLocaleFileName(locale))) {
             if (input == null) {
-                plugin.getLogger().fine("No bundled locale file " + getLocaleFileName(locale) + ". Using the default locale as reference.");
+                plugin.getLogger()
+                        .fine("No bundled locale file " + getLocaleFileName(locale)
+                                + ". Using the default locale as reference.");
                 return getDefaultLanguage();
             }
             return new PropertyResourceBundle(input);
@@ -461,7 +483,8 @@ public class Localizer implements ILocalizer {
     }
 
     private Set<String> getDefaultKeys() throws IOException {
-        Set<String> defaultKeys = new HashSet<>(Collections.list(getDefaultLanguage().getKeys()));
+        Set<String> defaultKeys =
+                new HashSet<>(Collections.list(getDefaultLanguage().getKeys()));
         defaultKeys.addAll(runtimeLocaleCodes.keySet());
         return defaultKeys;
     }
@@ -488,7 +511,6 @@ public class Localizer implements ILocalizer {
             // we will try to continue with the successfull loaded files. If there are none thats not bad.
             plugin.getLogger().log(Level.WARNING, "Failed to load message files.");
         }
-
 
         // Update keys of existing files.
         for (var path : localeFiles) {
@@ -528,7 +550,9 @@ public class Localizer implements ILocalizer {
             List<String> lines = new ArrayList<>();
             lines.add("# Keys added automatically at " + timestamp());
             for (var currKey : new TreeSet<>(updateKeys)) {
-                var value = refBundle.containsKey(currKey) ? refBundle.getString(currKey) : runtimeLocaleCodes.getOrDefault(currKey, "");
+                var value = refBundle.containsKey(currKey)
+                        ? refBundle.getString(currKey)
+                        : runtimeLocaleCodes.getOrDefault(currKey, "");
                 lines.add(currKey + "=" + escapeValue(value));
                 plugin.getLogger().info("Added: " + currKey + "=" + escapeValue(value));
             }
@@ -536,7 +560,11 @@ public class Localizer implements ILocalizer {
             try {
                 var content = Files.readString(path, StandardCharsets.UTF_8);
                 var separator = content.isEmpty() || content.endsWith("\n") ? "" : "\n";
-                Files.writeString(path, separator + String.join("\n", lines) + "\n", StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+                Files.writeString(
+                        path,
+                        separator + String.join("\n", lines) + "\n",
+                        StandardCharsets.UTF_8,
+                        StandardOpenOption.APPEND);
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;

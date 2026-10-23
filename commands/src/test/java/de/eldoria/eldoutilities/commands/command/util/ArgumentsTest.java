@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ArgumentsTest {
     @Test
     void rawKeepsEverythingAfterAFlag() {
-        var raw = new String[]{"stone", "-incair", "tree", "-place:drop"};
+        var raw = new String[] {"stone", "-incair", "tree", "-place:drop"};
         var args = Arguments.create(null, null, raw);
 
         assertEquals(1, args.size());
@@ -23,7 +23,7 @@ class ArgumentsTest {
 
     @Test
     void rawIsACopy() {
-        var args = Arguments.create(null, null, new String[]{"stone"});
+        var args = Arguments.create(null, null, new String[] {"stone"});
         args.raw()[0] = "changed";
 
         assertEquals("stone", args.raw()[0]);

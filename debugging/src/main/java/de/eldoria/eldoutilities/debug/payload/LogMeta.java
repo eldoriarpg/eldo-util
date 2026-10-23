@@ -17,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -27,7 +26,6 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class LogMeta extends LogData {
     public static final int MAX_LOG_PART_SIZE = 2500;
@@ -38,7 +36,6 @@ public class LogMeta extends LogData {
     public LogMeta(String log, String pluginLog, ExceptionData[] internalExceptions, ExceptionData[] exceptions) {
         super(log, pluginLog, internalExceptions, exceptions);
     }
-
 
     private static Pattern getPluginLog(Plugin plugin) {
         var prefix = plugin.getDescription().getPrefix();
@@ -111,7 +108,8 @@ public class LogMeta extends LogData {
                 end.add(line);
                 linesReadSinceScan++;
                 if (linesReadSinceScan == MAX_LOG_PART_SIZE) {
-                    exceptions.scan(end.getLinkedList(), linesRead - end.getLinkedList().size());
+                    exceptions.scan(
+                            end.getLinkedList(), linesRead - end.getLinkedList().size());
                     pluginLog.addAll(extractPluginLog(end.getLinkedList(), plugin));
                     linesReadSinceScan = SCAN_OVERLAP;
                 }

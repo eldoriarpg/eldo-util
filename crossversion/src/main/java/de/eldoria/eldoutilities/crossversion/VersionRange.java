@@ -14,9 +14,10 @@ import de.eldoria.eldoutilities.utils.Version;
 @Deprecated(since = "3.6.0", forRemoval = true)
 public interface VersionRange {
     @Deprecated(forRemoval = true)
-    default boolean isBetween(Version version){
+    default boolean isBetween(Version version) {
         return contains(version);
     }
+
     boolean contains(Version version);
 
     Version lower();

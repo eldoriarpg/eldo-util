@@ -12,7 +12,8 @@ import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 public class CommandException extends RuntimeException {
     private TagResolver replacements;
     private boolean silent;
-    private static final boolean INCLUDE_STACKTRACE = Boolean.parseBoolean(System.getProperty("eldoria.exception.commandexception.stacktrace", "true"));
+    private static final boolean INCLUDE_STACKTRACE =
+            Boolean.parseBoolean(System.getProperty("eldoria.exception.commandexception.stacktrace", "true"));
 
     private CommandException(String message, TagResolver replacements) {
         super(message, null, true, INCLUDE_STACKTRACE);

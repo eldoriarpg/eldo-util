@@ -6,11 +6,8 @@
 
 package de.eldoria.eldoutilities.crossversion.builder;
 
-import de.eldoria.eldoutilities.crossversion.VersionRange;
 import de.eldoria.eldoutilities.crossversion.function.BiVersionFunction;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
@@ -22,9 +19,9 @@ import java.util.function.BiFunction;
  * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
 @Deprecated(since = "3.6.0", forRemoval = true)
-public class BiFunctionBuilder<A, B, R> extends VersionFunctionBuilder<BiVersionFunction<A, B, R>, BiFunction<A, B, R>> {
-    protected BiFunctionBuilder() {
-    }
+public class BiFunctionBuilder<A, B, R>
+        extends VersionFunctionBuilder<BiVersionFunction<A, B, R>, BiFunction<A, B, R>> {
+    protected BiFunctionBuilder() {}
 
     /**
      * Build the version function.

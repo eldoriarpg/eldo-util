@@ -33,6 +33,7 @@ import static org.mockito.Mockito.when;
 class DebugConsentTest {
     @TempDir
     Path plugins;
+
     private Path configFile;
     private Plugin plugin;
     private CommandSender sender;

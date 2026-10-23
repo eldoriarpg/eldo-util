@@ -54,8 +54,12 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
      * @param downloadCommand   command line downloading the update, or null to offer no download
      * @param autoUpdateCommand command line switching automatic updates on, or null to not offer it
      */
-    public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest, @Nullable String downloadCommand,
-                          @Nullable String autoUpdateCommand) {
+    public UpdateNotifier(
+            Plugin plugin,
+            UpdateData<T> data,
+            T latest,
+            @Nullable String downloadCommand,
+            @Nullable String autoUpdateCommand) {
         this(plugin, data, latest, downloadCommand, autoUpdateCommand, false);
     }
 
@@ -69,8 +73,13 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
      * @param autoUpdateCommand command line switching automatic updates on, or null to not offer it
      * @param major             whether the update is a new major version
      */
-    public UpdateNotifier(Plugin plugin, UpdateData<T> data, T latest, @Nullable String downloadCommand,
-                          @Nullable String autoUpdateCommand, boolean major) {
+    public UpdateNotifier(
+            Plugin plugin,
+            UpdateData<T> data,
+            T latest,
+            @Nullable String downloadCommand,
+            @Nullable String autoUpdateCommand,
+            boolean major) {
         super(plugin, data, latest);
         this.downloadCommand = downloadCommand;
         this.autoUpdateCommand = autoUpdateCommand;
@@ -95,13 +104,14 @@ public class UpdateNotifier<T extends UpdateResponse> extends Notifier<T> {
             buttons.add(button(autoUpdateCommand, UpdaterMessages.AUTO_HOVER, UpdaterMessages.AUTO_BUTTON));
         }
         var message = data.updateMessage(latest());
-        if (major) message = message.stripTrailing() + "\n" + UpdaterMessages.resolve(plugin, UpdaterMessages.MAJOR_NOTICE);
+        if (major)
+            message = message.stripTrailing() + "\n" + UpdaterMessages.resolve(plugin, UpdaterMessages.MAJOR_NOTICE);
         if (buttons.isEmpty()) return message;
         return message.stripTrailing() + "\n" + String.join(" ", buttons);
     }
 
     private String button(String command, String hover, String label) {
-        return "<click:run_command:'%s'><hover:show_text:'%s'>%s</hover></click>".formatted(
-                command, UpdaterMessages.resolve(plugin, hover), UpdaterMessages.resolve(plugin, label));
+        return "<click:run_command:'%s'><hover:show_text:'%s'>%s</hover></click>"
+                .formatted(command, UpdaterMessages.resolve(plugin, hover), UpdaterMessages.resolve(plugin, label));
     }
 }

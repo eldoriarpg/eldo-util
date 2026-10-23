@@ -77,15 +77,20 @@ public final class UpdaterMessages {
             entry(AUTO_NEVER, "<red>[Don't ask again]</red>"),
             entry(AUTO_ENABLED, "<green>Automatic updates of <plugin_name> are enabled."),
             entry(AUTO_ASK_LATER, "You will be asked again after the next manual update."),
-            entry(AUTO_NOT_ASKED, "You will not be asked again. Automatic updates can still be enabled in the config of <plugin_name>."),
+            entry(
+                    AUTO_NOT_ASKED,
+                    "You will not be asked again. Automatic updates can still be enabled in the config of <plugin_name>."),
             entry(AUTO_UNAVAILABLE, "Automatic updates of <plugin_name> can only be enabled in its config."),
             entry(UNKNOWN_ACTION, "Unknown action. Use download, enable-auto, later or never."),
-            entry(MAJOR_NOTICE, "<red>This is a major update. It may not be compatible with your server or other plugins, so it is not installed automatically. Read the patch notes before updating."),
-            entry(MAJOR_CONFIRM, "<red>This is a major update of <plugin_name> and may not be compatible with your server or other plugins. Read the patch notes first."),
+            entry(
+                    MAJOR_NOTICE,
+                    "<red>This is a major update. It may not be compatible with your server or other plugins, so it is not installed automatically. Read the patch notes before updating."),
+            entry(
+                    MAJOR_CONFIRM,
+                    "<red>This is a major update of <plugin_name> and may not be compatible with your server or other plugins. Read the patch notes first."),
             entry(MAJOR_CONFIRM_BUTTON, "<red>[Download anyway]</red>"));
 
-    private UpdaterMessages() {
-    }
+    private UpdaterMessages() {}
 
     /**
      * The updater's locale codes with their English defaults.

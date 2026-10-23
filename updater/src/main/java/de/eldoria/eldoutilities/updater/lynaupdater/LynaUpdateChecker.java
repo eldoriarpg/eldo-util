@@ -62,17 +62,20 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
 
         queryParams.put("version", currentVersion());
 
-        userData.property(DefaultProperties.ARTIFACT)
-                .ifPresent(artifact -> queryParams.put("artifact", artifact));
+        userData.property(DefaultProperties.ARTIFACT).ifPresent(artifact -> queryParams.put("artifact", artifact));
 
-        userData.property(DefaultProperties.UNIX)
-                .ifPresent(unix -> queryParams.put("unix", unix));
+        userData.property(DefaultProperties.UNIX).ifPresent(unix -> queryParams.put("unix", unix));
 
         var request = HttpRequest.newBuilder()
                 .uri(URI.create("%s/api/v1/update/check?%s"
-                        .formatted(data.host(),
+                        .formatted(
+                                data.host(),
                                 queryParams.entrySet().stream()
-                                        .map(e -> "%s=%s".formatted(e.getKey(), URLEncoder.encode(String.valueOf(e.getValue()), StandardCharsets.UTF_8)))
+                                        .map(e -> "%s=%s"
+                                                .formatted(
+                                                        e.getKey(),
+                                                        URLEncoder.encode(
+                                                                String.valueOf(e.getValue()), StandardCharsets.UTF_8)))
                                         .collect(Collectors.joining("&")))))
                 .GET()
                 .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
@@ -105,8 +108,11 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
         try {
             build = latest.download().map(Build::unsized).or(this::exchangeToken);
         } catch (UncheckedIOException e) {
-            log.log(Level.SEVERE, "Could not store the new upgrade token. Reissue the token at %s/account/updaters."
-                    .formatted(getData().host()), e);
+            log.log(
+                    Level.SEVERE,
+                    "Could not store the new upgrade token. Reissue the token at %s/account/updaters."
+                            .formatted(getData().host()),
+                    e);
             return false;
         }
         if (build.isEmpty()) {
@@ -132,7 +138,9 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
     }
 
     private String currentVersion() {
-        return getData().userData().property(DefaultProperties.ARTIFACT_VERSION)
+        return getData()
+                .userData()
+                .property(DefaultProperties.ARTIFACT_VERSION)
                 .orElseGet(() -> getData().plugin().getDescription().getVersion());
     }
 
@@ -141,14 +149,16 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
         var log = data.plugin().getLogger();
         var token = data.tokenStore().token();
         if (token.isEmpty()) {
-            log.warning("No upgrade token configured for automatic updates. Create one at %s/account/updaters and put it into %s."
-                    .formatted(data.host(), data.tokenStore().location()));
+            log.warning(
+                    "No upgrade token configured for automatic updates. Create one at %s/account/updaters and put it into %s."
+                            .formatted(data.host(), data.tokenStore().location()));
             return Optional.empty();
         }
 
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(data.host() + "/api/v1/update/token"))
-                .POST(HttpRequest.BodyPublishers.ofString(gson.toJson(new TokenRequest(latest.latestVersion(), data.downloadType()))))
+                .POST(HttpRequest.BodyPublishers.ofString(
+                        gson.toJson(new TokenRequest(latest.latestVersion(), data.downloadType()))))
                 .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
                 .header("Authorization", "Bearer " + token.get())
                 .header("Content-Type", "application/json; utf-8")
@@ -180,14 +190,17 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
     private String refusal(HttpResponse<String> response) {
         var data = getData();
         return switch (response.statusCode()) {
-            case 401 -> "The upgrade token in %s is unknown or was already used. Reissue it at %s/account/updaters."
-                    .formatted(data.tokenStore().location(), data.host());
+            case 401 ->
+                "The upgrade token in %s is unknown or was already used. Reissue it at %s/account/updaters."
+                        .formatted(data.tokenStore().location(), data.host());
             case 403 -> "The account of the upgrade token has no access to this product anymore.";
-            case 404 -> "Lyna has no build of version %s for this upgrade token: %s"
-                    .formatted(latest.latestVersion(), response.body());
+            case 404 ->
+                "Lyna has no build of version %s for this upgrade token: %s"
+                        .formatted(latest.latestVersion(), response.body());
             case 429 -> "The upgrade token was exchanged too recently. Retrying on the next check.";
-            default -> "Lyna refused the upgrade token exchange with status %d: %s"
-                    .formatted(response.statusCode(), response.body());
+            default ->
+                "Lyna refused the upgrade token exchange with status %d: %s"
+                        .formatted(response.statusCode(), response.body());
         };
     }
 
@@ -213,12 +226,14 @@ public class LynaUpdateChecker extends Updater<LynaUpdateResponse, LynaUpdateDat
             Files.createDirectories(updateFolder);
             var response = client().send(request, HttpResponse.BodyHandlers.ofFile(partial));
             if (response.statusCode() != 200) {
-                log.warning("§cDownload of the update failed with status %d. Aborting update.".formatted(response.statusCode()));
+                log.warning("§cDownload of the update failed with status %d. Aborting update."
+                        .formatted(response.statusCode()));
                 Files.deleteIfExists(partial);
                 return false;
             }
             if (build.size() >= 0 && Files.size(partial) != build.size()) {
-                log.warning("§cDownloaded update has %d bytes instead of %d. Aborting update.".formatted(Files.size(partial), build.size()));
+                log.warning("§cDownloaded update has %d bytes instead of %d. Aborting update."
+                        .formatted(Files.size(partial), build.size()));
                 Files.deleteIfExists(partial);
                 return false;
             }

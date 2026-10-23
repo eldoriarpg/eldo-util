@@ -40,6 +40,7 @@ class LocalizerFilesTest {
 
     @TempDir
     Path dataFolder;
+
     private Path messages;
     private Plugin plugin;
     private final List<LogRecord> warnings = new ArrayList<>();
@@ -51,12 +52,10 @@ class LocalizerFilesTest {
         }
 
         @Override
-        public void flush() {
-        }
+        public void flush() {}
 
         @Override
-        public void close() {
-        }
+        public void close() {}
     };
 
     @BeforeEach
@@ -68,7 +67,7 @@ class LocalizerFilesTest {
         when(plugin.getDataFolder()).thenReturn(dataFolder.toFile());
         when(plugin.getResource(anyString())).thenAnswer(invocation -> switch ((String) invocation.getArgument(0)) {
             case "messages.properties", "messages_en_US.properties" ->
-                    new ByteArrayInputStream(BUNDLED.getBytes(StandardCharsets.UTF_8));
+                new ByteArrayInputStream(BUNDLED.getBytes(StandardCharsets.UTF_8));
             default -> null;
         });
     }
@@ -81,10 +80,12 @@ class LocalizerFilesTest {
 
     @Test
     void aLocaleFileAddedByTheServerOwnerIsUsed() throws IOException {
-        Files.writeString(messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\nfarewell.bye=Au revoir\n");
+        Files.writeString(
+                messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\nfarewell.bye=Au revoir\n");
         var player = mock(Player.class);
 
-        var localizer = Localizer.builder(plugin, "en_US").setUserLocale(p -> "fr_fr").build();
+        var localizer =
+                Localizer.builder(plugin, "en_US").setUserLocale(p -> "fr_fr").build();
 
         assertEquals("Bonjour", localizer.getValue("greeting.hello", player));
         localizer.setDefaultLocale("fr_FR");
@@ -119,7 +120,9 @@ class LocalizerFilesTest {
         properties.load(new java.io.StringReader(updated));
         assertEquals("Bonjour tout le monde", properties.getProperty("greeting.hello"));
         assertEquals("Bye", properties.getProperty("farewell.bye"));
-        assertEquals("Invalid arguments.\nSyntax: <gold><syntax><default>", properties.getProperty("error.invalidArguments"));
+        assertEquals(
+                "Invalid arguments.\nSyntax: <gold><syntax><default>",
+                properties.getProperty("error.invalidArguments"));
     }
 
     @Test
@@ -149,7 +152,11 @@ class LocalizerFilesTest {
     void buildLocalizedReplacesLocaleCodes() {
         var localizer = Localizer.builder(plugin, "en_US").build();
 
-        var message = MessageComposer.create().text("Say ").localeCode("greeting.hello").text("!").buildLocalized(localizer);
+        var message = MessageComposer.create()
+                .text("Say ")
+                .localeCode("greeting.hello")
+                .text("!")
+                .buildLocalized(localizer);
 
         assertEquals("Say Hello!", message);
     }

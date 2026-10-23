@@ -43,7 +43,8 @@ public final class ReflectionUtil {
     }
 
     public static boolean isPaper() {
-        return hasClass("com.destroystokyo.paper.PaperConfig") || hasClass("io.papermc.paper.configuration.Configuration");
+        return hasClass("com.destroystokyo.paper.PaperConfig")
+                || hasClass("io.papermc.paper.configuration.Configuration");
     }
 
     public static boolean isRelocated() {

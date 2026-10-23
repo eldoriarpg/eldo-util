@@ -15,11 +15,9 @@ class VersionFunctionTest {
     public void test() throws NoSuchFieldException, IllegalAccessException {
 
         VersionFunction<String, String> func = FunctionBuilder.functionBuilder(String.class, String.class)
-                .addExclusiveVersion(Version.of(1, 13), Version.of(1, 16),
-                        n -> n)
-                .addExclusiveVersion(Version.of(1, 16), Version.of(1, Integer.MAX_VALUE),
-                        n -> n)
+                .addExclusiveVersion(Version.of(1, 13), Version.of(1, 16), n -> n)
+                .addExclusiveVersion(Version.of(1, 16), Version.of(1, Integer.MAX_VALUE), n -> n)
                 .build();
-        func.get(Version.of(1,15,5));
+        func.get(Version.of(1, 15, 5));
     }
 }

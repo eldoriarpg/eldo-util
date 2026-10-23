@@ -85,7 +85,8 @@ public abstract class AdvancedCommand implements CommandRoute {
         }
 
         if (meta.subCommands().isEmpty()) {
-            throw CommandException.message("Unhandled end of command route. The command needs to implement a executor or subcommands");
+            throw CommandException.message(
+                    "Unhandled end of command route. The command needs to implement a executor or subcommands");
         }
         final var newArgs = args.subArguments();
 
@@ -95,7 +96,8 @@ public abstract class AdvancedCommand implements CommandRoute {
     }
 
     @Override
-    public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args) throws CommandException {
+    public @Nullable List<String> tabCompleteRoute(CommandSender sender, String label, Arguments args)
+            throws CommandException {
         if (!meta().permissions().isEmpty()) {
             var access = false;
             for (var permission : meta().permissions()) {
@@ -106,8 +108,8 @@ public abstract class AdvancedCommand implements CommandRoute {
             }
             if (!access) {
                 var permissions = String.join(", ", meta().permissions());
-                return Collections.singletonList(messageSender().translatePlain("error.permission",
-                        Replacement.create("PERMISSION", permissions)));
+                return Collections.singletonList(messageSender()
+                        .translatePlain("error.permission", Replacement.create("PERMISSION", permissions)));
             }
         }
 

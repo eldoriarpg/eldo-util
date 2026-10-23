@@ -8,7 +8,6 @@ package de.eldoria.eldoutilities.messages.impl;
 
 import de.eldoria.eldoutilities.messages.MessageSender;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.audience.Audiences;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -21,7 +20,12 @@ import org.bukkit.plugin.Plugin;
 import java.util.Set;
 
 public final class PaperMessageSender extends MessageSender {
-    public PaperMessageSender(Plugin plugin, MiniMessage miniMessage, TagResolver messageTagResolver, TagResolver errorTagResolver, Component prefix) {
+    public PaperMessageSender(
+            Plugin plugin,
+            MiniMessage miniMessage,
+            TagResolver messageTagResolver,
+            TagResolver errorTagResolver,
+            Component prefix) {
         super(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix);
     }
 
@@ -67,8 +71,15 @@ public final class PaperMessageSender extends MessageSender {
         player.showBossBar(bossBar);
     }
 
-    public BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags) {
-        var bossBar = BossBar.bossBar(serialize(player, message, messageTagResolver()), progress, color, overlay, flags);
+    public BossBar sendBossBar(
+            Player player,
+            String message,
+            float progress,
+            BossBar.Color color,
+            BossBar.Overlay overlay,
+            Set<BossBar.Flag> flags) {
+        var bossBar =
+                BossBar.bossBar(serialize(player, message, messageTagResolver()), progress, color, overlay, flags);
         player.showBossBar(bossBar);
         return bossBar;
     }

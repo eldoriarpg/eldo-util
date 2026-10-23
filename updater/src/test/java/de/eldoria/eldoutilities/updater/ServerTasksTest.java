@@ -18,8 +18,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class ServerTasksTest {
-    private final Runnable task = () -> {
-    };
+    private final Runnable task = () -> {};
     private Plugin plugin;
     private GlobalRegionScheduler scheduler;
 

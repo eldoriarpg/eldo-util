@@ -86,8 +86,7 @@ class MessageSenderTest {
     @Test
     void anUnparsedReplacementCannotAddTags() {
         var sender = new TestSender(plugin, Component.empty());
-        var component = sender.render("Home: <name>",
-                Replacement.unparsed("name", "<click:run_command:'/op me'>evil"));
+        var component = sender.render("Home: <name>", Replacement.unparsed("name", "<click:run_command:'/op me'>evil"));
         assertEquals("Home: <click:run_command:'/op me'>evil", plain(component));
         assertFalse(hasClickEvent(component));
     }
@@ -99,7 +98,8 @@ class MessageSenderTest {
     }
 
     private static boolean hasClickEvent(Component component) {
-        return component.clickEvent() != null || component.children().stream().anyMatch(MessageSenderTest::hasClickEvent);
+        return component.clickEvent() != null
+                || component.children().stream().anyMatch(MessageSenderTest::hasClickEvent);
     }
 
     private static String plain(Component component) {
@@ -121,9 +121,19 @@ class MessageSenderTest {
 
     private static final class TestSender extends MessageSender {
         private TestSender(Plugin plugin, Component prefix) {
-            super(plugin, MiniMessage.builder().tags(StandardTags.defaults()).build(),
-                    TagResolver.resolver(StandardTags.defaults(), TagResolver.builder().tag("default", Tag.styling(NamedTextColor.GREEN)).build()),
-                    TagResolver.resolver(StandardTags.defaults(), TagResolver.builder().tag("default", Tag.styling(NamedTextColor.RED)).build()),
+            super(
+                    plugin,
+                    MiniMessage.builder().tags(StandardTags.defaults()).build(),
+                    TagResolver.resolver(
+                            StandardTags.defaults(),
+                            TagResolver.builder()
+                                    .tag("default", Tag.styling(NamedTextColor.GREEN))
+                                    .build()),
+                    TagResolver.resolver(
+                            StandardTags.defaults(),
+                            TagResolver.builder()
+                                    .tag("default", Tag.styling(NamedTextColor.RED))
+                                    .build()),
                     prefix);
         }
 
@@ -136,37 +146,36 @@ class MessageSenderTest {
         }
 
         @Override
-        public void sendMessage(CommandSender sender, Component component) {
-        }
+        public void sendMessage(CommandSender sender, Component component) {}
 
         @Override
-        public void broadcast(String message) {
-        }
+        public void broadcast(String message) {}
 
         @Override
-        public void sendTitle(Player player, Title title) {
-        }
+        public void sendTitle(Player player, Title title) {}
 
         @Override
-        public void sendActionBar(Player player, String message, TagResolver... placeholder) {
-        }
+        public void sendActionBar(Player player, String message, TagResolver... placeholder) {}
 
         @Override
-        public void sendErrorActionBar(Player player, String message, TagResolver... placeholder) {
-        }
+        public void sendErrorActionBar(Player player, String message, TagResolver... placeholder) {}
 
         @Override
-        public void sendBossBar(Player player, BossBar bossBar) {
-        }
+        public void sendBossBar(Player player, BossBar bossBar) {}
 
         @Override
-        public BossBar sendBossBar(Player player, String message, float progress, BossBar.Color color, BossBar.Overlay overlay, Set<BossBar.Flag> flags) {
+        public BossBar sendBossBar(
+                Player player,
+                String message,
+                float progress,
+                BossBar.Color color,
+                BossBar.Overlay overlay,
+                Set<BossBar.Flag> flags) {
             return null;
         }
 
         @Override
-        public void hideBossBar(Player player, BossBar bossBar) {
-        }
+        public void hideBossBar(Player player, BossBar bossBar) {}
 
         @Override
         public Audience asAudience(Player player) {

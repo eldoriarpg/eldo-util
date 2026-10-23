@@ -18,8 +18,7 @@ import java.util.function.Function;
  * @since 1.0.0
  */
 public final class ObjUtil {
-    private ObjUtil() {
-    }
+    private ObjUtil() {}
 
     /**
      * Consumes a object if object is not null
