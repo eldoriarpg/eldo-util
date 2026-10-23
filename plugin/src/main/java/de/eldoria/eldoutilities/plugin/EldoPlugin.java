@@ -287,13 +287,6 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             onPluginEnable();
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
-            for (var cmd : failsafeCommands()) {
-                try {
-                    registerCommand(cmd, (TabExecutor) failcmd);
-                } catch (Throwable ex) {
-                    getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
-                }
-            }
             return;
         }
         getLogger().config("Scheduling post startup");
