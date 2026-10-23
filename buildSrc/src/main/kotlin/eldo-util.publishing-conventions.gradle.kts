@@ -7,56 +7,39 @@ plugins {
     id("de.chojo.publishdata")
 }
 
-group = "de.eldoria.util"
-
 publishData {
-    eldoNexus()
-    channels {
-        clear()
-        release("https://eldonexus.de/repository/maven-releases/")
-        dev("https://eldonexus.de/repository/maven-dev/")
-        snapshot("https://eldonexus.de/repository/maven-snapshots/")
-    }
+    eldoNexus(dev = false)
 }
 
 mavenPublishing {
-    publishToMavenCentral()
+    configure(JavaLibrary(javadocJar = JavadocJar.Javadoc(), sourcesJar = SourcesJar.Sources()))
     signAllPublications()
-
-    coordinates(groupId = "de.eldoria.util", artifactId = project.name, version = project.version.toString())
-
+    coordinates(rootProject.group.toString(), project.name, project.version.toString())
     pom {
-        name.set("eldo-util")
-        description.set(project.description)
-        inceptionYear.set("2025")
-        url.set("https://github.com/eldoriarpg/eldo-util")
+        name = if (project == rootProject) "eldo-util" else "eldo-util ${project.name}"
+        description = provider { project.description }
+        url = "https://github.com/eldoriarpg/eldo-util"
+        inceptionYear = "2021"
         licenses {
             license {
-                name.set("LGPL-3.0-or-later")
-                url.set("https://www.gnu.org/licenses/lgpl-3.0.html")
+                name = "LGPL-3.0-or-later"
+                url = "https://www.gnu.org/licenses/lgpl-3.0.html"
             }
         }
-
         developers {
             developer {
-                id.set("rainbowdashlabs")
-                name.set("Lilly Fülling")
-                email.set("mail@chojo.dev")
-                url.set("https://github.com/rainbowdashlabs")
+                id = "rainbowdashlabs"
+                name = "Nora Fülling"
+                email = "mail@chojo.dev"
+                url = "https://github.com/rainbowdashlabs"
+                organization = "Eldoria"
+                organizationUrl = "https://github.com/eldoriarpg"
             }
         }
-
         scm {
-            url.set("https://github.com/eldoriarpg/eldo-util")
-            connection.set("scm:git:git://github.com/eldoriarpg/eldo-util.git")
-            developerConnection.set("scm:git:ssh://github.com/eldoriarpg/eldo-util.git")
+            url = "https://github.com/eldoriarpg/eldo-util"
+            connection = "scm:git:git://github.com/eldoriarpg/eldo-util.git"
+            developerConnection = "scm:git:ssh://github.com/eldoriarpg/eldo-util.git"
         }
     }
-
-    configure(
-        JavaLibrary(
-            javadocJar = JavadocJar.Javadoc(),
-            sourcesJar = SourcesJar.Sources()
-        )
-    )
 }
