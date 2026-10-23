@@ -60,8 +60,8 @@ mavenPublishing {
         url.set("https://github.com/eldoriarpg/eldo-util")
         licenses {
             license {
-                name.set("LGPL-3.0")
-                url.set("https://opensource.org/license/lgpl-3-0")
+                name.set("LGPL-3.0-or-later")
+                url.set("https://www.gnu.org/licenses/lgpl-3.0.html")
             }
         }
 
