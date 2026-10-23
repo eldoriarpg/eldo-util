@@ -91,9 +91,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
         EldoUtilities.preWarm(eldoPlugin);
         eldoPlugin.failcmd = AdvancedCommandAdapter.wrap(
-                eldoPlugin,
-                new FailsaveCommand(
-                        eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase()));
+                eldoPlugin, new FailsaveCommand(eldoPlugin, eldoPlugin.failsafePermission()));
     }
 
     public static EldoPlugin getInstance() {
@@ -327,8 +325,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     private void initFailsave(String message, Throwable e) {
         getLogger().log(Level.SEVERE, message, e);
         getLogger().log(Level.SEVERE, "Initializing failsave mode.");
-        var failcmd =
-                new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        var failcmd = new FailsaveCommand(this, failsafePermission());
         for (var cmd : failsafeCommands()) {
             try {
                 registerCommand(cmd, failcmd);
@@ -336,6 +333,15 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                 getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
             }
         }
+    }
+
+    /**
+     * The permission that allows the debug command of the failsave mode, next to {@code eldoutilities.debug}.
+     *
+     * @return {@code <plugin>.debug} with the lower case plugin name
+     */
+    private String failsafePermission() {
+        return getName().toLowerCase(Locale.ROOT) + ".debug";
     }
 
     /**
