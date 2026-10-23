@@ -52,6 +52,7 @@ public abstract class MessageSender {
     private TagResolver messageTagResolver;
     private TagResolver errorTagResolver;
     private Component prefix;
+    private final @Nullable ILocalizer localizer;
 
     public MessageSender(
             Plugin plugin,
@@ -59,6 +60,27 @@ public abstract class MessageSender {
             TagResolver messageTagResolver,
             TagResolver errorTagResolver,
             Component prefix) {
+        this(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix, null);
+    }
+
+    /**
+     * Creates a message sender that localizes with the given localizer.
+     *
+     * @param plugin             owning plugin
+     * @param miniMessage        MiniMessage instance used to parse messages
+     * @param messageTagResolver tags of normal messages
+     * @param errorTagResolver   tags of error messages
+     * @param prefix             prefix put in front of every message
+     * @param localizer          localizer for locale codes, or null to use the localizer registered for the plugin
+     */
+    public MessageSender(
+            Plugin plugin,
+            MiniMessage miniMessage,
+            TagResolver messageTagResolver,
+            TagResolver errorTagResolver,
+            Component prefix,
+            @Nullable ILocalizer localizer) {
+        this.localizer = localizer;
         this.ownerPlugin = plugin.getClass();
         this.plugin = plugin;
         this.miniMessage = miniMessage;
@@ -249,6 +271,7 @@ public abstract class MessageSender {
     public void close() {}
 
     private ILocalizer loc() {
+        if (localizer != null && localizer != ILocalizer.DEFAULT) return localizer;
         return ILocalizer.getPluginLocalizer(ownerPlugin);
     }
 

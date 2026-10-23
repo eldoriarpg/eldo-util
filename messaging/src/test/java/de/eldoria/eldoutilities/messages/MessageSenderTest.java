@@ -84,6 +84,13 @@ class MessageSenderTest {
     }
 
     @Test
+    void theLocalizerOfTheSenderIsUsed() {
+        var sender = new TestSender(plugin, Component.empty(), new MapLocalizer(Map.of("greeting.hello", "Hallo")));
+        assertEquals("Hallo", plain(sender.render("greeting.hello")));
+        assertEquals("Hallo!", plain(sender.render("<i18n:greeting.hello>!")));
+    }
+
+    @Test
     void anUnparsedReplacementCannotAddTags() {
         var sender = new TestSender(plugin, Component.empty());
         var component = sender.render("Home: <name>", Replacement.unparsed("name", "<click:run_command:'/op me'>evil"));
@@ -121,6 +128,10 @@ class MessageSenderTest {
 
     private static final class TestSender extends MessageSender {
         private TestSender(Plugin plugin, Component prefix) {
+            this(plugin, prefix, null);
+        }
+
+        private TestSender(Plugin plugin, Component prefix, ILocalizer localizer) {
             super(
                     plugin,
                     MiniMessage.builder().tags(StandardTags.defaults()).build(),
@@ -134,7 +145,8 @@ class MessageSenderTest {
                             TagResolver.builder()
                                     .tag("default", Tag.styling(NamedTextColor.RED))
                                     .build()),
-                    prefix);
+                    prefix,
+                    localizer);
         }
 
         private Component render(String message, TagResolver... placeholder) {

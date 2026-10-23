@@ -19,8 +19,14 @@ public final class Plugins {
         throw new UnsupportedOperationException("This is a utility class.");
     }
 
+    /**
+     * Finds the jar a plugin was loaded from.
+     *
+     * @param plugin plugin
+     * @return the plugin jar, or empty when the plugin is no {@link JavaPlugin} or its file cannot be read
+     */
     public static Optional<File> getPluginFile(Plugin plugin) {
-        // Get File of plugin
+        if (!(plugin instanceof JavaPlugin)) return Optional.empty();
         Field fileField;
         try {
             fileField = JavaPlugin.class.getDeclaredField("file");
@@ -30,7 +36,7 @@ public final class Plugins {
         }
         fileField.setAccessible(true);
         try {
-            return Optional.of((File) fileField.get(plugin));
+            return Optional.ofNullable((File) fileField.get(plugin));
         } catch (IllegalAccessException e) {
             plugin.getLogger().log(Level.WARNING, "Could not retrieve file of plugin.", e);
             return Optional.empty();

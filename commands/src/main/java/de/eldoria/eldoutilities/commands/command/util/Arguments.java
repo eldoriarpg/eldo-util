@@ -125,6 +125,7 @@ public class Arguments implements Iterable<Input> {
      * Splits the arguments if they were grouped by {@link #parseQuoted()}
      */
     public void splitArgs() {
+        args.clear();
         for (var s : Arrays.stream(rawArgs).collect(Collectors.toList())) {
             if (FlagContainer.isFlag(s)) break;
             args.add(Input.of(plugin, s));

@@ -28,4 +28,15 @@ class ArgumentsTest {
 
         assertEquals("stone", args.raw()[0]);
     }
+
+    @Test
+    void splittingAfterParsingQuotesRestoresTheArguments() {
+        var args = Arguments.create(null, null, new String[] {"\"a", "b\"", "c"});
+
+        args.parseQuoted();
+        assertEquals(2, args.size());
+        args.splitArgs();
+        assertEquals(3, args.size());
+        assertEquals("c", args.asString(2));
+    }
 }

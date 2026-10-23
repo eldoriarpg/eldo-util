@@ -222,17 +222,18 @@ public final class Completion {
     }
 
     /**
-     * Complete a player
+     * Completes the names of players who are online or played in the last 30 days.
      *
      * @param value current value
-     * @return null as this will enable minecraft to standard completion which is nearly always a player
+     * @return names of players that match the value
      */
     public static List<String> completePlayers(String value) {
         if (PLAYER_NAMES.isEmpty()) {
             PLAYER_NAMES.addAll(Arrays.stream(Bukkit.getOfflinePlayers())
                     .filter(p -> Instant.ofEpochMilli(p.getLastPlayed())
                             .isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
-                    .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
+                    .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed)
+                            .reversed())
                     .limit(OFFLINE_PLAYER_CACHE_SIZE)
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toSet()));
@@ -244,13 +245,13 @@ public final class Completion {
     }
 
     /**
-     * Complete a player
+     * Completes the names of the players who are online.
      *
      * @param value current value
-     * @return null as this will enable minecraft to standard completion which is nearly always a player
+     * @return names of online players that match the value
      */
     public static List<String> completeOnlinePlayers(String value) {
-        Set<String> complete = new LinkedHashSet<>(complete(value, PLAYER_NAMES));
+        Set<String> complete = new LinkedHashSet<>();
         if (ONLINE_NAMES.isEmpty() || lastPlayerRefresh.isBefore(Instant.now().minus(10, ChronoUnit.SECONDS))) {
             ONLINE_NAMES.clear();
             ONLINE_NAMES.addAll(

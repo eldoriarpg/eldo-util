@@ -58,6 +58,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     private DebugLogger debugLogger;
     private AdvancedCommandAdapter failcmd;
     private ReloadListener reloadListener;
+    private boolean loadFailed;
 
     public EldoPlugin() {
         registerSelf(this);
@@ -91,9 +92,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
         EldoUtilities.preWarm(eldoPlugin);
         eldoPlugin.failcmd = AdvancedCommandAdapter.wrap(
-                eldoPlugin,
-                new FailsaveCommand(
-                        eldoPlugin, eldoPlugin.getDescription().getFullName().toLowerCase()));
+                eldoPlugin, new FailsaveCommand(eldoPlugin, eldoPlugin.failsafePermission()));
     }
 
     public static EldoPlugin getInstance() {
@@ -252,7 +251,9 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         try {
             onPluginLoad();
         } catch (Throwable e) {
-            initFailsave("Plugin failed to load.", e);
+            getLogger().log(Level.SEVERE, "Plugin failed to load.", e);
+            getLogger().log(Level.SEVERE, "The failsave mode starts when the plugin enables.");
+            loadFailed = true;
         }
     }
 
@@ -267,6 +268,11 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     @Override
     public final void onEnable() {
+        if (loadFailed) {
+            getLogger().log(Level.SEVERE, "Plugin failed to load. Skipping the enable.");
+            initFailsave();
+            return;
+        }
         var start = Instant.now();
         var reload = isLocked();
         if (reload) {
@@ -289,13 +295,6 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             onPluginEnable();
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
-            for (var cmd : failsafeCommands()) {
-                try {
-                    registerCommand(cmd, (TabExecutor) failcmd);
-                } catch (Throwable ex) {
-                    getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
-                }
-            }
             return;
         }
         getLogger().config("Scheduling post startup");
@@ -326,9 +325,16 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     private void initFailsave(String message, Throwable e) {
         getLogger().log(Level.SEVERE, message, e);
+        initFailsave();
+    }
+
+    /**
+     * Registers the failsafe commands. Commands of a Paper plugin can only be registered while it enables, so a failed
+     * load starts the failsave mode in {@link #onEnable()}.
+     */
+    private void initFailsave() {
         getLogger().log(Level.SEVERE, "Initializing failsave mode.");
-        var failcmd =
-                new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
+        var failcmd = new FailsaveCommand(this, failsafePermission());
         for (var cmd : failsafeCommands()) {
             try {
                 registerCommand(cmd, failcmd);
@@ -336,6 +342,15 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
                 getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
             }
         }
+    }
+
+    /**
+     * The permission that allows the debug command of the failsave mode, next to {@code eldoutilities.debug}.
+     *
+     * @return {@code <plugin>.debug} with the lower case plugin name
+     */
+    private String failsafePermission() {
+        return getName().toLowerCase(Locale.ROOT) + ".debug";
     }
 
     /**
@@ -407,7 +422,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     @Override
     public final void onDisable() {
-        if (reloadListener.isReload()) {
+        if (reloadListener != null && reloadListener.isReload()) {
             getLogger().severe("Plugin is disabled by server reload.");
             createLock();
         }

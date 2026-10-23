@@ -105,14 +105,8 @@ A command without an executor interface is a route. It needs subcommands, a defa
 | `withDefaultCommand(AdvancedCommand)` | the command that runs when no subcommand is given. |
 | `hidden()` | the command still works, but it is not suggested in tab completion. |
 | `ofParent(AdvancedCommand)` | sets the parent command. Subcommands added with `withSubCommand` get their parent set for you. |
-| `allowPlayer()`, `allowConsole()`, `allowCommandSender(...)` | limit which sender types may run an `ITabExecutor` command. |
+| `allowPlayer()`, `allowConsole()`, `allowCommandSender(...)` | limit which sender types may run an `ITabExecutor` command. A sender matches when it is an instance of one of the allowed types, otherwise it gets `error.invalidSender`. |
 | `build()` | creates the `CommandMeta`. |
-
-:::warning
-`allowPlayer()`, `allowConsole()` and `allowCommandSender(...)` compare the exact class of the sender. Real senders
-are server classes, so they do not match and the command answers with `error.invalidSender`. Use
-`IPlayerTabExecutor` or `IConsoleTabExecutor` to limit a command to players or the console.
-:::
 
 Arguments are shown in the usage text: required ones as `<name>`, optional ones as `[name]`. Before your
 `onCommand` runs, eldo-util checks that at least the required number of arguments is there. If not, the user gets
@@ -229,8 +223,9 @@ throw CommandException.message("error.notOwner", Replacement.create("owner", own
 - `CommandException.silent()` stops the command and sends nothing.
 
 The error is sent through the [message sender](./messages.md) of your plugin with `sendError`. In tab completion,
-the error text is shown as the only suggestion. eldo-util only catches `CommandException`. Other exceptions reach the
-server, which reports them as usual.
+the error text is shown as the only suggestion. Any other exception thrown while a command runs is logged with level
+`SEVERE` in your plugin log, and the sender gets no message. In tab completion other exceptions reach the server,
+which reports them as usual.
 
 For player input in replacements, use `Replacement.unparsed`. See [Messages](./messages.md).
 
@@ -250,12 +245,12 @@ For player input in replacements, use `Replacement.unparsed`. See [Messages](./m
 | `invalidArguments(meta, args)` | `error.invalidArguments` when required arguments are missing. |
 | `invalidArguments(meta, args, Argument...)`, `invalidArguments(args, Argument...)` | the same with your own argument list. |
 | `range(value, min, max)` | `error.invalidRange` |
-| `min(value, min)` | `error.tooLow` |
+| `min(value, min)` | `error.tooSmall` |
 | `max(value, max)` | `error.tooLarge` |
 | `enumValue(value, Class)` | `error.invalidEnumValue` |
 | `isInteger`, `isLong`, `isDouble` | `error.invalidNumber` |
 | `invalidNumber()` | `error.invalidNumber`, always. |
-| `isBoolean(value)`, `isBoolean(value, aTrue, aFalse)` | `error.invalidBoolen` |
+| `isBoolean(value)`, `isBoolean(value, aTrue, aFalse)` | `error.invalidBoolean` |
 | `invalidLength(input, max)` | `error.invalidLength` when the input has `max` characters or more. |
 | `missingArgument(args, index)` | `error.missingArgument` |
 
@@ -271,8 +266,8 @@ For player input in replacements, use `Replacement.unparsed`. See [Messages](./m
 | `completeMaterial(value, lowerCase)` | materials. Also matches parts of a name, so `oak` finds `OAK_LOG` and `DARK_OAK_LOG`. |
 | `completeBoolean(value)` | `true` and `false`. |
 | `completeWorlds(value)` | world names. Spaces become `:`. |
-| `completePlayers(value)` | online players and players seen in the last 30 days. |
-| `completeOnlinePlayers(value)` | online players. Once `completePlayers` was used, the recently seen players are added as well. |
+| `completePlayers(value)` | online players and the 1000 players seen most recently within the last 30 days. |
+| `completeOnlinePlayers(value)` | online players. |
 | `completeInt(value, min, max)`, `completeDouble(value, min, max)` | the range, like `1 » 10`. Throws an error when the input is no number or out of range. |
 | `completeMinInt`, `completeMinDouble`, `completeMaxInt`, `completeMaxDouble` | the limit. Throws an error when the input is no number or past the limit. |
 | `completeFreeInput(value, maxLength, hint)` | your hint, or an error when the input is too long. |
@@ -321,14 +316,14 @@ them. Add a key to your own locale files to change the text.
 | `error.invalidMaterial` | |
 | `error.invalidEnumValue` | `values` |
 | `error.invalidRange` | `min`, `max` |
+| `error.tooSmall` | `min` |
 | `error.tooLarge` | `max` |
 | `error.invalidLength` | `max` |
 | `error.notOnline` | |
+| `error.unknownPlayer` | |
+| `error.unknownWorld` | |
 | `commands.about` | `plugin_name`, `authors`, `version`, `website`, `discord` |
 
-:::warning
-Some checks use keys that have no built-in text: `error.unkownPlayer` (from `asOfflinePlayer`), `error.unkownWorld`
-(from `asWorld`), `error.tooLow` (from `CommandAssertions.min`) and `error.invalidBoolen` (from
-`CommandAssertions.isBoolean`). The spelling is exactly like this. If you use these methods, add the keys to your
-locale files.
-:::
+Before 3.6.0 four of these keys were misspelled: `error.unkownPlayer`, `error.unkownWorld`, `error.invalidBoolen` and
+`error.tooLow`. A locale file that still has an old key keeps working. When the file is updated, the new key gets the
+text of the old one.

@@ -90,7 +90,8 @@ task.runTaskTimer(plugin, 0, 1);
 
 `CompletableBukkitFuture.supplyAsync(...)` and `runAsync(...)` run work off the server thread, like the matching
 `CompletableFuture` methods, and return a `BukkitFutureResult`. Its `whenComplete` callbacks run on the server thread
-through the Bukkit scheduler, so they may use the Bukkit API.
+through the Bukkit scheduler, so they may use the Bukkit API. A callback runs on the next tick at the earliest, also
+when the result is already there.
 
 ```java
 CompletableBukkitFuture.supplyAsync(() -> database.loadHome(player.getUniqueId()))

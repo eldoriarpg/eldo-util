@@ -46,10 +46,10 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  * <p>
  * Easy to use and fully automatic setup and updating of locales.
  * <p>
- * Requires to have at least one default locale and one fallback locale in the resources. Use the {@link #create(Plugin, String...)} constructor for initial setup. This will create missing files
- * and updates existing files.
+ * Requires to have at least one default locale and one fallback locale in the resources. Use
+ * {@link #builder(Plugin, String)} for the setup. This will create missing files and updates existing files.
  * <p>
- * You can change the currently used locale every time via {@link #setLocale(String)}.
+ * You can change the currently used locale every time via {@link #setDefaultLocale(String)}.
  * <p>
  * The localizer also allows to use locales which are not included in the resources folder: every locale file in the
  * locales directory is loaded, and receives the keys it lacks from the default locale.
@@ -61,6 +61,15 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  */
 @SuppressWarnings("unused")
 public class Localizer implements ILocalizer {
+    private static final Map<String, String> KEY_ALIASES = Map.of(
+            "error.unknownPlayer", "error.unkownPlayer",
+            "error.unkownPlayer", "error.unknownPlayer",
+            "error.unknownWorld", "error.unkownWorld",
+            "error.unkownWorld", "error.unknownWorld",
+            "error.invalidBoolean", "error.invalidBoolen",
+            "error.invalidBoolen", "error.invalidBoolean",
+            "error.tooSmall", "error.tooLow",
+            "error.tooLow", "error.tooSmall");
 
     private String defaultLanguage;
     private final Plugin plugin;
@@ -182,42 +191,44 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaults() {
-        runtimeLocaleCodes.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
-        runtimeLocaleCodes.put("error.invalidCommand", "Invalid Command");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
+        runtimeLocaleCodes.putIfAbsent("error.invalidCommand", "Invalid Command");
+        runtimeLocaleCodes.putIfAbsent(
                 "error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidRange",
                 "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
-        runtimeLocaleCodes.put("error.invalidMaterial", "Invalid material.");
-        runtimeLocaleCodes.put("error.invalidNumber", "Invalid number");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent("error.invalidMaterial", "Invalid material.");
+        runtimeLocaleCodes.putIfAbsent("error.invalidNumber", "Invalid number");
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
-        runtimeLocaleCodes.put("error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
-        runtimeLocaleCodes.put("error.notOnline", "Invalid player. This player is not online.");
-        runtimeLocaleCodes.put("error.unknownPlayer", "Invalid player. This player has never played on this server.");
-        runtimeLocaleCodes.put("error.unknownWorld", "Invalid world.");
-        runtimeLocaleCodes.put("error.notAsConsole", "This command can not be executed from console.");
-        runtimeLocaleCodes.put("error.onlyPlayer", "This command can only be used by players.");
-        runtimeLocaleCodes.put("error.onlyConsole", "This command can only be used by console.");
-        runtimeLocaleCodes.put("error.invalidSender", "This command can not be executed from here.");
-        runtimeLocaleCodes.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
-        runtimeLocaleCodes.put("error.notAsPlayer", "This command can not be executed as player");
-        runtimeLocaleCodes.put("error.tooSmall", "The number is too small. Min: <gold><min>");
-        runtimeLocaleCodes.put("error.tooLarge", "The number is too Large. Max: <gold><max>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
+                "error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
+        runtimeLocaleCodes.putIfAbsent("error.notOnline", "Invalid player. This player is not online.");
+        runtimeLocaleCodes.putIfAbsent(
+                "error.unknownPlayer", "Invalid player. This player has never played on this server.");
+        runtimeLocaleCodes.putIfAbsent("error.unknownWorld", "Invalid world.");
+        runtimeLocaleCodes.putIfAbsent("error.notAsConsole", "This command can not be executed from console.");
+        runtimeLocaleCodes.putIfAbsent("error.onlyPlayer", "This command can only be used by players.");
+        runtimeLocaleCodes.putIfAbsent("error.onlyConsole", "This command can only be used by console.");
+        runtimeLocaleCodes.putIfAbsent("error.invalidSender", "This command can not be executed from here.");
+        runtimeLocaleCodes.putIfAbsent("error.missingArgument", "Argument <INDEX> is accessed but not present.");
+        runtimeLocaleCodes.putIfAbsent("error.notAsPlayer", "This command can not be executed as player");
+        runtimeLocaleCodes.putIfAbsent("error.tooSmall", "The number is too small. Min: <gold><min>");
+        runtimeLocaleCodes.putIfAbsent("error.tooLarge", "The number is too Large. Max: <gold><max>");
+        runtimeLocaleCodes.putIfAbsent(
                 "commands.about",
                 "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
-        runtimeLocaleCodes.put("dialog.accept", "accept");
-        runtimeLocaleCodes.put("dialog.deny", "deny");
-        runtimeLocaleCodes.put("dialog.add", "add");
-        runtimeLocaleCodes.put("dialog.remove", "remove");
-        runtimeLocaleCodes.put("dialog.leftClickChange", "Left click to change");
-        runtimeLocaleCodes.put("dialog.rightClickRemove", "Right click to remove");
+        runtimeLocaleCodes.putIfAbsent("dialog.accept", "accept");
+        runtimeLocaleCodes.putIfAbsent("dialog.deny", "deny");
+        runtimeLocaleCodes.putIfAbsent("dialog.add", "add");
+        runtimeLocaleCodes.putIfAbsent("dialog.remove", "remove");
+        runtimeLocaleCodes.putIfAbsent("dialog.leftClickChange", "Left click to change");
+        runtimeLocaleCodes.putIfAbsent("dialog.rightClickRemove", "Right click to remove");
     }
 
     @Override
@@ -229,7 +240,7 @@ public class Localizer implements ILocalizer {
      * Change the locale to the language. If the locale is not present the fallback locale will be used.
      *
      * @param language language to be used
-     * @deprecated Use
+     * @deprecated Use {@link #setDefaultLocale(String)}
      */
     @Override
     @Deprecated(forRemoval = true)
@@ -278,7 +289,8 @@ public class Localizer implements ILocalizer {
 
         if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
             if (reportedMissing.add(key)) {
-                plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
+                plugin.getLogger()
+                        .warning("Key " + key + " has no text in any locale file, child localizer or built-in text.");
                 plugin.getLogger().log(Level.FINE, "Missing key " + key + " requested from", new RuntimeException());
             }
             result = key;
@@ -296,9 +308,29 @@ public class Localizer implements ILocalizer {
         return getValue(key, defaultLanguage);
     }
 
+    /**
+     * Looks a key up in the locale files, the children and the built-in codes.
+     * <p>
+     * Keys that were renamed are still found under their old name, in both directions: a locale file that holds the
+     * old key answers for the new one, and the old key gets the text of the new one.
+     *
+     * @param key      locale code
+     * @param language language to look the key up in
+     * @return the text, or null when no file, child or built-in code has the key
+     */
     @Override
     @Nullable
     public String getValue(String key, String language) {
+        var alias = KEY_ALIASES.get(key);
+        var result = fileValue(key, language);
+        if (result == null && alias != null) result = fileValue(alias, language);
+        if (result == null) result = runtimeLocaleCodes.get(key);
+        if (result == null && alias != null) result = runtimeLocaleCodes.get(alias);
+        return result;
+    }
+
+    @Nullable
+    private String fileValue(String key, String language) {
         String result = null;
         if (localeBundle(language).containsKey(key)) {
             try {
@@ -320,9 +352,6 @@ public class Localizer implements ILocalizer {
                 result = child.getValue(key, language);
                 if (result != null) break;
             }
-        }
-        if (result == null) {
-            result = runtimeLocaleCodes.get(key);
         }
         return result;
     }
@@ -469,12 +498,12 @@ public class Localizer implements ILocalizer {
         }
     }
 
-    private Set<String> existingKeys(Path path) throws IOException {
+    private Properties existingEntries(Path path) throws IOException {
         var properties = new Properties();
         try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             properties.load(reader);
         }
-        return properties.stringPropertyNames();
+        return properties;
     }
 
     private static String escapeValue(String value) {
@@ -533,9 +562,11 @@ public class Localizer implements ILocalizer {
                 continue;
             }
 
+            Properties existing;
             // load the external property file.
             try {
-                updateKeys.removeAll(existingKeys(path));
+                existing = existingEntries(path);
+                updateKeys.removeAll(existing.stringPropertyNames());
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;
@@ -550,9 +581,15 @@ public class Localizer implements ILocalizer {
             List<String> lines = new ArrayList<>();
             lines.add("# Keys added automatically at " + timestamp());
             for (var currKey : new TreeSet<>(updateKeys)) {
-                var value = refBundle.containsKey(currKey)
-                        ? refBundle.getString(currKey)
-                        : runtimeLocaleCodes.getOrDefault(currKey, "");
+                var alias = KEY_ALIASES.get(currKey);
+                String value;
+                if (alias != null && existing.containsKey(alias)) {
+                    value = existing.getProperty(alias);
+                } else if (refBundle.containsKey(currKey)) {
+                    value = refBundle.getString(currKey);
+                } else {
+                    value = runtimeLocaleCodes.getOrDefault(currKey, "");
+                }
                 lines.add(currKey + "=" + escapeValue(value));
                 plugin.getLogger().info("Added: " + currKey + "=" + escapeValue(value));
             }

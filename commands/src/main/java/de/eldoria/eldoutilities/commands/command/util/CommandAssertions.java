@@ -142,9 +142,9 @@ public final class CommandAssertions {
      */
     public static void sender(CommandSender sender, CommandMeta meta) throws CommandException {
         for (var clazz : meta.allowedSender()) {
-            if (sender.getClass().isInstance(clazz)) return;
+            if (clazz.isInstance(sender)) return;
         }
-        throw CommandException.message("Invalid sender");
+        throw CommandException.message("error.invalidSender");
     }
 
     /**
@@ -216,7 +216,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(int value, int min) throws CommandException {
-        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooSmall", Replacement.create("MIN", min));
     }
 
     /**
@@ -226,7 +226,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(double value, double min) throws CommandException {
-        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooSmall", Replacement.create("MIN", min));
     }
 
     /**
@@ -251,7 +251,7 @@ public final class CommandAssertions {
 
     /**
      * Checks if a enum value is invalid. Will send a message based on {@code error.invalidEnumValue} locale key which
-     * should provide a placeholder for {@code VALUE} which will be replaced with an array of possible inputs
+     * should provide a placeholder for {@code VALUES} which will be replaced with the possible inputs, separated by commas
      *
      * @param value value of enum
      * @param clazz clazz of enum
@@ -261,7 +261,7 @@ public final class CommandAssertions {
         isTrue(
                 EnumUtil.parse(value, clazz).isPresent(),
                 "error.invalidEnumValue",
-                Replacement.create("VALUES", Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
+                Replacement.create("VALUES", EnumUtil.enumValues(clazz)));
     }
 
     public static void invalidNumber() throws CommandException {
@@ -281,11 +281,11 @@ public final class CommandAssertions {
     }
 
     public static void isBoolean(String value) throws CommandException {
-        isTrue(Parser.parseBoolean(value).isPresent(), "error.invalidBoolen");
+        isTrue(Parser.parseBoolean(value).isPresent(), "error.invalidBoolean");
     }
 
     public static void isBoolean(String value, String isTrue, String isFalse) throws CommandException {
-        isTrue(Parser.parseBoolean(value, isTrue, isFalse).isPresent(), "error.invalidBoolen");
+        isTrue(Parser.parseBoolean(value, isTrue, isFalse).isPresent(), "error.invalidBoolean");
     }
 
     public static void invalidLength(String input, int max) throws CommandException {
@@ -332,7 +332,9 @@ public final class CommandAssertions {
 
     public static void allowedSender(CommandMeta meta, CommandSender sender) throws CommandException {
         if (meta.allowedSender().isEmpty()) return;
-        if (meta.allowedSender().contains(sender.getClass())) return;
+        for (var clazz : meta.allowedSender()) {
+            if (clazz.isInstance(sender)) return;
+        }
         throw CommandException.message("error.invalidSender");
     }
 }

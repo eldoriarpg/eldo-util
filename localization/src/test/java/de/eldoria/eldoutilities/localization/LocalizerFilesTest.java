@@ -93,6 +93,25 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void aRenamedKeyIsFoundUnderItsOldName() throws IOException {
+        Files.writeString(messages.resolve("messages_en_US.properties"), BUNDLED + "error.unkownPlayer=Who is that?\n");
+
+        var localizer = Localizer.builder(plugin, "en_US").build();
+
+        assertEquals("Who is that?", localizer.getValue("error.unknownPlayer"));
+        assertEquals("The number is too small. Min: <gold><min>", localizer.getValue("error.tooLow"));
+    }
+
+    @Test
+    void aTextFromTheBuilderReplacesTheBuiltInText() {
+        var localizer = Localizer.builder(plugin, "en_US")
+                .addLocaleCodes("error.invalidCommand", "No such command")
+                .build();
+
+        assertEquals("No such command", localizer.getValue("error.invalidCommand"));
+    }
+
+    @Test
     void aMissingKeyIsReportedOnce() {
         var localizer = Localizer.builder(plugin, "en_US").build();
         warnings.clear();
@@ -101,6 +120,9 @@ class LocalizerFilesTest {
         assertEquals("does.not.exist", localizer.getMessage("does.not.exist"));
 
         assertEquals(1, warnings.size());
+        assertEquals(
+                "Key does.not.exist has no text in any locale file, child localizer or built-in text.",
+                warnings.getFirst().getMessage());
     }
 
     @Test
