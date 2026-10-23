@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -112,18 +113,24 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     /**
      * Register a tabexecutor for a command.
      * <p>
-     * This tabexecutor will handle execution and tab completion.
+     * This tabexecutor will handle execution and tab completion. A command declared in the {@code plugin.yml} gets the
+     * executor. Otherwise, as for Paper plugins whose {@code paper-plugin.yml} declares no commands, the command is
+     * registered through Paper, which is only possible while the plugin enables.
      *
      * @param command     name of command
      * @param tabExecutor command executor
      */
     public final void registerCommand(String command, TabExecutor tabExecutor) {
+        registerCommand(command, List.of(), tabExecutor);
+    }
+
+    private void registerCommand(String command, Collection<String> aliases, TabExecutor tabExecutor) {
         var cmd = getCommand(command);
         if (cmd != null) {
             cmd.setExecutor(tabExecutor);
             return;
         }
-        getLogger().warning("Command " + command + " not found!");
+        registerCommand(command, aliases, new PaperCommandBridge(command, tabExecutor));
     }
 
     /**
@@ -140,13 +147,14 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     /**
      * Register a tabexecutor for a command.
      * <p>
-     * This tabexecutor will handle execution and tab completion.
+     * This tabexecutor will handle execution and tab completion. Without a {@code plugin.yml} entry the command is
+     * registered through Paper, with the aliases of the command's {@link AdvancedCommand#meta() meta}.
      *
      * @param command  name of command
      * @param executor command executor
      */
     public final void registerCommand(String command, AdvancedCommand executor) {
-        registerCommand(command, (TabExecutor) AdvancedCommandAdapter.wrap(this, executor));
+        registerCommand(command, List.of(executor.meta().aliases()), AdvancedCommandAdapter.wrap(this, executor));
     }
 
     /**
@@ -265,7 +273,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             onPluginEnable();
         } catch (Throwable e) {
             initFailsave("Plugin failed to enable.", e);
-            for (var cmd : getDescription().getCommands().keySet()) {
+            for (var cmd : failsafeCommands()) {
                 try {
                     registerCommand(cmd, (TabExecutor) failcmd);
                 } catch (Throwable ex) {
@@ -304,13 +312,24 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         getLogger().log(Level.SEVERE, message, e);
         getLogger().log(Level.SEVERE, "Initializing failsave mode.");
         var failcmd = new FailsaveCommand(instance, getDescription().getFullName().toLowerCase());
-        for (var cmd : getDescription().getCommands().keySet()) {
+        for (var cmd : failsafeCommands()) {
             try {
                 registerCommand(cmd, failcmd);
             } catch (Throwable ex) {
                 getLogger().log(Level.WARNING, "Failed to initialize failsafe command", ex);
             }
         }
+    }
+
+    /**
+     * The commands that answer in failsave mode: those of the {@code plugin.yml}, or for a Paper plugin, which declares
+     * none, the lower case plugin name.
+     *
+     * @return command names
+     */
+    private Collection<String> failsafeCommands() {
+        var commands = getDescription().getCommands().keySet();
+        return commands.isEmpty() ? List.of(getName().toLowerCase(Locale.ROOT)) : commands;
     }
 
     private void onReload() throws Throwable {
