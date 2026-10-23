@@ -265,7 +265,7 @@ For player input in replacements, use `Replacement.unparsed`. See [Messages](./m
 | `completeMaterial(value, lowerCase)` | materials. Also matches parts of a name, so `oak` finds `OAK_LOG` and `DARK_OAK_LOG`. |
 | `completeBoolean(value)` | `true` and `false`. |
 | `completeWorlds(value)` | world names. Spaces become `:`. |
-| `completePlayers(value)` | online players and players seen in the last 30 days. |
+| `completePlayers(value)` | online players and the 1000 players seen most recently within the last 30 days. |
 | `completeOnlinePlayers(value)` | online players. |
 | `completeInt(value, min, max)`, `completeDouble(value, min, max)` | the range, like `1 » 10`. Throws an error when the input is no number or out of range. |
 | `completeMinInt`, `completeMinDouble`, `completeMaxInt`, `completeMaxDouble` | the limit. Throws an error when the input is no number or past the limit. |

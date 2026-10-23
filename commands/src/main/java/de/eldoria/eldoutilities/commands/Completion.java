@@ -232,7 +232,8 @@ public final class Completion {
             PLAYER_NAMES.addAll(Arrays.stream(Bukkit.getOfflinePlayers())
                     .filter(p -> Instant.ofEpochMilli(p.getLastPlayed())
                             .isAfter(Instant.now().minus(30, ChronoUnit.DAYS)))
-                    .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed))
+                    .sorted(Comparator.comparingLong(OfflinePlayer::getLastPlayed)
+                            .reversed())
                     .limit(OFFLINE_PLAYER_CACHE_SIZE)
                     .map(OfflinePlayer::getName)
                     .collect(Collectors.toSet()));
