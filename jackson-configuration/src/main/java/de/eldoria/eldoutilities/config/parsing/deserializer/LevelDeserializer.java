@@ -18,7 +18,7 @@ public class LevelDeserializer extends ValueDeserializer<Level> {
             case "OFF" -> Level.OFF;
             case "SEVERE" -> Level.SEVERE;
             case "WARNING" -> Level.WARNING;
-            case "DEBUG", "TRUE" -> Level.CONFIG;
+            case "CONFIG", "DEBUG", "TRUE" -> Level.CONFIG;
             case "FINE" -> Level.FINE;
             case "FINER" -> Level.FINER;
             case "FINEST" -> Level.FINEST;
