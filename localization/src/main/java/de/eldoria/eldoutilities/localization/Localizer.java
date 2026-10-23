@@ -46,10 +46,10 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  * <p>
  * Easy to use and fully automatic setup and updating of locales.
  * <p>
- * Requires to have at least one default locale and one fallback locale in the resources. Use the {@link #create(Plugin, String...)} constructor for initial setup. This will create missing files
- * and updates existing files.
+ * Requires to have at least one default locale and one fallback locale in the resources. Use
+ * {@link #builder(Plugin, String)} for the setup. This will create missing files and updates existing files.
  * <p>
- * You can change the currently used locale every time via {@link #setLocale(String)}.
+ * You can change the currently used locale every time via {@link #setDefaultLocale(String)}.
  * <p>
  * The localizer also allows to use locales which are not included in the resources folder: every locale file in the
  * locales directory is loaded, and receives the keys it lacks from the default locale.
@@ -240,7 +240,7 @@ public class Localizer implements ILocalizer {
      * Change the locale to the language. If the locale is not present the fallback locale will be used.
      *
      * @param language language to be used
-     * @deprecated Use
+     * @deprecated Use {@link #setDefaultLocale(String)}
      */
     @Override
     @Deprecated(forRemoval = true)
