@@ -1,5 +1,6 @@
 plugins {
     id("eldo-util.java-conventions")
+    id("eldo-util.publishing-conventions")
 }
 
 description = "Utility library for Paper plugins."
