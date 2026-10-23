@@ -184,6 +184,33 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void reloadReadsEditedAndNewFiles() throws IOException {
+        var localizer = Localizer.builder(plugin, "en_US").build();
+        var english = messages.resolve("messages_en_US.properties");
+        Files.writeString(english, Files.readString(english).replace("greeting.hello=Hello", "greeting.hello=Hi"));
+        Files.writeString(messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\n");
+
+        localizer.reload();
+
+        assertEquals("Hi", localizer.getValue("greeting.hello"));
+        assertEquals("Bonjour", localizer.getValue("greeting.hello", "fr_FR"));
+        assertEquals("Bye", localizer.getValue("farewell.bye", "fr_FR"));
+    }
+
+    @Test
+    void reloadFallsBackWhenTheDefaultLanguageIsGone() throws IOException {
+        var french = messages.resolve("messages_fr_FR.properties");
+        Files.writeString(french, "greeting.hello=Bonjour\n");
+        var localizer = Localizer.builder(plugin, "en_US").build();
+        localizer.setDefaultLocale("fr_FR");
+        Files.delete(french);
+
+        localizer.reload();
+
+        assertEquals("Hello", localizer.getValue("greeting.hello"));
+    }
+
+    @Test
     void buildLocalizedReplacesLocaleCodes() {
         var localizer = Localizer.builder(plugin, "en_US").build();
 

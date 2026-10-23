@@ -23,7 +23,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -78,7 +77,8 @@ public class Localizer implements ILocalizer {
     private final Set<String> includedLocales;
     private final Pattern localePattern = Pattern.compile("_(([a-zA-Z]{2})(_[a-zA-Z]{2})?)\\.properties");
     private final Map<String, String> runtimeLocaleCodes;
-    private final Map<String, ResourceBundle> languages = new HashMap<>();
+    private final String fallbackLocale;
+    private volatile Map<String, ResourceBundle> languages;
     private final Function<Player, String> userLocale;
     private final List<ILocalizer> children = new ArrayList<>();
     private final Set<String> reportedMissing = ConcurrentHashMap.newKeySet();
@@ -115,21 +115,47 @@ public class Localizer implements ILocalizer {
         this.localesPrefix = localesPrefix;
         this.userLocale = userLocale != null ? userLocale : player -> defaultLanguage;
         this.includedLocales = includedLocales;
+        this.fallbackLocale = fallbackLocale;
         defaultLanguage = fallbackLocale;
         this.runtimeLocaleCodes = runtimeLocaleCodes;
         createDefaults();
         bootstrap();
-        loadLanguage(fallbackLocale);
-        if (!languages.containsKey(fallbackLocale)) {
+        languages = readLanguages();
+        LOCALIZER.put(plugin.getClass(), this);
+    }
+
+    /**
+     * Reads the locale files again, so texts that server owners edited are used without a restart.
+     * <p>
+     * Missing files of included locales are copied again, missing keys are appended like on startup, and locale files
+     * that were added to the folder are loaded. If the default language has no file anymore, the fallback locale
+     * becomes the default language again.
+     */
+    @Override
+    public void reload() {
+        createOrUpdateLocaleFiles();
+        languages = readLanguages();
+        reportedMissing.clear();
+        if (!languages.containsKey(defaultLanguage)) {
+            plugin.getLogger()
+                    .warning("Language %s is gone. Using %s instead.".formatted(defaultLanguage, fallbackLocale));
+            defaultLanguage = fallbackLocale;
+        }
+    }
+
+    private Map<String, ResourceBundle> readLanguages() {
+        Map<String, ResourceBundle> loaded = new ConcurrentHashMap<>();
+        readLanguage(loaded, fallbackLocale);
+        if (!loaded.containsKey(fallbackLocale)) {
             plugin.getLogger().log(Level.SEVERE, "Could not load default locale");
         }
-        LOCALIZER.put(plugin.getClass(), this);
         for (String locale : includedLocales) {
-            loadLanguage(locale);
+            readLanguage(loaded, locale);
         }
         for (String locale : localesInDirectory()) {
-            if (!languages.containsKey(locale)) loadLanguage(locale);
+            if (!loaded.containsKey(locale)) readLanguage(loaded, locale);
         }
+        return loaded;
     }
 
     /**
@@ -395,8 +421,12 @@ public class Localizer implements ILocalizer {
     }
 
     private void loadLanguage(String language) {
+        readLanguage(languages, language);
+    }
+
+    private void readLanguage(Map<String, ResourceBundle> target, String language) {
         try {
-            languages.put(language, getBundle(getLocaleFile(language)));
+            target.put(language, getBundle(getLocaleFile(language)));
         } catch (IOException e) {
             plugin.getLogger().log(Level.WARNING, "Failed to load language %s.".formatted(language), e);
         }
