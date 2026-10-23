@@ -42,7 +42,8 @@ public class MessageSenderBuilder {
     }
 
     /**
-     * The localizer used to serialize messages via the {@code <i8ln>} tag
+     * The localizer for locale codes in messages and in the {@code <i18n>} tag. Without it, the localizer registered
+     * for the plugin is used.
      *
      * @param localizer localizer instance
      * @return builder instance
@@ -117,13 +118,11 @@ public class MessageSenderBuilder {
                 defaultTagResolver.resolver(StandardTags.defaults()).build();
         var messageSender = new PaperMessageSender(
                 plugin,
-                miniMessage
-                        .tags(defaultResolver)
-                        .preProcessor(in -> preProcessor.apply(localizer.localize(in)))
-                        .build(),
+                miniMessage.tags(defaultResolver).preProcessor(preProcessor).build(),
                 TagResolver.resolver(defaultResolver, messageTagResolver.build()),
                 TagResolver.resolver(defaultResolver, errorTagResolver.build()),
-                prefix);
+                prefix,
+                localizer);
         MessageSender.register(messageSender);
         return messageSender;
     }

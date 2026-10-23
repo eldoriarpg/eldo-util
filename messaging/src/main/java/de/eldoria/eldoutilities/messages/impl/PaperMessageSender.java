@@ -6,6 +6,7 @@
 
 package de.eldoria.eldoutilities.messages.impl;
 
+import de.eldoria.eldoutilities.localization.ILocalizer;
 import de.eldoria.eldoutilities.messages.MessageSender;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
@@ -16,6 +17,7 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -27,6 +29,26 @@ public final class PaperMessageSender extends MessageSender {
             TagResolver errorTagResolver,
             Component prefix) {
         super(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix);
+    }
+
+    /**
+     * Creates a Paper message sender that localizes with the given localizer.
+     *
+     * @param plugin             owning plugin
+     * @param miniMessage        MiniMessage instance used to parse messages
+     * @param messageTagResolver tags of normal messages
+     * @param errorTagResolver   tags of error messages
+     * @param prefix             prefix put in front of every message
+     * @param localizer          localizer for locale codes, or null to use the localizer registered for the plugin
+     */
+    public PaperMessageSender(
+            Plugin plugin,
+            MiniMessage miniMessage,
+            TagResolver messageTagResolver,
+            TagResolver errorTagResolver,
+            Component prefix,
+            @Nullable ILocalizer localizer) {
+        super(plugin, miniMessage, messageTagResolver, errorTagResolver, prefix, localizer);
     }
 
     public void sendMessage(CommandSender sender, Component component) {

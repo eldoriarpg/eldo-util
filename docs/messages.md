@@ -50,7 +50,7 @@ before the first command runs.
 | `debug(Consumer<String>)` | Receives MiniMessage's parser debug output. |
 | `preProcessor(UnaryOperator<String>)` | Changes the raw text before it is parsed. |
 | `postProcessor(UnaryOperator<Component>)` | Changes the component after it is parsed. |
-| `localizer(ILocalizer)` | A localizer for the pre processing step. You do not need it: messages are always localized with the localizer registered for your plugin. |
+| `localizer(ILocalizer)` | The localizer for locale codes and `<i18n>` tags. Without it, the localizer registered for your plugin is used. |
 
 The color of a message is applied through the `<default>` tag. Every message starts with it, and you can use it to
 switch back to the message color after another color: `<gold><amount><default> items`. The prefix is also
