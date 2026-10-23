@@ -81,7 +81,7 @@ In failsave mode, eldo-util registers a fallback command:
 - or, for a Paper plugin that declares no commands, for your plugin name in lower case.
 
 The fallback command tells the user that the plugin failed to load. `/<command> debug` creates a
-[debug report](./debugging.md) that the user can send to you. The debug part needs the permission
+[debug report](./debugging.md) that the user can send to you. The fallback command needs the permission
 `<plugin>.debug` (your plugin name in lower case, like `myplugin.debug`) or `eldoutilities.debug`.
 
 When `onPluginLoad` fails, `onPluginEnable` is not called. The failsave mode starts when the server enables the plugin,
