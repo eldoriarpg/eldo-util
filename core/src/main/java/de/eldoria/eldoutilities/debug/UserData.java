@@ -13,7 +13,6 @@ import org.bukkit.plugin.Plugin;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -43,14 +42,14 @@ public final class UserData {
                         .filter(r -> !r.isBlank())
                         .map(e -> e.split("=", 2))
                         .filter(e -> e.length == 2)
-                        .collect(Collectors.toMap(e -> e[0], e -> e[1]));
+                        .collect(Collectors.toMap(e -> e[0], e -> e[1], (first, last) -> last, LinkedHashMap::new));
             }
-            Path pluginFile = Plugins.getPluginFile(plugin).get().toPath();
-            String md5 = Hashing.md5().hashBytes(Files.readAllBytes(pluginFile)).toString();
-            String sha256 =
-                    Hashing.sha256().hashBytes(Files.readAllBytes(pluginFile)).toString();
-            buildProperties.put("md5", md5);
-            buildProperties.put("sha256", sha256);
+            var pluginFile = Plugins.getPluginFile(plugin);
+            if (pluginFile.isPresent()) {
+                byte[] jar = Files.readAllBytes(pluginFile.get().toPath());
+                buildProperties.put("md5", Hashing.md5().hashBytes(jar).toString());
+                buildProperties.put("sha256", Hashing.sha256().hashBytes(jar).toString());
+            }
         } catch (IOException e) {
 
         }
