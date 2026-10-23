@@ -11,6 +11,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,11 @@ class UpdateDataBuilderTest {
     @Test
     void playersAreNotifiedByDefault() {
         assertTrue(new Builder(plugin).notifyUpdate);
+    }
+
+    @Test
+    void theNotifyPermissionIsNamedAfterThePlugin() {
+        assertEquals("myplugin.updates", new Builder(plugin).notifyPermission);
     }
 
     /**

@@ -10,11 +10,12 @@ import de.eldoria.eldoutilities.messages.MessageSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
-    protected String notifyPermission = "eldoutilities.admin";
+    protected String notifyPermission;
     protected boolean notifyUpdate = true;
     protected boolean autoUpdate;
     protected String updateUrl;
@@ -26,8 +27,16 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
     public UpdateDataBuilder(Plugin plugin) {
         this.plugin = plugin;
         updateUrl = plugin.getDescription().getWebsite();
+        notifyPermission = plugin.getName().toLowerCase(Locale.ROOT) + ".updates";
     }
 
+    /**
+     * The permission that players need to get the update notice and to use the update command. Operators always may.
+     * Defaults to {@code <plugin>.updates}, the plugin name in lower case, like {@code pickmeup.updates}.
+     *
+     * @param notifyPermission permission to declare in the plugin descriptor
+     * @return builder instance
+     */
     public T notifyPermission(String notifyPermission) {
         this.notifyPermission = notifyPermission;
         return (T) this;

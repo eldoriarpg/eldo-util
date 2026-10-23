@@ -31,9 +31,7 @@ publishData {
 Build the update data with `LynaUpdateData.builder(plugin)` and create the updater with `Updater.lyna(data)`:
 
 ```java
-LynaUpdateData data = LynaUpdateData.builder(this)
-        .notifyPermission("myplugin.updates")
-        .build();
+LynaUpdateData data = LynaUpdateData.builder(this).build();
 
 Updater<LynaUpdateResponse, LynaUpdateData> updater = Updater.lyna(data);
 updater.start();
@@ -41,6 +39,9 @@ updater.start();
 
 `builder(plugin)` throws an `IllegalStateException` when `build.data` has no `lynaProduct` or the value is not a
 number. `builder(plugin, productId)` takes the id directly instead.
+
+Declare the notify permission, by default `<plugin>.updates` with your plugin name in lower case, in your plugin
+descriptor with `default: op`.
 
 `start()` checks right away and then every 6 hours. Checks and downloads run on a thread of the updater, not on the
 server thread.
@@ -60,7 +61,7 @@ files when it is created.
 
 | Method | Default | What it does |
 |---|---|---|
-| `notifyPermission(String)` | `eldoutilities.admin` | Players with this permission (and operators) get the notice on join. It also allows the update command. |
+| `notifyPermission(String)` | `<plugin>.updates`, your plugin name in lower case | Players with this permission (and operators) get the notice on join. It also allows the update command. |
 | `notifyUpdate(boolean)` | `true` | Send the notice to players on join. The console always gets it. |
 | `autoUpdate(boolean)` | `false` | Download new stable versions on their own. See [automatic updates](#automatic-updates). |
 | `askForAutoUpdate(boolean)` | `true` | Offer admins to switch automatic updates on from chat. |
