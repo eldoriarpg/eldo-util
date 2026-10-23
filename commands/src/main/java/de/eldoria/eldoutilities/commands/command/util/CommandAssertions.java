@@ -142,9 +142,9 @@ public final class CommandAssertions {
      */
     public static void sender(CommandSender sender, CommandMeta meta) throws CommandException {
         for (var clazz : meta.allowedSender()) {
-            if (sender.getClass().isInstance(clazz)) return;
+            if (clazz.isInstance(sender)) return;
         }
-        throw CommandException.message("Invalid sender");
+        throw CommandException.message("error.invalidSender");
     }
 
     /**

@@ -29,6 +29,14 @@ class CommandAssertionsTest {
     }
 
     @Test
+    void senderAcceptsServerImplementations() {
+        var meta = CommandMeta.builder("test").allowConsole().build();
+
+        assertDoesNotThrow(() -> CommandAssertions.sender(console, meta));
+        assertThrows(CommandException.class, () -> CommandAssertions.sender(player, meta));
+    }
+
+    @Test
     void allowedSenderAcceptsEveryoneWithoutRestriction() {
         var meta = CommandMeta.builder("test").build();
 
