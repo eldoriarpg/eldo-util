@@ -60,7 +60,13 @@ tasks {
 
 spotless {
     java {
+        target("src/**/*.java")
         licenseHeaderFile(rootProject.file("HEADER.txt"))
-        target("**/*.java")
+        palantirJavaFormat(libs.findVersion("palantir").get().requiredVersion).formatJavadoc(false)
+        removeUnusedImports()
+        importOrder("", "java", "javax", "\\#")
+        trimTrailingWhitespace()
+        endWithNewline()
+        encoding("UTF-8")
     }
 }
