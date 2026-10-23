@@ -289,9 +289,10 @@ while typing.
 eldo-util ships three ready commands:
 
 - `DefaultAbout(plugin)` is an `about` subcommand. It sends `commands.about` with the plugin name, authors, version,
-  website and the Eldoria Discord. `DefaultAbout(plugin, discord, localeKey, replacements...)` lets you change the
-  Discord link, the locale key and add your own replacements. The replacements are `plugin_name`, `authors`,
-  `version`, `website` and `discord`.
+  website and the Eldoria Discord. The built-in text labels the lines `Version:`, `Website:` and `Support:`; locale
+  files that already hold `commands.about` keep their own text. `DefaultAbout(plugin, discord, localeKey,
+  replacements...)` lets you change the Discord link, the locale key and add your own replacements. The replacements
+  are `plugin_name`, `authors`, `version`, `website` and `discord`.
 - `DefaultDebug(plugin, permission)` is a `debug` subcommand. It creates a [debug report](./debugging.md). It needs
   your permission or `eldoutilities.debug`. `DefaultDebug(plugin, permission, settings)` takes `DebugSettings`.
 - `FailsaveCommand` is the command of the [failsave mode](./plugin.md#failsave-mode). You do not create it yourself.

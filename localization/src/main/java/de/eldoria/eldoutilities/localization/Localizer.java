@@ -249,7 +249,7 @@ public class Localizer implements ILocalizer {
         runtimeLocaleCodes.putIfAbsent("error.tooLarge", "The number is too Large. Max: <gold><max>");
         runtimeLocaleCodes.putIfAbsent(
                 "commands.about",
-                "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
+                "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nWebsite: <bold><website></bold>\nSupport: <bold><discord></bold>");
         runtimeLocaleCodes.putIfAbsent("dialog.accept", "accept");
         runtimeLocaleCodes.putIfAbsent("dialog.deny", "deny");
         runtimeLocaleCodes.putIfAbsent("dialog.add", "add");
