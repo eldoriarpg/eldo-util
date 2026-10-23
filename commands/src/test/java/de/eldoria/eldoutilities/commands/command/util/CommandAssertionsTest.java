@@ -8,11 +8,14 @@ package de.eldoria.eldoutilities.commands.command.util;
 
 import de.eldoria.eldoutilities.commands.command.CommandMeta;
 import de.eldoria.eldoutilities.commands.exceptions.CommandException;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -41,5 +44,19 @@ class CommandAssertionsTest {
         var meta = CommandMeta.builder("test").build();
 
         assertDoesNotThrow(() -> CommandAssertions.allowedSender(meta, console));
+    }
+
+    enum Shape {
+        ROUND,
+        SQUARE
+    }
+
+    @Test
+    void enumValueListsTheValidValues() {
+        var exception =
+                assertThrows(CommandException.class, () -> CommandAssertions.enumValue("triangle", Shape.class));
+
+        var text = MiniMessage.miniMessage().deserialize("<values>", exception.replacements());
+        assertEquals("round, square", PlainTextComponentSerializer.plainText().serialize(text));
     }
 }

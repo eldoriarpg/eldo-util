@@ -251,7 +251,7 @@ public final class CommandAssertions {
 
     /**
      * Checks if a enum value is invalid. Will send a message based on {@code error.invalidEnumValue} locale key which
-     * should provide a placeholder for {@code VALUE} which will be replaced with an array of possible inputs
+     * should provide a placeholder for {@code VALUES} which will be replaced with the possible inputs, separated by commas
      *
      * @param value value of enum
      * @param clazz clazz of enum
@@ -261,7 +261,7 @@ public final class CommandAssertions {
         isTrue(
                 EnumUtil.parse(value, clazz).isPresent(),
                 "error.invalidEnumValue",
-                Replacement.create("VALUES", Replacement.create("VALUES", EnumUtil.enumValues(clazz))));
+                Replacement.create("VALUES", EnumUtil.enumValues(clazz)));
     }
 
     public static void invalidNumber() throws CommandException {
