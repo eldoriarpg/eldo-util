@@ -39,7 +39,7 @@ public class AdvancedCommandAdapter extends AdvancedCommand implements TabExecut
             @NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         try {
             executeCommand(sender, label, args);
-        } catch (CommandException e) {
+        } catch (Throwable e) {
             handleCommandError(sender, e);
         }
         return true;

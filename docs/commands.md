@@ -223,8 +223,9 @@ throw CommandException.message("error.notOwner", Replacement.create("owner", own
 - `CommandException.silent()` stops the command and sends nothing.
 
 The error is sent through the [message sender](./messages.md) of your plugin with `sendError`. In tab completion,
-the error text is shown as the only suggestion. eldo-util only catches `CommandException`. Other exceptions reach the
-server, which reports them as usual.
+the error text is shown as the only suggestion. Any other exception thrown while a command runs is logged with level
+`SEVERE` in your plugin log, and the sender gets no message. In tab completion other exceptions reach the server,
+which reports them as usual.
 
 For player input in replacements, use `Replacement.unparsed`. See [Messages](./messages.md).
 
