@@ -99,6 +99,7 @@ public class Localizer implements ILocalizer {
      * @param localesPath     path of the locales directory
      * @param localesPrefix   prefix of the locale files
      * @param fallbackLocale  fallbackLocale
+     * @param userLocale      the language of a player, or null to give players the default language
      * @param includedLocales internal provided locales
      */
     Localizer(
@@ -112,7 +113,7 @@ public class Localizer implements ILocalizer {
         this.plugin = plugin;
         this.localesPath = localesPath;
         this.localesPrefix = localesPrefix;
-        this.userLocale = userLocale;
+        this.userLocale = userLocale != null ? userLocale : player -> defaultLanguage;
         this.includedLocales = includedLocales;
         defaultLanguage = fallbackLocale;
         this.runtimeLocaleCodes = runtimeLocaleCodes;

@@ -29,7 +29,6 @@ public class LocalizerBuilder {
         this.plugin = plugin;
         this.fallbackLocale = fallbackLocale;
         includedLocales.add(fallbackLocale);
-        userLocale = p -> fallbackLocale;
     }
 
     public LocalizerBuilder setLocalesPath(String localesPath) {
@@ -42,6 +41,15 @@ public class LocalizerBuilder {
         return this;
     }
 
+    /**
+     * Sets which language a player gets.
+     * <p>
+     * Without it, players get the default language of the localizer, which {@link Localizer#setDefaultLocale(String)}
+     * changes.
+     *
+     * @param userLocale returns the language of a player
+     * @return this builder
+     */
     public LocalizerBuilder setUserLocale(Function<Player, String> userLocale) {
         this.userLocale = userLocale;
         return this;

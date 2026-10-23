@@ -93,6 +93,19 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void aPlayerWithoutOwnLocaleGetsTheDefaultLanguage() throws IOException {
+        Files.writeString(
+                messages.resolve("messages_fr_FR.properties"), "greeting.hello=Bonjour\nfarewell.bye=Au revoir\n");
+        var player = mock(Player.class);
+
+        var localizer = Localizer.builder(plugin, "en_US").build();
+
+        assertEquals("Hello", localizer.getValue("greeting.hello", player));
+        localizer.setDefaultLocale("fr_FR");
+        assertEquals("Bonjour", localizer.getValue("greeting.hello", player));
+    }
+
+    @Test
     void aRenamedKeyIsFoundUnderItsOldName() throws IOException {
         Files.writeString(messages.resolve("messages_en_US.properties"), BUNDLED + "error.unkownPlayer=Who is that?\n");
 
