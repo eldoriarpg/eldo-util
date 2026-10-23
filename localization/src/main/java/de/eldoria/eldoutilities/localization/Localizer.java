@@ -289,7 +289,8 @@ public class Localizer implements ILocalizer {
 
         if (result == null && LOCALIZATION_CODE.matcher(key).matches()) {
             if (reportedMissing.add(key)) {
-                plugin.getLogger().warning("Key " + key + " is missing in fallback file.");
+                plugin.getLogger()
+                        .warning("Key " + key + " has no text in any locale file, child localizer or built-in text.");
                 plugin.getLogger().log(Level.FINE, "Missing key " + key + " requested from", new RuntimeException());
             }
             result = key;

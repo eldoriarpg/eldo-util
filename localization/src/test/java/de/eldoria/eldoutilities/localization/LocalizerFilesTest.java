@@ -120,6 +120,9 @@ class LocalizerFilesTest {
         assertEquals("does.not.exist", localizer.getMessage("does.not.exist"));
 
         assertEquals(1, warnings.size());
+        assertEquals(
+                "Key does.not.exist has no text in any locale file, child localizer or built-in text.",
+                warnings.getFirst().getMessage());
     }
 
     @Test
