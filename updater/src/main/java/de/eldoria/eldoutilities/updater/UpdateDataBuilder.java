@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V extends UpdateData<?>> {
     protected final Plugin plugin;
     protected String notifyPermission = "eldoutilities.admin";
-    protected boolean notifyUpdate;
+    protected boolean notifyUpdate = true;
     protected boolean autoUpdate;
     protected String updateUrl;
     protected String updateMessage = UpdaterMessages.NOTICE;
@@ -33,6 +33,13 @@ public abstract class UpdateDataBuilder<T extends UpdateDataBuilder<?, ?>, V ext
         return (T) this;
     }
 
+    /**
+     * Whether players with the notify permission get the update notice when they join. The console always gets it.
+     * Defaults to true.
+     *
+     * @param notifyUpdate false to tell only the console
+     * @return builder instance
+     */
     public T notifyUpdate(boolean notifyUpdate) {
         this.notifyUpdate = notifyUpdate;
         return (T) this;
