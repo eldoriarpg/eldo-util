@@ -12,13 +12,14 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 
 /**
- * Helper for the Metrics class of bstats. Just because they removed this shitty isEnabled() function.
+ * Helper for bStats, whose Metrics class no longer tells whether metrics are enabled.
  */
 public class EldoMetrics {
 
     /**
-     * Check if metrics are enabled
+     * Checks whether the server owner left bStats enabled in {@code plugins/bStats/config.yml}.
      *
+     * @param plugin any plugin of the server, used to find the plugins folder
      * @return true if enabled
      */
     public static boolean isEnabled(Plugin plugin) {
