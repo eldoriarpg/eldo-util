@@ -80,18 +80,58 @@ public final class Replacement {
         return Placeholder.unparsed(sanitizeKey(key), String.valueOf(value));
     }
 
+    /**
+     * Creates a replacement that shows a number with two decimals.
+     * <p>
+     * The number is formatted with the default locale of the server, so a server running in German shows {@code 1,50}
+     * where an English one shows {@code 1.50}.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
     public static TagResolver create(String key, Double value) {
         return create(key, String.format("%.2f", value));
     }
 
+    /**
+     * Creates a replacement that shows a number with two decimals.
+     * <p>
+     * The number is formatted with the default locale of the server, so a server running in German shows {@code 1,50}
+     * where an English one shows {@code 1.50}.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
     public static TagResolver create(String key, Float value) {
         return create(key, String.format("%.2f", value));
     }
 
+    /**
+     * Creates a replacement that shows a number with two decimals.
+     * <p>
+     * The number is formatted with the default locale of the server, so a server running in German shows {@code 1,50}
+     * where an English one shows {@code 1.50}.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
     public static TagResolver number(String key, Double value) {
         return create(key, value);
     }
 
+    /**
+     * Creates a replacement that shows a number with two decimals.
+     * <p>
+     * The number is formatted with the default locale of the server, so a server running in German shows {@code 1,50}
+     * where an English one shows {@code 1.50}.
+     *
+     * @param key   key of replacement
+     * @param value value for replacement
+     * @return replacement with registered replacement
+     */
     public static TagResolver number(String key, Float value) {
         return create(key, value);
     }
