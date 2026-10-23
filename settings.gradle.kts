@@ -1,16 +1,15 @@
-rootProject.name = "eldo-util"
-
 pluginManagement {
     repositories {
-        maven("https://eldonexus.de/repository/maven-proxies/")
-        maven("https://eldonexus.de/repository/maven-public/")
         gradlePluginPortal()
+        maven("https://eldonexus.de/repository/maven-public/")
     }
 }
 
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
+
+rootProject.name = "eldo-util"
 
 include("core")
 include("messaging")

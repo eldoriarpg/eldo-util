@@ -36,16 +36,15 @@ repositories {
 val libs = versionCatalogs.named("libs")
 
 dependencies {
-    compileOnly("org.jetbrains", "annotations", "26.1.0")
+    compileOnly(libs.findLibrary("annotations").get())
     compileOnly(libs.findLibrary("paper").get())
 
-    testImplementation("org.jetbrains", "annotations", "26.1.0")
+    testImplementation(libs.findLibrary("annotations").get())
     testImplementation(libs.findLibrary("paper").get())
-    testImplementation("org.junit.jupiter", "junit-jupiter-api", "6.1.3")
-    testImplementation("org.junit.jupiter", "junit-jupiter-params", "6.1.3")
-    testRuntimeOnly("org.junit.jupiter", "junit-jupiter-engine", "6.1.3")
-    testRuntimeOnly("org.junit.platform", "junit-platform-launcher", "6.1.3")
-    testImplementation("org.mockito", "mockito-core", "5.24.0")
+    testImplementation(platform(libs.findLibrary("junit-bom").get()))
+    testImplementation(libs.findLibrary("junit-jupiter").get())
+    testImplementation(libs.findLibrary("mockito-core").get())
+    testRuntimeOnly(libs.findLibrary("junit-launcher").get())
 }
 
 mavenPublishing {
