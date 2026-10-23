@@ -84,7 +84,9 @@ The fallback command tells the user that the plugin failed to load. `/<command> 
 [debug report](./debugging.md) that the user can send to you. The debug part needs the permission
 `<plugin>.debug` (your plugin name in lower case, like `myplugin.debug`) or `eldoutilities.debug`.
 
-When `onPluginEnable` fails, the rest of the enable is skipped. The post start is not scheduled.
+When `onPluginLoad` fails, `onPluginEnable` is not called. The failsave mode starts when the server enables the plugin,
+because a Paper plugin can only register commands then. When `onPluginEnable` fails, the rest of the enable is
+skipped. The post start is not scheduled.
 
 ## Logging
 
