@@ -90,7 +90,8 @@ files like your own keys:
 - `commands.about`: the text of the about command,
 - `dialog.*`: button texts like `dialog.accept`.
 
-To change one of them, put it into your bundled locale files. Server owners can edit it in the files on disk.
+To change one of them, put it into your bundled locale files or pass it to `addLocaleCodes` on the builder. Server
+owners can edit it in the files on disk.
 
 ## Which language is used
 

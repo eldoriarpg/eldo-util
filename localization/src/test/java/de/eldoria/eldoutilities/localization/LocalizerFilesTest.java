@@ -103,6 +103,15 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void aTextFromTheBuilderReplacesTheBuiltInText() {
+        var localizer = Localizer.builder(plugin, "en_US")
+                .addLocaleCodes("error.invalidCommand", "No such command")
+                .build();
+
+        assertEquals("No such command", localizer.getValue("error.invalidCommand"));
+    }
+
+    @Test
     void aMissingKeyIsReportedOnce() {
         var localizer = Localizer.builder(plugin, "en_US").build();
         warnings.clear();

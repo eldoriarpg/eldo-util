@@ -191,42 +191,44 @@ public class Localizer implements ILocalizer {
     }
 
     private void createDefaults() {
-        runtimeLocaleCodes.put("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
-        runtimeLocaleCodes.put("error.invalidCommand", "Invalid Command");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent("error.invalidArguments", "Invalid arguments.\nSyntax: <gold><syntax><default>");
+        runtimeLocaleCodes.putIfAbsent("error.invalidCommand", "Invalid Command");
+        runtimeLocaleCodes.putIfAbsent(
                 "error.endOfRoute", "Please choose a subcommand. Available commands are:\n<gold><commands><default>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.permission", "You do not have the permission to do this. (<gold><permission><default>)");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidRange",
                 "This value is out of range. Min: <gold><min><default> Max: <gold><max><default>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidEnumValue", "Invalid input value. Valid inputs are <gold><values><default>.");
-        runtimeLocaleCodes.put("error.invalidMaterial", "Invalid material.");
-        runtimeLocaleCodes.put("error.invalidNumber", "Invalid number");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent("error.invalidMaterial", "Invalid material.");
+        runtimeLocaleCodes.putIfAbsent("error.invalidNumber", "Invalid number");
+        runtimeLocaleCodes.putIfAbsent(
                 "error.invalidBoolean", "Invalid value, <gold><true><default> or <gold><false><default>");
-        runtimeLocaleCodes.put("error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
-        runtimeLocaleCodes.put("error.notOnline", "Invalid player. This player is not online.");
-        runtimeLocaleCodes.put("error.unknownPlayer", "Invalid player. This player has never played on this server.");
-        runtimeLocaleCodes.put("error.unknownWorld", "Invalid world.");
-        runtimeLocaleCodes.put("error.notAsConsole", "This command can not be executed from console.");
-        runtimeLocaleCodes.put("error.onlyPlayer", "This command can only be used by players.");
-        runtimeLocaleCodes.put("error.onlyConsole", "This command can only be used by console.");
-        runtimeLocaleCodes.put("error.invalidSender", "This command can not be executed from here.");
-        runtimeLocaleCodes.put("error.missingArgument", "Argument <INDEX> is accessed but not present.");
-        runtimeLocaleCodes.put("error.notAsPlayer", "This command can not be executed as player");
-        runtimeLocaleCodes.put("error.tooSmall", "The number is too small. Min: <gold><min>");
-        runtimeLocaleCodes.put("error.tooLarge", "The number is too Large. Max: <gold><max>");
-        runtimeLocaleCodes.put(
+        runtimeLocaleCodes.putIfAbsent(
+                "error.invalidLength", "This input is too long. Max: <gold><max><default> chars.");
+        runtimeLocaleCodes.putIfAbsent("error.notOnline", "Invalid player. This player is not online.");
+        runtimeLocaleCodes.putIfAbsent(
+                "error.unknownPlayer", "Invalid player. This player has never played on this server.");
+        runtimeLocaleCodes.putIfAbsent("error.unknownWorld", "Invalid world.");
+        runtimeLocaleCodes.putIfAbsent("error.notAsConsole", "This command can not be executed from console.");
+        runtimeLocaleCodes.putIfAbsent("error.onlyPlayer", "This command can only be used by players.");
+        runtimeLocaleCodes.putIfAbsent("error.onlyConsole", "This command can only be used by console.");
+        runtimeLocaleCodes.putIfAbsent("error.invalidSender", "This command can not be executed from here.");
+        runtimeLocaleCodes.putIfAbsent("error.missingArgument", "Argument <INDEX> is accessed but not present.");
+        runtimeLocaleCodes.putIfAbsent("error.notAsPlayer", "This command can not be executed as player");
+        runtimeLocaleCodes.putIfAbsent("error.tooSmall", "The number is too small. Min: <gold><min>");
+        runtimeLocaleCodes.putIfAbsent("error.tooLarge", "The number is too Large. Max: <gold><max>");
+        runtimeLocaleCodes.putIfAbsent(
                 "commands.about",
                 "<bold><gold><plugin_name></bold><default> by <bold><authors></bold>\nVersion: <bold><version></bold>\nSpigot: <bold><website></bold>\nSupport: <bold><discord></bold>");
-        runtimeLocaleCodes.put("dialog.accept", "accept");
-        runtimeLocaleCodes.put("dialog.deny", "deny");
-        runtimeLocaleCodes.put("dialog.add", "add");
-        runtimeLocaleCodes.put("dialog.remove", "remove");
-        runtimeLocaleCodes.put("dialog.leftClickChange", "Left click to change");
-        runtimeLocaleCodes.put("dialog.rightClickRemove", "Right click to remove");
+        runtimeLocaleCodes.putIfAbsent("dialog.accept", "accept");
+        runtimeLocaleCodes.putIfAbsent("dialog.deny", "deny");
+        runtimeLocaleCodes.putIfAbsent("dialog.add", "add");
+        runtimeLocaleCodes.putIfAbsent("dialog.remove", "remove");
+        runtimeLocaleCodes.putIfAbsent("dialog.leftClickChange", "Left click to change");
+        runtimeLocaleCodes.putIfAbsent("dialog.rightClickRemove", "Right click to remove");
     }
 
     @Override
