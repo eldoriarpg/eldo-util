@@ -105,14 +105,8 @@ A command without an executor interface is a route. It needs subcommands, a defa
 | `withDefaultCommand(AdvancedCommand)` | the command that runs when no subcommand is given. |
 | `hidden()` | the command still works, but it is not suggested in tab completion. |
 | `ofParent(AdvancedCommand)` | sets the parent command. Subcommands added with `withSubCommand` get their parent set for you. |
-| `allowPlayer()`, `allowConsole()`, `allowCommandSender(...)` | limit which sender types may run an `ITabExecutor` command. |
+| `allowPlayer()`, `allowConsole()`, `allowCommandSender(...)` | limit which sender types may run an `ITabExecutor` command. A sender matches when it is an instance of one of the allowed types, otherwise it gets `error.invalidSender`. |
 | `build()` | creates the `CommandMeta`. |
-
-:::warning
-`allowPlayer()`, `allowConsole()` and `allowCommandSender(...)` compare the exact class of the sender. Real senders
-are server classes, so they do not match and the command answers with `error.invalidSender`. Use
-`IPlayerTabExecutor` or `IConsoleTabExecutor` to limit a command to players or the console.
-:::
 
 Arguments are shown in the usage text: required ones as `<name>`, optional ones as `[name]`. Before your
 `onCommand` runs, eldo-util checks that at least the required number of arguments is there. If not, the user gets
