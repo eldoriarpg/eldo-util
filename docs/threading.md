@@ -35,7 +35,7 @@ A queue that works through its objects on the server thread, a few per tick. You
 and handle each one in `execute(object)`. The task schedules itself when it gets work.
 
 - Each tick it handles objects until the queue is empty or 50 ms have passed. A smaller limit can be passed to the
-  constructor; a larger one is cut to 50 ms.
+  constructor; a larger one is cut to 50 ms, and a warning in the log says so.
 - Override `proceed(object)` to leave the next object in the queue until a later tick.
 - `tick()` runs once per tick before the queue is worked on.
 - After 200 idle ticks (or the number you pass) the task stops until new work arrives.

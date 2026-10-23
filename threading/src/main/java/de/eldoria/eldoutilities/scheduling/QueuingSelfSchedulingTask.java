@@ -14,17 +14,35 @@ import java.util.Queue;
 import java.util.function.Predicate;
 
 public abstract class QueuingSelfSchedulingTask<T> extends ReschedulingTask {
-    protected static final int DEFAULT_MAX_DURATION_TARGET = 50; // assuming 50ms = 1 tick
+    /**
+     * The length of one tick in milliseconds, which is also the longest time limit a run may have.
+     */
+    protected static final int DEFAULT_MAX_DURATION_TARGET = 50;
+
     protected static final int DEFAULT_MAX_IDLE_TICKS = 200;
     private final Queue<T> tasks;
     private final int maxIdleTicks;
     private final int maxDurationTarget;
     private int idleTicks;
 
+    /**
+     * Creates a task with its own limits.
+     * <p>
+     * A time limit above {@value #DEFAULT_MAX_DURATION_TARGET} ms, one tick, is lowered to it with a warning.
+     *
+     * @param plugin            plugin owning the task
+     * @param maxIdleTicks      ticks without work after which the task stops until new work arrives
+     * @param maxDurationTarget milliseconds a run may handle objects for
+     */
     public QueuingSelfSchedulingTask(Plugin plugin, int maxIdleTicks, int maxDurationTarget) {
         super(plugin);
         tasks = getQueueImplementation();
         this.maxIdleTicks = maxIdleTicks;
+        if (maxDurationTarget > DEFAULT_MAX_DURATION_TARGET) {
+            plugin.getLogger()
+                    .warning("%s: a time limit of %d ms is above one tick. Using %d ms."
+                            .formatted(getClass().getSimpleName(), maxDurationTarget, DEFAULT_MAX_DURATION_TARGET));
+        }
         this.maxDurationTarget = Math.max(0, Math.min(maxDurationTarget, DEFAULT_MAX_DURATION_TARGET));
     }
 
