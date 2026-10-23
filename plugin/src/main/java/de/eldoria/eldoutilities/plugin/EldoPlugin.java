@@ -29,7 +29,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
@@ -164,7 +163,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     /**
      * Schedules a repeating task.
      * <p>
-     * This task will be executed by the main server thread.
+     * This task will be executed by the main server thread. Not available on Folia, which has no main thread.
      *
      * @param task   Task to be executed
      * @param period Period in server ticks of the task
@@ -177,7 +176,7 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
     /**
      * Schedules a repeating task.
      * <p>
-     * This task will be executed by the main server thread.
+     * This task will be executed by the main server thread. Not available on Folia, which has no main thread.
      *
      * @param task   Task to be executed
      * @param delay  Delay in server ticks before executing first repeat
@@ -199,6 +198,9 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
 
     /**
      * Get the servers scheduler.
+     * <p>
+     * Not available on Folia. Use the region, entity or async schedulers of the server instead, which work on Paper as
+     * well.
      *
      * @return scheduler instance
      */
@@ -273,25 +275,29 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
             return;
         }
         getLogger().config("Scheduling post startup");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                var start = Instant.now();
-                try {
-                    onPostStart(reload);
-                    onPostStart();
-                } catch (Throwable e) {
-                    initFailsave("Plugin post start failed.", e);
-                    return;
-                }
-                var until = start.until(Instant.now(), ChronoUnit.MILLIS);
-                getLogger().info("Post startup done. Required " + until + " ms.");
-
-            }
-        }.runTaskLater(this, 1);
+        getServer().getGlobalRegionScheduler().runDelayed(this, task -> postStart(reload), 1);
         removeLock();
         var until = start.until(Instant.now(), ChronoUnit.MILLIS);
         getLogger().info("Enabled. Required " + until + " ms.");
+    }
+
+    /**
+     * Runs the post start hooks one tick after enable. It is scheduled on the global region scheduler, which exists on
+     * Paper and Folia alike, so plugins built on this class also load on Folia.
+     *
+     * @param reload whether the enable was caused by a server reload
+     */
+    private void postStart(boolean reload) {
+        var start = Instant.now();
+        try {
+            onPostStart(reload);
+            onPostStart();
+        } catch (Throwable e) {
+            initFailsave("Plugin post start failed.", e);
+            return;
+        }
+        var until = start.until(Instant.now(), ChronoUnit.MILLIS);
+        getLogger().info("Post startup done. Required " + until + " ms.");
     }
 
     private void initFailsave(String message, Throwable e) {
