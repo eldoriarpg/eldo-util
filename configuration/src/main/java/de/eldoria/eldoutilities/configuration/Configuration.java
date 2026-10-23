@@ -10,7 +10,9 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * Wrapper class for EldoConfig. Can be used as default and unconfigured config.
+ * @deprecated Use the jackson-configuration module. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class Configuration extends EldoConfig {
     public Configuration(Plugin plugin) {
         super(plugin);

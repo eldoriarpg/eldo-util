@@ -18,7 +18,9 @@ import java.util.function.BiFunction;
  * @param <A> first Input Type
  * @param <B> second Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class BiVersionFunction<A, B, R> extends BaseVersionFunction<BiFunction<A, B, R>> {
 
     public BiVersionFunction(Map<VersionRange, BiFunction<A, B, R>> functions) {

@@ -6,7 +6,6 @@
 
 package de.eldoria.eldoutilities.logging;
 
-import de.eldoria.eldoutilities.configuration.EldoConfig;
 import de.eldoria.eldoutilities.plugin.EldoPlugin;
 
 import java.util.logging.Level;

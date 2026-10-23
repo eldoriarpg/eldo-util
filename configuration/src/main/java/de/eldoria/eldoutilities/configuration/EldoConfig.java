@@ -36,7 +36,9 @@ import java.util.regex.Pattern;
  * This class can also be act as a main config which holds references to external configuration files.
  *
  * @since 1.1.0
+ * @deprecated Use the jackson-configuration module. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public abstract class EldoConfig {
     private static final Map<Plugin, EldoConfig> INSTANCE_CONFIG = new HashMap<>();
     protected final Plugin plugin;

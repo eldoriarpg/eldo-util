@@ -3,4 +3,4 @@ plugins {
     id("eldo-util.publishing-conventions")
 }
 
-description = "Legacy configuration files using the Bukkit configuration system"
+description = "Deprecated: configuration files on the Bukkit configuration system. Removed in 4.0."

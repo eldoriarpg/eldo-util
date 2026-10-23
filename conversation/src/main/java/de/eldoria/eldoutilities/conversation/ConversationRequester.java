@@ -25,7 +25,9 @@ import java.util.function.Predicate;
 
 /**
  * Class to handle Conversations.
+ * @deprecated This module is removed in 4.0 without a replacement.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class ConversationRequester implements ConversationAbandonedListener, ConversationCanceller {
 
     private final Plugin plugin;

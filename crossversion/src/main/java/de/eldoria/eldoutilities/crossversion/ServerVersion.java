@@ -13,7 +13,9 @@ import org.bukkit.Bukkit;
  * Enum to determine and work with multiple versions.
  *
  * @since 1.0.0
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public final class ServerVersion {
     public static final Version MC_UNKOWN = Version.of(0, 0, 0);
 

@@ -68,7 +68,9 @@ public abstract class Updater<V extends UpdateResponse, T extends UpdateData<V>>
      *
      * @param data spigot plugin data
      * @return Updater instance
+     * @deprecated Use {@link #lyna(LynaUpdateData)}. Removed in 4.0.
      */
+    @Deprecated(since = "3.6.0", forRemoval = true)
     public static Updater<DefaultUpdateResponse, SpigotUpdateData> spigot(SpigotUpdateData data) {
         return new SpigotUpdateChecker(data);
     }

@@ -23,7 +23,9 @@ import java.util.logging.Level;
 
 /**
  * A simple wrapper to manage File configurations.
+ * @deprecated Use the jackson-configuration module. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public final class ConfigFileWrapper {
     private final File file;
     @Nullable

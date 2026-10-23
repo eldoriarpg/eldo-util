@@ -23,7 +23,9 @@ import java.util.Map;
 
 /**
  * Wrapper for {@link Conversation}
+ * @deprecated This module is removed in 4.0 without a replacement.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class EldoConversation extends Conversation {
     private final ILocalizer localizer;
     private final MessageSender sender;

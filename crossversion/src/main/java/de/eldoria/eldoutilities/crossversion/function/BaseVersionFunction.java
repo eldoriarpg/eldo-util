@@ -13,6 +13,10 @@ import de.eldoria.eldoutilities.utils.Version;
 
 import java.util.Map;
 
+/**
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
+ */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class BaseVersionFunction<V> {
     private final Map<VersionRange, V> functions;
 

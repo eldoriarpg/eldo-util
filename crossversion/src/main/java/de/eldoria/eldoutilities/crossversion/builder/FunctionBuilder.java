@@ -18,7 +18,9 @@ import java.util.function.Function;
  *
  * @param <A> first Input Type
  * @param <R> result Type
+ * @deprecated eldo-util targets a single Paper version. This module is removed in 4.0.
  */
+@Deprecated(since = "3.6.0", forRemoval = true)
 public class FunctionBuilder<A, R> extends VersionFunctionBuilder<VersionFunction<A, R>, Function<A, R>> {
     protected FunctionBuilder() {
     }
