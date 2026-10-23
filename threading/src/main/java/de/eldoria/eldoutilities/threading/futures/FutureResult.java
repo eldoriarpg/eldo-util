@@ -18,10 +18,8 @@ public interface FutureResult<T> {
     /**
      * Attaches a completion callback to this {@link FutureResult}.
      * <p>
-     * If the action is already complete, the runnable will be called immediately.
-     * <p>
-     * If it is not complete, the consumer will be called synchronously using
-     * the Bukkit scheduler when the action is completed.</p>
+     * The callback always runs on the server thread through the Bukkit scheduler, at the earliest on the next tick,
+     * also when the action is already complete.
      *
      * @param callback the callback
      */
@@ -34,10 +32,8 @@ public interface FutureResult<T> {
     /**
      * Attaches a completion callback to this {@link FutureResult}.
      * <p>
-     * If the action is already complete, the runnable will be called immediately.
-     * <p>
-     * If it is not complete, the consumer will be called synchronously using
-     * the Bukkit scheduler when the action is completed.</p>
+     * The callback always runs on the server thread through the Bukkit scheduler, at the earliest on the next tick,
+     * also when the action is already complete.
      *
      * @param plugin   used for callback.
      * @param callback the callback
