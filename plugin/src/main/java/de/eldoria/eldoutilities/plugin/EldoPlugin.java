@@ -124,13 +124,22 @@ public abstract class EldoPlugin extends JavaPlugin implements DebugDataProvider
         registerCommand(command, List.of(), tabExecutor);
     }
 
+    /**
+     * Gives a command of the {@code plugin.yml} its executor, and registers any other command through Paper. Paper
+     * plugins declare no commands and may not call {@link #getCommand(String)} while they start, so the descriptor
+     * decides which way a command goes.
+     */
     private void registerCommand(String command, Collection<String> aliases, TabExecutor tabExecutor) {
+        if (!getDescription().getCommands().containsKey(command)) {
+            registerCommand(command, aliases, new PaperCommandBridge(command, tabExecutor));
+            return;
+        }
         var cmd = getCommand(command);
         if (cmd != null) {
             cmd.setExecutor(tabExecutor);
             return;
         }
-        registerCommand(command, aliases, new PaperCommandBridge(command, tabExecutor));
+        getLogger().warning("Command " + command + " not found!");
     }
 
     /**
