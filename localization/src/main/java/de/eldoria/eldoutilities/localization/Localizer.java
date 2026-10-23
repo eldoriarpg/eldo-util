@@ -61,6 +61,15 @@ import static de.eldoria.eldoutilities.localization.ILocalizer.isLocaleCode;
  */
 @SuppressWarnings("unused")
 public class Localizer implements ILocalizer {
+    private static final Map<String, String> KEY_ALIASES = Map.of(
+            "error.unknownPlayer", "error.unkownPlayer",
+            "error.unkownPlayer", "error.unknownPlayer",
+            "error.unknownWorld", "error.unkownWorld",
+            "error.unkownWorld", "error.unknownWorld",
+            "error.invalidBoolean", "error.invalidBoolen",
+            "error.invalidBoolen", "error.invalidBoolean",
+            "error.tooSmall", "error.tooLow",
+            "error.tooLow", "error.tooSmall");
 
     private String defaultLanguage;
     private final Plugin plugin;
@@ -296,9 +305,29 @@ public class Localizer implements ILocalizer {
         return getValue(key, defaultLanguage);
     }
 
+    /**
+     * Looks a key up in the locale files, the children and the built-in codes.
+     * <p>
+     * Keys that were renamed are still found under their old name, in both directions: a locale file that holds the
+     * old key answers for the new one, and the old key gets the text of the new one.
+     *
+     * @param key      locale code
+     * @param language language to look the key up in
+     * @return the text, or null when no file, child or built-in code has the key
+     */
     @Override
     @Nullable
     public String getValue(String key, String language) {
+        var alias = KEY_ALIASES.get(key);
+        var result = fileValue(key, language);
+        if (result == null && alias != null) result = fileValue(alias, language);
+        if (result == null) result = runtimeLocaleCodes.get(key);
+        if (result == null && alias != null) result = runtimeLocaleCodes.get(alias);
+        return result;
+    }
+
+    @Nullable
+    private String fileValue(String key, String language) {
         String result = null;
         if (localeBundle(language).containsKey(key)) {
             try {
@@ -320,9 +349,6 @@ public class Localizer implements ILocalizer {
                 result = child.getValue(key, language);
                 if (result != null) break;
             }
-        }
-        if (result == null) {
-            result = runtimeLocaleCodes.get(key);
         }
         return result;
     }
@@ -469,12 +495,12 @@ public class Localizer implements ILocalizer {
         }
     }
 
-    private Set<String> existingKeys(Path path) throws IOException {
+    private Properties existingEntries(Path path) throws IOException {
         var properties = new Properties();
         try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             properties.load(reader);
         }
-        return properties.stringPropertyNames();
+        return properties;
     }
 
     private static String escapeValue(String value) {
@@ -533,9 +559,11 @@ public class Localizer implements ILocalizer {
                 continue;
             }
 
+            Properties existing;
             // load the external property file.
             try {
-                updateKeys.removeAll(existingKeys(path));
+                existing = existingEntries(path);
+                updateKeys.removeAll(existing.stringPropertyNames());
             } catch (IOException e) {
                 plugin.getLogger().log(Level.WARNING, "Could not update locale " + path + ".", e);
                 continue;
@@ -550,9 +578,15 @@ public class Localizer implements ILocalizer {
             List<String> lines = new ArrayList<>();
             lines.add("# Keys added automatically at " + timestamp());
             for (var currKey : new TreeSet<>(updateKeys)) {
-                var value = refBundle.containsKey(currKey)
-                        ? refBundle.getString(currKey)
-                        : runtimeLocaleCodes.getOrDefault(currKey, "");
+                var alias = KEY_ALIASES.get(currKey);
+                String value;
+                if (alias != null && existing.containsKey(alias)) {
+                    value = existing.getProperty(alias);
+                } else if (refBundle.containsKey(currKey)) {
+                    value = refBundle.getString(currKey);
+                } else {
+                    value = runtimeLocaleCodes.getOrDefault(currKey, "");
+                }
                 lines.add(currKey + "=" + escapeValue(value));
                 plugin.getLogger().info("Added: " + currKey + "=" + escapeValue(value));
             }

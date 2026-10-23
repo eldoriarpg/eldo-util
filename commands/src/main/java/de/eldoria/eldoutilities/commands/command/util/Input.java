@@ -174,7 +174,7 @@ public class Input {
         for (var player : plugin.getServer().getOfflinePlayers()) {
             if (name.equalsIgnoreCase(player.getName())) return player;
         }
-        throw CommandException.message("error.unkownPlayer");
+        throw CommandException.message("error.unknownPlayer");
     }
 
     /**
@@ -187,7 +187,7 @@ public class Input {
     public World asWorld() throws CommandException, IndexOutOfBoundsException {
         var name = asString();
         var world = plugin.getServer().getWorld(name);
-        if (world == null) throw CommandException.message("error.unkownWorld");
+        if (world == null) throw CommandException.message("error.unknownWorld");
         return world;
     }
 }

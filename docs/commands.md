@@ -244,12 +244,12 @@ For player input in replacements, use `Replacement.unparsed`. See [Messages](./m
 | `invalidArguments(meta, args)` | `error.invalidArguments` when required arguments are missing. |
 | `invalidArguments(meta, args, Argument...)`, `invalidArguments(args, Argument...)` | the same with your own argument list. |
 | `range(value, min, max)` | `error.invalidRange` |
-| `min(value, min)` | `error.tooLow` |
+| `min(value, min)` | `error.tooSmall` |
 | `max(value, max)` | `error.tooLarge` |
 | `enumValue(value, Class)` | `error.invalidEnumValue` |
 | `isInteger`, `isLong`, `isDouble` | `error.invalidNumber` |
 | `invalidNumber()` | `error.invalidNumber`, always. |
-| `isBoolean(value)`, `isBoolean(value, aTrue, aFalse)` | `error.invalidBoolen` |
+| `isBoolean(value)`, `isBoolean(value, aTrue, aFalse)` | `error.invalidBoolean` |
 | `invalidLength(input, max)` | `error.invalidLength` when the input has `max` characters or more. |
 | `missingArgument(args, index)` | `error.missingArgument` |
 
@@ -315,14 +315,14 @@ them. Add a key to your own locale files to change the text.
 | `error.invalidMaterial` | |
 | `error.invalidEnumValue` | `values` |
 | `error.invalidRange` | `min`, `max` |
+| `error.tooSmall` | `min` |
 | `error.tooLarge` | `max` |
 | `error.invalidLength` | `max` |
 | `error.notOnline` | |
+| `error.unknownPlayer` | |
+| `error.unknownWorld` | |
 | `commands.about` | `plugin_name`, `authors`, `version`, `website`, `discord` |
 
-:::warning
-Some checks use keys that have no built-in text: `error.unkownPlayer` (from `asOfflinePlayer`), `error.unkownWorld`
-(from `asWorld`), `error.tooLow` (from `CommandAssertions.min`) and `error.invalidBoolen` (from
-`CommandAssertions.isBoolean`). The spelling is exactly like this. If you use these methods, add the keys to your
-locale files.
-:::
+Before 3.6.0 four of these keys were misspelled: `error.unkownPlayer`, `error.unkownWorld`, `error.invalidBoolen` and
+`error.tooLow`. A locale file that still has an old key keeps working. When the file is updated, the new key gets the
+text of the old one.

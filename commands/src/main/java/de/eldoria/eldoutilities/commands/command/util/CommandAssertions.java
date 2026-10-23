@@ -216,7 +216,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(int value, int min) throws CommandException {
-        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooSmall", Replacement.create("MIN", min));
     }
 
     /**
@@ -226,7 +226,7 @@ public final class CommandAssertions {
      * @param min   min value
      */
     public static void min(double value, double min) throws CommandException {
-        isTrue(value >= min, "error.tooLow", Replacement.create("MIN", min));
+        isTrue(value >= min, "error.tooSmall", Replacement.create("MIN", min));
     }
 
     /**
@@ -281,11 +281,11 @@ public final class CommandAssertions {
     }
 
     public static void isBoolean(String value) throws CommandException {
-        isTrue(Parser.parseBoolean(value).isPresent(), "error.invalidBoolen");
+        isTrue(Parser.parseBoolean(value).isPresent(), "error.invalidBoolean");
     }
 
     public static void isBoolean(String value, String isTrue, String isFalse) throws CommandException {
-        isTrue(Parser.parseBoolean(value, isTrue, isFalse).isPresent(), "error.invalidBoolen");
+        isTrue(Parser.parseBoolean(value, isTrue, isFalse).isPresent(), "error.invalidBoolean");
     }
 
     public static void invalidLength(String input, int max) throws CommandException {

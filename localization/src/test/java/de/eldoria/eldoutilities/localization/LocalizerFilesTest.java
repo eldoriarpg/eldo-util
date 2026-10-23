@@ -93,6 +93,16 @@ class LocalizerFilesTest {
     }
 
     @Test
+    void aRenamedKeyIsFoundUnderItsOldName() throws IOException {
+        Files.writeString(messages.resolve("messages_en_US.properties"), BUNDLED + "error.unkownPlayer=Who is that?\n");
+
+        var localizer = Localizer.builder(plugin, "en_US").build();
+
+        assertEquals("Who is that?", localizer.getValue("error.unknownPlayer"));
+        assertEquals("The number is too small. Min: <gold><min>", localizer.getValue("error.tooLow"));
+    }
+
+    @Test
     void aMissingKeyIsReportedOnce() {
         var localizer = Localizer.builder(plugin, "en_US").build();
         warnings.clear();
