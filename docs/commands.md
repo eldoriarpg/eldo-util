@@ -266,7 +266,7 @@ For player input in replacements, use `Replacement.unparsed`. See [Messages](./m
 | `completeBoolean(value)` | `true` and `false`. |
 | `completeWorlds(value)` | world names. Spaces become `:`. |
 | `completePlayers(value)` | online players and players seen in the last 30 days. |
-| `completeOnlinePlayers(value)` | online players. Once `completePlayers` was used, the recently seen players are added as well. |
+| `completeOnlinePlayers(value)` | online players. |
 | `completeInt(value, min, max)`, `completeDouble(value, min, max)` | the range, like `1 » 10`. Throws an error when the input is no number or out of range. |
 | `completeMinInt`, `completeMinDouble`, `completeMaxInt`, `completeMaxDouble` | the limit. Throws an error when the input is no number or past the limit. |
 | `completeFreeInput(value, maxLength, hint)` | your hint, or an error when the input is too long. |
