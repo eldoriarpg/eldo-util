@@ -26,6 +26,56 @@ publishData {
 `artifactVersion` (the version it compares, falling back to the version of your plugin descriptor), `artifact` and
 `unix` (the build time). publishdata writes all of them.
 
+## Licence key
+
+A plugin can carry the Lyna licence key it was handed out with. Ask publishdata for the placeholder:
+
+```kotlin
+publishData {
+    buildData {
+        put("lynaProduct", "42")
+        lynaLicense()
+    }
+}
+```
+
+That writes `lynaLicense=%%__LYNA_LICENSE__%%`. Lyna replaces the placeholder with the downloader's licence key when
+it serves the jar, and BuiltByBit does the same through a custom "External license key" placeholder named
+`%%__LYNA_LICENSE__%%`. Read it with `LynaLicense`:
+
+```java
+LynaLicense license = LynaLicense.of(this);
+switch (license.state()) {
+    case INJECTED -> license.key().ifPresent(key -> getLogger().info("Licensed"));
+    case NOT_INJECTED -> getLogger().info("No licence key in this jar");
+    case UNAVAILABLE -> getLogger().warning("BuiltByBit could not issue a licence key, please contact us");
+}
+```
+
+- `INJECTED`: the jar carries a key, and `key()` holds it.
+- `NOT_INJECTED`: the build data has no entry or still holds the placeholder. A local build, one taken from the
+  repository, or a download no licence covers looks like this.
+- `UNAVAILABLE`: BuiltByBit could not get a key and wrote its apology instead.
+
+Debug reports show the state, never the key.
+
+A server owner finds the key without the plugin too: it is the value after `lynaLicense=` in `build.data` at the top
+level of the jar, which any zip tool opens. To claim it they sign up on the Lyna instance and redeem the key under
+**Licenses** in their account, or with `/register` in its Discord server. Put those steps in your plugin's docs.
+
+Lyna also takes a claim link, `<host>/claim#<key>`: it signs the owner up or in and claims the key in one go.
+Consider a licence command that shows the key and that link to whoever runs it, so the owner never has to open the
+jar:
+
+```java
+LynaLicense license = LynaLicense.of(plugin);
+license.key().ifPresentOrElse(
+        key -> sender.sendMessage("Claim your licence: " + LynaUpdateData.HOST + "/claim#" + key),
+        () -> sender.sendMessage("This copy carries no licence key."));
+```
+
+Guard the command with a permission defaulting to op: the key is the owner's.
+
 ## Start the updater
 
 Build the update data with `LynaUpdateData.builder(plugin)` and create the updater with `Updater.lyna(data)`:

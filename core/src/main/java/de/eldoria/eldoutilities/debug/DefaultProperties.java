@@ -41,7 +41,12 @@ public enum DefaultProperties {
     /**
      * Id of the product at Lyna, added to the build data by the build, e.g. {@code buildData { put("lynaProduct", "8") }}
      */
-    LYNA_PRODUCT("lynaProduct");
+    LYNA_PRODUCT("lynaProduct"),
+    /**
+     * The licence key the jar was handed out with, added to the build data by the build, e.g.
+     * {@code buildData { lynaLicense() }}. Read it with {@link LynaLicense}.
+     */
+    LYNA_LICENSE("lynaLicense");
 
     private final String key;
 

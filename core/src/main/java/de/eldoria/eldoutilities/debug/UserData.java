@@ -82,7 +82,9 @@ public final class UserData {
         properties.add("Premium: " + isPremium());
         properties.add("User: " + user());
         properties.add("Nonce: " + nonce);
+        properties.add("Lyna licence: " + LynaLicense.of(this).state());
         buildProperties.entrySet().stream()
+                .filter(e -> !DefaultProperties.LYNA_LICENSE.key().equals(e.getKey()))
                 .map(e -> "%s: %s".formatted(e.getKey(), e.getValue()))
                 .forEach(properties::add);
         return String.join("\n", properties);
