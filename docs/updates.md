@@ -59,6 +59,10 @@ switch (license.state()) {
 
 Debug reports show the state, never the key.
 
+A server owner finds the key without the plugin too: it is the value after `lynaLicense=` in `build.data` at the top
+level of the jar, which any zip tool opens. To claim it they sign up on the Lyna instance and redeem the key under
+**Licenses** in their account, or with `/register` in its Discord server. Put those steps in your plugin's docs.
+
 ## Start the updater
 
 Build the update data with `LynaUpdateData.builder(plugin)` and create the updater with `Updater.lyna(data)`:
