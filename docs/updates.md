@@ -63,6 +63,19 @@ A server owner finds the key without the plugin too: it is the value after `lyna
 level of the jar, which any zip tool opens. To claim it they sign up on the Lyna instance and redeem the key under
 **Licenses** in their account, or with `/register` in its Discord server. Put those steps in your plugin's docs.
 
+Lyna also takes a claim link, `<host>/claim#<key>`: it signs the owner up or in and claims the key in one go.
+Consider a licence command that shows the key and that link to whoever runs it, so the owner never has to open the
+jar:
+
+```java
+LynaLicense license = LynaLicense.of(plugin);
+license.key().ifPresentOrElse(
+        key -> sender.sendMessage("Claim your licence: " + LynaUpdateData.HOST + "/claim#" + key),
+        () -> sender.sendMessage("This copy carries no licence key."));
+```
+
+Guard the command with a permission defaulting to op: the key is the owner's.
+
 ## Start the updater
 
 Build the update data with `LynaUpdateData.builder(plugin)` and create the updater with `Updater.lyna(data)`:
